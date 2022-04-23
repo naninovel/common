@@ -1,0 +1,33 @@
+{
+    "name": "@naninovel/common",
+    "version": "1.0.1",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": ["dist/*"],
+    "jest": {
+        "preset": "ts-jest",
+        "testMatch": ["**/test/**/*.ts"]
+    },
+    "scripts": {
+        "test": "jest",
+        "compile-js": "webpack --mode production",
+        "compile-ts": "tsc --outDir ./dist --declaration --emitDeclarationOnly --skipLibCheck",
+        "build": "npm run compile-js && npm run compile-ts",
+        "publish-npm": "npm version patch && npm publish --access public"
+    },
+    "dependencies": {
+        "vscode-languageserver": "^7.0.0"
+    },
+    "peerDependencies": {
+        "bindings": "file:./bindings"
+    },
+    "devDependencies": {
+        "typescript": "^4.6.3",
+        "ts-node": "^10.7.0",
+        "ts-jest": "^27.1.4",
+        "ts-loader": "^9.2.8",
+        "@types/jest": "^27.4.1",
+        "webpack": "^5.72.0",
+        "webpack-cli": "^4.9.2"
+    }
+}

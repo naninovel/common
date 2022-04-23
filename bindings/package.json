@@ -1,0 +1,6 @@
+{
+    "private": true,
+    "name": "bindings",
+    "main": "Program/bin/dotnet.js",
+    "types": "Program/bin/dotnet.d.ts"
+}
