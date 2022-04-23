@@ -16,10 +16,8 @@
         "publish-npm": "npm version patch && npm publish --access public"
     },
     "dependencies": {
+        "bindings": "file:./bindings",
         "vscode-languageserver": "^7.0.0"
-    },
-    "peerDependencies": {
-        "bindings": "file:./bindings"
     },
     "devDependencies": {
         "typescript": "^4.6.3",
