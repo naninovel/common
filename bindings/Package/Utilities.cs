@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using DotNetJS;
+using Naninovel.Common.Bindings;
+
+[assembly: JSNamespace(Utilities.NamespacePattern, Utilities.NamespaceReplacement)]
 
 namespace Naninovel.Common.Bindings;
 
