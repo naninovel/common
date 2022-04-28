@@ -1,6 +1,6 @@
 {
     "name": "@naninovel/common",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": ["dist/*"],
@@ -16,7 +16,6 @@
         "publish-npm": "npm publish --access public"
     },
     "dependencies": {
-        "bindings": "file:./bindings",
         "vscode-languageserver": "^7.0.0"
     },
     "devDependencies": {
@@ -26,6 +25,7 @@
         "ts-loader": "^9.2.8",
         "@types/jest": "^27.4.1",
         "webpack": "^5.72.0",
-        "webpack-cli": "^4.9.2"
+        "webpack-cli": "^4.9.2",
+        "bindings": "file:./bindings"
     }
 }
