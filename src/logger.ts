@@ -1,14 +1,14 @@
 ﻿import { Bindings } from "bindings";
 
-let currentLogger: (message: string) => void;
-
-injectLogger(console.log);
+let thisLogger: (message: string) => void;
 
 export function injectLogger(logger: (message: string) => void) {
-    currentLogger = logger;
+    thisLogger = logger;
     Bindings.Log = logger;
 }
 
 export function log(message: string) {
-    currentLogger(message);
+    if (thisLogger == null)
+        injectLogger(console.log);
+    thisLogger(message);
 }

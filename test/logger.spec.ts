@@ -1,7 +1,10 @@
 ﻿import { log, injectLogger } from "../src";
 
 describe("logger", () => {
-    it("can inject and log", () => {
+    it("can log without injecting", () => {
+        expect(() => log("")).not.toThrow();
+    });
+    it("can inject custom logger", () => {
         let message = "";
         injectLogger(msg => message = msg);
         log("foo");

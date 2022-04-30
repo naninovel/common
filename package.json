@@ -1,6 +1,6 @@
 {
     "name": "@naninovel/common",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": ["dist/*"],
@@ -9,7 +9,7 @@
         "testMatch": ["**/test/**/*.ts"]
     },
     "scripts": {
-        "test": "jest",
+        "test": "jest --silent=true",
         "compile-js": "webpack --mode production",
         "compile-ts": "tsc --outDir ./dist --declaration --emitDeclarationOnly --skipLibCheck",
         "build": "npm run compile-js && npm run compile-ts",
