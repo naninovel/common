@@ -7,10 +7,12 @@
     "files": ["dist/*", "assets/*"],
     "jest": {
         "preset": "ts-jest",
-        "testMatch": ["**/test/**/*.ts"]
+        "testMatch": ["**/test/**/*.ts"],
+        "coveragePathIgnorePatterns": ["backend/*"]
     },
     "scripts": {
         "test": "jest --silent=true",
+        "cover": "npm test -- --coverage",
         "compile": "tsc",
         "publish-npm": "npm publish --access public"
     },
