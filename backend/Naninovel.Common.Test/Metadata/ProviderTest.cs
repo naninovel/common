@@ -1,3 +1,4 @@
+using System.Linq;
 using Xunit;
 
 namespace Naninovel.Metadata.Test;
@@ -6,6 +7,17 @@ public class ProviderTest
 {
     private MetadataProvider provider => new(meta);
     private readonly Project meta = new();
+
+    [Fact]
+    public void ProjectMetadataIsAssignedToCollections ()
+    {
+        meta.Actors = new[] { new Actor { Id = "foo" } };
+        meta.Constants = new[] { new Constant { Name = "bar" } };
+        meta.Resources = new[] { new Resource { Path = "nya" } };
+        Assert.Equal("foo", provider.Actors.First().Id);
+        Assert.Equal("bar", provider.Constants.First().Name);
+        Assert.Equal("nya", provider.Resources.First().Path);
+    }
 
     [Fact]
     public void WhenCommandNotFoundNullIsReturned ()
