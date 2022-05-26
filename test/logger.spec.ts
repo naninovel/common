@@ -1,4 +1,4 @@
-﻿import { log, injectLogger } from "logger";
+﻿import { log, injectLogger } from "../src";
 
 describe("logger", () => {
     it("can log without injecting", () => {

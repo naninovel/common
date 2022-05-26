@@ -1,5 +1,5 @@
 ﻿import { Metadata } from "backend";
-import { defaultMetadata, mergeWithDefaultMetadata } from "metadata";
+import { defaultMetadata, mergeWithDefaultMetadata } from "../src";
 
 describe("project metadata", () => {
     it("can provide default", () => {
