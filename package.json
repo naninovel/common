@@ -1,6 +1,6 @@
 {
     "name": "@naninovel/common",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Systems used by multiple consumers: runtime, editor, language server, etc.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -8,7 +8,8 @@
     "jest": {
         "preset": "ts-jest",
         "testMatch": ["**/test/**/*.ts"],
-        "coveragePathIgnorePatterns": ["backend/*"]
+        "coveragePathIgnorePatterns": ["backend/*"],
+        "moduleDirectories": ["node_modules", "src"]
     },
     "scripts": {
         "test": "jest --silent=true",
