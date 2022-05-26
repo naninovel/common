@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naninovel.Common", "Naninovel.Common\Naninovel.Common.csproj", "{56257CAA-9762-4352-B2D3-08855ACA7410}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naninovel.Common.Test", "Naninovel.Common.Test\Naninovel.Common.Test.csproj", "{F713EE0E-61E2-4D53-A6A2-313791595216}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naninovel.Common.Bindings", "Naninovel.Common.Bindings\Naninovel.Common.Bindings.csproj", "{51D33D7F-2DF2-4CF6-BC7D-AD1D5A80929D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naninovel.Common.WASM", "Naninovel.Common.WASM\Naninovel.Common.WASM.csproj", "{D441AE9F-A1C1-44DE-AC22-200586FDAE7F}"
+EndProject
+Global
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56257CAA-9762-4352-B2D3-08855ACA7410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56257CAA-9762-4352-B2D3-08855ACA7410}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51D33D7F-2DF2-4CF6-BC7D-AD1D5A80929D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51D33D7F-2DF2-4CF6-BC7D-AD1D5A80929D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F713EE0E-61E2-4D53-A6A2-313791595216}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F713EE0E-61E2-4D53-A6A2-313791595216}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D441AE9F-A1C1-44DE-AC22-200586FDAE7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D441AE9F-A1C1-44DE-AC22-200586FDAE7F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+EndGlobal

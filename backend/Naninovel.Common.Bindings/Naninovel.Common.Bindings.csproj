@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <PackageId>Naninovel.Common.Bindings</PackageId>
+        <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</Version>
+        <Authors>Elringus</Authors>
+        <Company>ReWaffle LLC</Company>
+        <PackageDescription>JavaScript bindings for common systems.</PackageDescription>
+        <RepositoryUrl>https://github.com/Naninovel/Common</RepositoryUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DotNetJS" Version="0.13.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Naninovel.Common/Naninovel.Common.csproj"/>
+    </ItemGroup>
+
+</Project>
