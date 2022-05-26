@@ -1,4 +1,4 @@
-﻿import { Metadata } from "bindings";
+﻿import { Metadata } from "backend";
 
 export const defaultMetadata: Metadata.Project = getDefaultMetadata();
 

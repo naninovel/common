@@ -1,4 +1,4 @@
-﻿import { Bindings } from "bindings";
+﻿import { Bindings } from "backend";
 
 let thisLogger: (message: string) => void;
 
