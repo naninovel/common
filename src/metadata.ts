@@ -1,21 +1,19 @@
 ﻿import { Metadata } from "backend";
 
-export const defaultMetadata: Metadata.Project = getDefaultMetadata();
+export function getDefaultMetadata(): Metadata.Project {
+    const json = require("../assets/default-metadata.json");
+    return typeof json === "string" ? JSON.parse(json) : json;
+}
 
-export function mergeWithDefaultMetadata(customMetadata: Metadata.Project): Metadata.Project {
+export function mergeMetadata(...metadata: Metadata.Project[]) {
     const mergedMetadata: Metadata.Project = {} as any;
-    mergeObject(deepClone(defaultMetadata), mergedMetadata);
-    mergeObject(deepClone(customMetadata), mergedMetadata);
+    for (const meta of metadata)
+        mergeObject(deepClone(meta), mergedMetadata);
     return mergedMetadata;
 }
 
 function deepClone(object: any) {
     return JSON.parse(JSON.stringify(object));
-}
-
-function getDefaultMetadata(): Metadata.Project {
-    const json = require("../assets/default-metadata.json");
-    return typeof json === "string" ? JSON.parse(json) : json;
 }
 
 function mergeObject(source: any, destination: any) {
