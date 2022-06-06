@@ -120,11 +120,7 @@ internal class GenericTextLineLexer
         if (state.Is(AuthorAppearance[0])) lastAppearance = state.Index;
         state.Move();
 
-        bool IsValidAuthor ()
-        {
-            if (state.IsLetterOrDigit) return true;
-            return state.Is('_') || state.Is('-') || state.Is('.') || state.Is('/');
-        }
+        bool IsValidAuthor () => !state.IsSpace && !state.Is('"') && !state.Is('\\');
     }
 
     private void AddPrecedingText ()

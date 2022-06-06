@@ -9,7 +9,6 @@ internal class LexState
     public int Length => text.Length;
     public int EndIndex => text.Length - 1;
     public bool EndReached => Index > EndIndex;
-    public bool IsLetterOrDigit => IsIndexValid(Index) && char.IsLetterOrDigit(text[Index]);
     public bool IsSpace => IsIndexValid(Index) && char.IsWhiteSpace(text[Index]);
     public bool IsNotSpace => IsIndexValid(Index) && !char.IsWhiteSpace(text[Index]);
     public bool IsPreviousSpace => IsIndexValid(Index - 1) && char.IsWhiteSpace(text[Index - 1]);
