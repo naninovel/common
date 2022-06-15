@@ -4,6 +4,8 @@ namespace Naninovel.Parsing;
 
 internal class GenericTextLineLexer
 {
+    private bool hasAppearance => firstAppearance > -1;
+
     private readonly ExpressionLexer expressionLexer;
     private readonly CommandBodyLexer commandLexer;
 
@@ -13,7 +15,7 @@ internal class GenericTextLineLexer
     private int startIndex;
     private int lastTextStart;
     private int lastNotSpace;
-    private int lastAppearance;
+    private int firstAppearance;
 
     public GenericTextLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer)
     {
@@ -25,7 +27,7 @@ internal class GenericTextLineLexer
     {
         ResetState(state);
         while (!state.EndReached)
-            if (!TryAddAuthor() && !TryAddInlinedCommand() && !TryAddExpression())
+            if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression())
                 Move();
         AddPrecedingText();
         return LineType.GenericText;
@@ -39,10 +41,10 @@ internal class GenericTextLineLexer
         startIndex = state.Index;
         lastTextStart = startIndex;
         lastNotSpace = -1;
-        lastAppearance = -1;
+        firstAppearance = -1;
     }
 
-    private bool TryAddAuthor ()
+    private bool TryAddAuthorPrefix ()
     {
         if (!ShouldTryAdd()) return false;
         Move();
@@ -59,23 +61,21 @@ internal class GenericTextLineLexer
                                 && state.Is(AuthorAssign[0])
                                 && state.Index > startIndex;
 
-        void AddAppearance ()
-        {
-            if (!HasAppearance()) return;
-            state.AddToken(TokenType.AppearanceAssign, lastAppearance, 1);
-            var length = state.Index - lastAppearance - 2;
-            if (length <= 0) state.AddError(ErrorType.MissingAppearance, lastAppearance, 1);
-            else state.AddToken(TokenType.AuthorAppearance, lastAppearance + 1, length);
-        }
-
         void AddIdentifier ()
         {
-            var idEndIndex = HasAppearance() ? lastAppearance + 1 : state.Index;
-            var length = idEndIndex - startIndex - 1;
+            var endIndex = hasAppearance ? firstAppearance + 1 : state.Index;
+            var length = endIndex - startIndex - 1;
             state.AddToken(TokenType.AuthorId, startIndex, length);
         }
 
-        bool HasAppearance () => lastAppearance > -1;
+        void AddAppearance ()
+        {
+            if (!hasAppearance) return;
+            state.AddToken(TokenType.AppearanceAssign, firstAppearance, 1);
+            var length = state.Index - firstAppearance - 2;
+            if (length <= 0) state.AddError(ErrorType.MissingAppearance, firstAppearance, 1);
+            else state.AddToken(TokenType.AuthorAppearance, firstAppearance + 1, length);
+        }
     }
 
     private bool TryAddInlinedCommand ()
@@ -117,7 +117,7 @@ internal class GenericTextLineLexer
     {
         if (state.IsNotSpace) lastNotSpace = state.Index;
         if (!IsValidAuthor()) canAddAuthor = false;
-        if (state.Is(AuthorAppearance[0])) lastAppearance = state.Index;
+        if (state.Is(AuthorAppearance[0]) && !hasAppearance) firstAppearance = state.Index;
         state.Move();
 
         bool IsValidAuthor () => !state.IsSpace && !state.Is('"') && !state.Is('\\');

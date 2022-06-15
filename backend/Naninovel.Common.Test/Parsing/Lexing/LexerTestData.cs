@@ -322,6 +322,11 @@ public static class LexerTestData
             AuthorAssign(5, 2), GenericText(7, 1)
         ),
         T(
+            "x.x.x: x",
+            AuthorId(0, 1), AppearanceAssign(1, 1), AuthorAppearance(2, 3),
+            AuthorAssign(5, 2), GenericText(7, 1)
+        ),
+        T(
             "x.x+x,x-,x>: x",
             AuthorId(0, 1), AppearanceAssign(1, 1), AuthorAppearance(2, 9),
             AuthorAssign(11, 2), GenericText(13, 1)
