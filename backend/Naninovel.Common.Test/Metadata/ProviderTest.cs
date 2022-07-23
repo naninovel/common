@@ -5,15 +5,16 @@ namespace Naninovel.Metadata.Test;
 
 public class ProviderTest
 {
-    private MetadataProvider provider => new(meta);
-    private readonly Project meta = new();
+    private readonly MetadataProvider provider = new();
 
     [Fact]
     public void ProjectMetadataIsAssignedToCollections ()
     {
-        meta.Actors = new[] { new Actor { Id = "foo" } };
-        meta.Constants = new[] { new Constant { Name = "bar" } };
-        meta.Resources = new[] { new Resource { Path = "nya" } };
+        provider.Update(new() {
+            Actors = new[] { new Actor { Id = "foo" } },
+            Constants = new[] { new Constant { Name = "bar" } },
+            Resources = new[] { new Resource { Path = "nya" } }
+        });
         Assert.Equal("foo", provider.Actors.First().Id);
         Assert.Equal("bar", provider.Constants.First().Name);
         Assert.Equal("nya", provider.Resources.First().Path);
@@ -34,14 +35,16 @@ public class ProviderTest
     [Fact]
     public void CanFindCommandById ()
     {
-        meta.Commands = new[] { new Command { Id = "foo" } };
+        var meta = new Project { Commands = new[] { new Command { Id = "foo" } } };
+        provider.Update(meta);
         Assert.Equal(meta.Commands[0], provider.FindCommand("foo"));
     }
 
     [Fact]
     public void CanFindCommandByAlias ()
     {
-        meta.Commands = new[] { new Command { Id = "foo", Alias = "f" } };
+        var meta = new Project { Commands = new[] { new Command { Id = "foo", Alias = "f" } } };
+        provider.Update(meta);
         Assert.Equal(meta.Commands[0], provider.FindCommand("f"));
     }
 
@@ -49,7 +52,8 @@ public class ProviderTest
     public void CanFindParameterById ()
     {
         var param = new Parameter { Id = "bar" };
-        meta.Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } };
+        var meta = new Project { Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } } };
+        provider.Update(meta);
         Assert.Equal(param, provider.FindParameter("foo", "bar"));
     }
 
@@ -57,7 +61,8 @@ public class ProviderTest
     public void CanFindParameterByAlias ()
     {
         var param = new Parameter { Id = "bar", Alias = "b" };
-        meta.Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } };
+        var meta = new Project { Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } } };
+        provider.Update(meta);
         Assert.Equal(param, provider.FindParameter("foo", "b"));
     }
 
@@ -65,7 +70,19 @@ public class ProviderTest
     public void CanFindNamelessParameter ()
     {
         var param = new Parameter { Id = "bar", Nameless = true };
-        meta.Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } };
+        var meta = new Project { Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } } };
+        provider.Update(meta);
         Assert.Equal(param, provider.FindParameter("foo", ""));
+    }
+
+    [Fact]
+    public void CanCreateProviderWithMeta ()
+    {
+        var provider = new MetadataProvider(new() {
+            Variables = new[] { "foo" },
+            Functions = new[] { "bar" }
+        });
+        Assert.Equal("foo", provider.Variables.First());
+        Assert.Equal("bar", provider.Functions.First());
     }
 }

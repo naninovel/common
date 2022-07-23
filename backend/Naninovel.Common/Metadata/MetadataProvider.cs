@@ -9,24 +9,37 @@ namespace Naninovel.Metadata;
 /// </summary>
 public class MetadataProvider
 {
-    public IReadOnlyCollection<Actor> Actors { get; }
-    public IReadOnlyCollection<Command> Commands { get; }
-    public IReadOnlyCollection<Constant> Constants { get; }
-    public IReadOnlyCollection<Resource> Resources { get; }
-    public IReadOnlyCollection<string> Variables { get; }
-    public IReadOnlyCollection<string> Functions { get; }
+    public IReadOnlyCollection<Actor> Actors => actors;
+    public IReadOnlyCollection<Command> Commands => commands;
+    public IReadOnlyCollection<Constant> Constants => constants;
+    public IReadOnlyCollection<Resource> Resources => resources;
+    public IReadOnlyCollection<string> Variables => variables;
+    public IReadOnlyCollection<string> Functions => functions;
 
+    private readonly List<Actor> actors = new();
+    private readonly List<Command> commands = new();
+    private readonly List<Constant> constants = new();
+    private readonly List<Resource> resources = new();
+    private readonly List<string> variables = new();
+    private readonly List<string> functions = new();
     private readonly Dictionary<string, Command> commandById = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Command> commandByAlias = new(StringComparer.OrdinalIgnoreCase);
 
-    public MetadataProvider (Project project)
+    public MetadataProvider () { }
+    public MetadataProvider (Project meta) => Update(meta);
+
+    /// <summary>
+    /// Replaces the current metadata.
+    /// </summary>
+    public void Update (Project meta)
     {
-        Actors = project.Actors ?? Array.Empty<Actor>();
-        Commands = project.Commands ?? Array.Empty<Command>();
-        Constants = project.Constants ?? Array.Empty<Constant>();
-        Resources = project.Resources ?? Array.Empty<Resource>();
-        Variables = project.Variables ?? Array.Empty<string>();
-        Functions = project.Functions ?? Array.Empty<string>();
+        ResetState();
+        actors.AddRange(meta.Actors ?? Array.Empty<Actor>());
+        commands.AddRange(meta.Commands ?? Array.Empty<Command>());
+        constants.AddRange(meta.Constants ?? Array.Empty<Constant>());
+        resources.AddRange(meta.Resources ?? Array.Empty<Resource>());
+        variables.AddRange(meta.Variables ?? Array.Empty<string>());
+        functions.AddRange(meta.Functions ?? Array.Empty<string>());
         foreach (var command in Commands)
             IndexCommand(command);
     }
@@ -52,6 +65,18 @@ public class MetadataProvider
             .FirstOrDefault(p => p.Nameless && paramAliasOrId == string.Empty ||
                                  string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
                                  string.Equals(p.Id, paramAliasOrId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void ResetState ()
+    {
+        actors.Clear();
+        commands.Clear();
+        constants.Clear();
+        resources.Clear();
+        variables.Clear();
+        functions.Clear();
+        commandById.Clear();
+        commandByAlias.Clear();
     }
 
     private void IndexCommand (Command command)
