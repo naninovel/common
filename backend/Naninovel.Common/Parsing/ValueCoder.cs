@@ -20,13 +20,13 @@ public static class ValueCoder
 
     /// <summary>
     /// Returns raw parameter value with unescaped control symbols
-    /// and unwrapped from quotes; expressions fragments are preserved as is.
+    /// and (optionally) unwrapped from quotes; expressions fragments are preserved as is.
     /// </summary>
     /// <param name="value">The value to decode.</param>
-    public static string Decode (string value)
+    public static string Decode (string value, bool unwrap = true)
     {
         if (string.IsNullOrEmpty(value)) return value;
-        var unwrap = IsWrapped();
+        unwrap = unwrap && IsWrapped();
         if (unwrap) value = Unwrap();
         if (value.Length < 2) return value;
         var expression = false;
@@ -69,15 +69,16 @@ public static class ValueCoder
 
     /// <summary>
     /// Prepares a raw value to be used in script text by escaping control symbols
-    /// and wrapping in quotes when unwrapped whitespace is found.
+    /// and (optionally) wrapping in quotes when unwrapped whitespace is found.
     /// </summary>
     /// <param name="value">The value to encode.</param>
     /// <param name="ignoredRanges">The ranges to ignore when encoding (eg, expressions).</param>
+    /// <param name="wrap">Whether to wrap the value in quotes when it contains whitespace.</param>
     public static string Encode (string value,
-        IReadOnlyCollection<(int start, int length)> ignoredRanges = null)
+        IReadOnlyCollection<(int start, int length)> ignoredRanges = null, bool wrap = true)
     {
         if (string.IsNullOrEmpty(value)) return value;
-        var wrap = IsAnySpaceUnwrapped();
+        wrap = wrap && IsAnySpaceUnwrapped();
         for (int i = value.Length - 1; i >= 0; i--)
             if (ShouldEscape(i))
                 value = value.Insert(i, "\\");

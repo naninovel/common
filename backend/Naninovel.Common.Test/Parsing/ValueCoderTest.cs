@@ -45,6 +45,20 @@ public class ValueCoderTest
     }
 
     [Fact]
+    public void WhenUnwrapEnabledDecodeUnwrapsWhitespace ()
+    {
+        const string value = @"""a \"" c""";
+        Assert.Equal(@"a "" c", Decode(value, unwrap: true));
+    }
+
+    [Fact]
+    public void WhenUnwrapDisabledDecodeDoesntUnwrap ()
+    {
+        const string value = @"a "" c";
+        Assert.Equal(@"a "" c", Decode(value, unwrap: false));
+    }
+
+    [Fact]
     public void ValueDecodedCorrectly ()
     {
         const string value = @"\[x{x\[ }x \{xx\}""\\";
@@ -78,6 +92,20 @@ public class ValueCoderTest
         const string value = @"{x}{x}""[x]x";
         var expressions = new[] { (3, 3) };
         Assert.Equal(@"\{x\}{x}""\[x\]x", Encode(value, expressions));
+    }
+
+    [Fact]
+    public void WhenWrapEnabledEncodeWrapsWhitespace ()
+    {
+        const string value = @"a "" c";
+        Assert.Equal(@"""a \"" c""", Encode(value, wrap: true));
+    }
+
+    [Fact]
+    public void WhenWrapDisabledEncodeDoesntWrap ()
+    {
+        const string value = @"a "" c";
+        Assert.Equal(@"a "" c", Encode(value, wrap: false));
     }
 
     [Fact]
