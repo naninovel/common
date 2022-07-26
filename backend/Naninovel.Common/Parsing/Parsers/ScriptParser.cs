@@ -10,10 +10,6 @@ public class ScriptParser
 {
     private static readonly string[] lineBreakSymbols = { "\r\n", "\n", "\r" };
 
-    private readonly CommandLineParser commandLineParser = new();
-    private readonly CommentLineParser commentLineParser = new();
-    private readonly GenericTextLineParser genericTextLineParser = new();
-    private readonly LabelLineParser labelLineParser = new();
     private readonly Lexer lexer = new();
     private readonly List<Token> tokens = new();
 
@@ -50,11 +46,10 @@ public class ScriptParser
     {
         tokens.Clear();
         return lexer.TokenizeLine(lineText, tokens) switch {
-            LineType.Comment => commentLineParser.Parse(lineText, tokens, errors),
-            LineType.Label => labelLineParser.Parse(lineText, tokens, errors),
-            LineType.Command => commandLineParser.Parse(lineText, tokens, errors),
-            LineType.GenericText => genericTextLineParser.Parse(lineText, tokens, errors),
-            _ => EmptyLine.Shared
+            LineType.Comment => null,
+            LineType.Label => null,
+            LineType.Command => null,
+            _ => null
         };
     }
 }

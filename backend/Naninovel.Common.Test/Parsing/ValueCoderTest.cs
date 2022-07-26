@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Xunit;
 using static Naninovel.Parsing.ValueCoder;
 
@@ -165,31 +164,6 @@ public class ValueCoderTest
     {
         const string value = @"\""a b\""";
         Assert.Equal(@"""\""a b\""""", Wrap(value));
-    }
-
-    [Fact]
-    public void RelativeRangesCalculatedCorrectly ()
-    {
-        var genericText = new GenericText();
-        genericText.StartIndex = 10;
-        genericText.Length = 8;
-
-        var expression1 = new LineText();
-        expression1.StartIndex = 10;
-        expression1.Length = 3;
-        genericText.Expressions.Add(expression1);
-
-        var expression2 = new LineText();
-        expression2.StartIndex = 14;
-        expression2.Length = 4;
-        genericText.Expressions.Add(expression2);
-
-        var ranges = new List<(int, int)>();
-        genericText.Expressions.GetRelativeRanges(genericText, ranges);
-        Assert.Equal(0, ranges[0].Item1);
-        Assert.Equal(3, ranges[0].Item2);
-        Assert.Equal(4, ranges[1].Item1);
-        Assert.Equal(4, ranges[1].Item2);
     }
 
     [Fact]

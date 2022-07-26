@@ -1,12 +1,36 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Naninovel.Parsing;
 
-public class Command : LineContent
+/// <summary>
+/// Represents an operation executed at script playback.
+/// </summary>
+/// <remarks>
+/// This type represent command body, which is a part of
+/// <see cref="CommandLine"/> and <see cref="InlinedCommand"/>.
+/// </remarks>
+public class Command
 {
-    public LineText Identifier { get; } = new();
-    public List<Parameter> Parameters { get; } = new();
+    /// <summary>
+    /// Unique identifier of the command.
+    /// </summary>
+    /// <remarks>
+    /// Not case-sensitive.
+    /// In v1 can be either alias or type name of the command implementation.
+    /// </remarks>
+    public string Identifier { get; }
+    /// <summary>
+    /// Parameters of the command describing its behaviour.
+    /// </summary>
+    public IReadOnlyList<Parameter> Parameters { get; }
+
+    public Command (string identifier, IEnumerable<Parameter> parameters)
+    {
+        Identifier = identifier;
+        Parameters = parameters.ToArray();
+    }
 
     public override string ToString ()
     {

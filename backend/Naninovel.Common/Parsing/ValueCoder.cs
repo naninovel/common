@@ -124,17 +124,6 @@ public static class ValueCoder
     }
 
     /// <summary>
-    /// Adds modified versions of the line ranges to the provided collection,
-    /// where start index is relative to the provided parent.
-    /// </summary>
-    public static void GetRelativeRanges (this IEnumerable<LineContent> content,
-        LineContent parent, ICollection<(int start, int length)> result)
-    {
-        foreach (var c in content)
-            result.Add((c.StartIndex - parent.StartIndex, c.Length));
-    }
-
-    /// <summary>
     /// Splits (decoded) list value into individual items.
     /// </summary>
     /// <param name="value">The decoded list value to split.</param>
