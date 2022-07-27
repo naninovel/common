@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Naninovel.Parsing.Test.Parsing;
+namespace Naninovel.Parsing.Test;
 
 public class ParseErrorTest
 {
