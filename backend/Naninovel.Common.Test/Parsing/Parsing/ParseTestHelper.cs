@@ -28,4 +28,9 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
     {
         return Errors.Any(e => e.Message == message);
     }
+
+    public bool HasError (ErrorType error)
+    {
+        return Errors.Any(e => e.Message == LexingErrors.GetFor(error));
+    }
 }
