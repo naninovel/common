@@ -111,7 +111,7 @@ public class CommandLineParserTest
         Assert.Equal("k.Happy", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
         Assert.Equal("pos", line.Command.Parameters[1].Identifier);
         Assert.Equal("x", (line.Command.Parameters[1].Value[0] as Expression)!.Text);
-        Assert.Equal(",10", (line.Command.Parameters[1].Value[0] as PlainText)!.Text);
+        Assert.Equal(",10", (line.Command.Parameters[1].Value[1] as PlainText)!.Text);
         Assert.Equal("wait", line.Command.Parameters[2].Identifier);
         Assert.Equal("false", (line.Command.Parameters[2].Value[0] as PlainText)!.Text);
     }

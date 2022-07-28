@@ -18,9 +18,14 @@ internal class LineWalker
         this.errors = errors;
     }
 
+    public string Extract (int startIndex, int length)
+    {
+        return lineText.Substring(startIndex, length);
+    }
+
     public string Extract (Token token)
     {
-        return lineText.Substring(token.StartIndex, token.Length);
+        return Extract(token.StartIndex, token.Length);
     }
 
     public void AddError (string message)
@@ -35,25 +40,25 @@ internal class LineWalker
 
     public bool Next (TokenType types, ErrorType errors, out Token token)
     {
-        return TryNext(types, errors, out token);
+        return MoveUntilMatch(types, errors, out token);
     }
 
     public bool Next (TokenType types, out Token token)
     {
-        return TryNext(types, null, out token);
+        return MoveUntilMatch(types, null, out token);
     }
 
     public bool Next (ErrorType errors, out Token token)
     {
-        return TryNext(Error, errors, out token);
+        return MoveUntilMatch(Error, errors, out token);
     }
 
     public bool Next (out Token token)
     {
-        return TryNext(null, null, out token);
+        return MoveUntilMatch(null, null, out token);
     }
 
-    private bool TryNext (TokenType? types, ErrorType? errors, out Token result)
+    private bool MoveUntilMatch (TokenType? types, ErrorType? errors, out Token result)
     {
         index++;
         for (int i = index; i < tokens.Count; i++)
