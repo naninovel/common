@@ -1,5 +1,7 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using Xunit;
 using System.Linq;
+using static Naninovel.Parsing.TokenType;
 using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
 
@@ -25,6 +27,33 @@ public class CommandLineParserTest
         Assert.Empty(line.Command.Identifier);
         Assert.Empty(line.Command.Parameters);
         Assert.True(parser.HasError(MissingCommandId));
+    }
+
+    [Fact]
+    public void WhenCommandTokensMissingErrorIsAdded ()
+    {
+        var errors = new List<ParseError>();
+        var parser = new CommandLineParser();
+        parser.Parse("@", new[] { new Token(LineId, 0, 1) }, errors);
+        Assert.Contains(MissingCommandTokens, errors.Select(e => e.Message));
+    }
+
+    [Fact]
+    public void CanParseCommandIdentifier ()
+    {
+        var line = parser.Parse("@foo");
+        Assert.Equal("foo", line.Command.Identifier);
+        Assert.Empty(line.Command.Parameters);
+        Assert.Empty(parser.Errors);
+    }
+
+    [Fact]
+    public void TrimsSpaceBeforeCommandIdentifier ()
+    {
+        var line = parser.Parse("@ \t foo");
+        Assert.Equal("foo", line.Command.Identifier);
+        Assert.Empty(line.Command.Parameters);
+        Assert.Empty(parser.Errors);
     }
 
     [Fact]

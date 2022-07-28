@@ -9,7 +9,7 @@ public class CommandLineParser
 {
     private readonly LineWalker walker = new();
     private readonly CommandParser commandParser = new();
-    private Command command = new("", Array.Empty<Parameter>());
+    private Command command = null!;
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens,
         ICollection<ParseError> errors = null)

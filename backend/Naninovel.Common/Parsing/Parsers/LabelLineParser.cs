@@ -8,7 +8,7 @@ namespace Naninovel.Parsing;
 public class LabelLineParser
 {
     private readonly LineWalker walker = new();
-    private string label = "";
+    private string label = null!;
 
     public LabelLine Parse (string lineText, IReadOnlyList<Token> tokens,
         ICollection<ParseError> errors = null)

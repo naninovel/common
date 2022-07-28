@@ -7,7 +7,7 @@ namespace Naninovel.Parsing;
 public class CommentLineParser
 {
     private readonly LineWalker walker = new();
-    private string comment = "";
+    private string comment = null!;
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens,
         ICollection<ParseError> errors = null)
