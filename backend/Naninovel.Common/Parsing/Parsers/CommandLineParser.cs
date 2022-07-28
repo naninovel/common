@@ -1,29 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommentLineParser
+public class CommandLineParser
 {
     private readonly LineWalker walker = new();
-    private string comment = "";
+    private readonly CommandParser commandParser = new();
+    private Command command = new("", Array.Empty<Parameter>());
 
-    public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens,
+    public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens,
         ICollection<ParseError> errors = null)
     {
         ResetState(lineText, tokens, errors);
         if (!walker.Next(LineId, out _))
             walker.AddError(MissingLineId);
-        else if (walker.Next(CommentText, out var commentToken))
-            comment = walker.Extract(commentToken);
-        return new CommentLine(comment);
+        else command = commandParser.Parse(walker);
+        return new CommandLine(command);
     }
 
     private void ResetState (string lineText, IReadOnlyList<Token> tokens,
         ICollection<ParseError> errors = null)
     {
-        comment = "";
+        command = new("", Array.Empty<Parameter>());
         walker.Reset(lineText, tokens, errors);
     }
 }

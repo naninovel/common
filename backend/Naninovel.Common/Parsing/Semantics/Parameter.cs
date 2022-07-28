@@ -34,10 +34,10 @@ public class Parameter
     /// </summary>
     public bool Dynamic => Value.Any(v => v is Expression);
 
-    public Parameter (string identifier, IEnumerable<IMixedValue> value)
+    public Parameter (string identifier, IReadOnlyList<IMixedValue> value)
     {
         Identifier = identifier;
-        Value = value.ToArray();
+        Value = value;
     }
 
     public override string ToString ()

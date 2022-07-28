@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Naninovel.Parsing;
@@ -26,10 +25,10 @@ public class Command
     /// </summary>
     public IReadOnlyList<Parameter> Parameters { get; }
 
-    public Command (string identifier, IEnumerable<Parameter> parameters)
+    public Command (string identifier, IReadOnlyList<Parameter> parameters)
     {
         Identifier = identifier;
-        Parameters = parameters.ToArray();
+        Parameters = parameters;
     }
 
     public override string ToString ()

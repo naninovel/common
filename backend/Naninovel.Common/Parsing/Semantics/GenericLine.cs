@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Naninovel.Parsing;
@@ -19,10 +18,10 @@ public class GenericLine : IScriptLine
     /// </summary>
     public IReadOnlyList<IGenericContent> Content { get; }
 
-    public GenericLine (GenericPrefix prefix, IEnumerable<IGenericContent> content)
+    public GenericLine (GenericPrefix prefix, IReadOnlyList<IGenericContent> content)
     {
         Prefix = prefix;
-        Content = content.ToArray();
+        Content = content;
     }
 
     public override string ToString ()

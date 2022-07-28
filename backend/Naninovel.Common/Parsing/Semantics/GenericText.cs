@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Naninovel.Parsing;
@@ -14,9 +13,9 @@ public class GenericText : IGenericContent
     /// </summary>
     public IReadOnlyList<IMixedValue> Text { get; }
 
-    public GenericText (IEnumerable<IMixedValue> text)
+    public GenericText (IReadOnlyList<IMixedValue> text)
     {
-        Text = text.ToArray();
+        Text = text;
     }
 
     public override string ToString ()

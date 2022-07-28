@@ -3,7 +3,7 @@ using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-internal class TokenWalker
+internal class LineWalker
 {
     private string lineText;
     private IReadOnlyList<Token> tokens;

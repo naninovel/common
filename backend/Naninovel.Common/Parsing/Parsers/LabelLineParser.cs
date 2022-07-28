@@ -7,7 +7,7 @@ namespace Naninovel.Parsing;
 
 public class LabelLineParser
 {
-    private readonly TokenWalker walker = new();
+    private readonly LineWalker walker = new();
     private string label = "";
 
     public LabelLine Parse (string lineText, IReadOnlyList<Token> tokens,
