@@ -55,7 +55,7 @@ internal class LexState
 
     public bool IsUnescaped (char @char)
     {
-        return Is(@char) && !IsPrevious('\\');
+        return Is(@char) && !ValueCoder.IsEscaped(text, Index);
     }
 
     private bool IsIndexValid (int index)

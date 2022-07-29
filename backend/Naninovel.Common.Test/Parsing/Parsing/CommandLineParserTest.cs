@@ -140,10 +140,10 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void ParameterValuesAreDecoded ()
+    public void PlainTextIsDecoded ()
     {
-        var line = parser.Parse(@"@c ""x \"" \{ \}"" p:""\{x\}");
-        Assert.Equal(@"x "" { }", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
-        Assert.Equal(@"""{x}", (line.Command.Parameters[1].Value[0] as PlainText)!.Text);
+        var line = parser.Parse(@"@c ""x \"" \{ \} \\"" p:""\{x\}\\");
+        Assert.Equal(@"x "" { } \", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
+        Assert.Equal(@"""{x}\", (line.Command.Parameters[1].Value[0] as PlainText)!.Text);
     }
 }

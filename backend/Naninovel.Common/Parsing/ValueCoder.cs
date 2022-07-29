@@ -182,7 +182,13 @@ public static class ValueCoder
         }
     }
 
-    private static bool IsEscaped (string value, int i) => i > 0 && value[i - 1] == '\\';
+    /// <summary>
+    /// Tests whether char at the provided index inside specified value is escaped.
+    /// </summary>
+    public static bool IsEscaped (string value, int i)
+    {
+        return i > 0 && value[i - 1] == '\\' && !IsEscaped(value, i - 1);
+    }
 
     private static bool IsIgnored (IEnumerable<(int start, int length)> ignoredRanges, int i)
     {

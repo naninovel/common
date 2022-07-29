@@ -60,15 +60,15 @@ public class ValueCoderTest
     [Fact]
     public void ValueDecodedCorrectly ()
     {
-        const string value = @"\[x{x\[ }x \{xx\}""\\";
-        Assert.Equal(@"[x{x\[ }x {xx}""\", Decode(value));
+        const string value = @"\[x{x\[ }x \{xx\}""\\{";
+        Assert.Equal(@"[x{x\[ }x {xx}""\{", Decode(value));
     }
 
     [Fact]
     public void ValueUnwrappedCorrectly ()
     {
-        const string value = @"""x\""\, \""x { \"" }x""";
-        Assert.Equal(@"x""\, ""x { \"" }x", Decode(value));
+        const string value = @"""x\""\, \""x { \"" }x\\""";
+        Assert.Equal(@"x""\, ""x { \"" }x\", Decode(value));
     }
 
     [Fact]
@@ -260,5 +260,17 @@ public class ValueCoderTest
         var (name, value) = SplitNamed("foo\\.12.5");
         Assert.Equal("foo.12", name);
         Assert.Equal("5", value);
+    }
+
+    [Fact]
+    public void IsEscapeDetectsEscapedSymbols ()
+    {
+        Assert.True(IsEscaped(@"\{", 1));
+    }
+
+    [Fact]
+    public void IsEscapeDetectsPreviousEscapes ()
+    {
+        Assert.False(IsEscaped(@"\\{", 2));
     }
 }
