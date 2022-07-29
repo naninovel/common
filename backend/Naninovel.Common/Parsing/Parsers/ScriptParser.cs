@@ -12,6 +12,10 @@ public class ScriptParser
 
     private readonly Lexer lexer = new();
     private readonly List<Token> tokens = new();
+    private readonly CommandLineParser commandParser = new();
+    private readonly CommentLineParser commentParser = new();
+    private readonly GenericLineParser genericParser = new();
+    private readonly LabelLineParser labelParser = new();
 
     /// <summary>
     /// Splits provided script text into individual lines.
@@ -46,10 +50,10 @@ public class ScriptParser
     {
         tokens.Clear();
         return lexer.TokenizeLine(lineText, tokens) switch {
-            LineType.Comment => null,
-            LineType.Label => null,
-            LineType.Command => null,
-            _ => null
+            LineType.Comment => commentParser.Parse(lineText, tokens, errors),
+            LineType.Label => labelParser.Parse(lineText, tokens, errors),
+            LineType.Command => commandParser.Parse(lineText, tokens, errors),
+            _ => genericParser.Parse(lineText, tokens, errors),
         };
     }
 }
