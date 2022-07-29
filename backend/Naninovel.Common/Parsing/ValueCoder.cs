@@ -87,11 +87,13 @@ public static class ValueCoder
 
         bool IsAnySpaceUnwrapped ()
         {
-            var wrapping = false;
+            bool wrapping = false, anySpace = false;
             for (int i = 0; i < value.Length; i++)
-                if (!wrapping && char.IsWhiteSpace(value[i])) return true;
+                if (IsIgnored(ignoredRanges, i)) continue;
+                else if (!wrapping && char.IsWhiteSpace(value[i])) return true;
                 else if (value[i] == '"' && !IsEscaped(value, i)) wrapping = !wrapping;
-            return false;
+                else if (char.IsWhiteSpace(value[i])) anySpace = true;
+            return wrapping && anySpace;
         }
 
         bool ShouldEscape (int i)

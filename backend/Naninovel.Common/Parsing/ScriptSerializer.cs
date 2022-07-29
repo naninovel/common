@@ -10,6 +10,8 @@ namespace Naninovel.Parsing;
 public class ScriptSerializer
 {
     private readonly StringBuilder builder = new();
+    private readonly StringBuilder mixedBuilder = new();
+    private readonly List<(int, int)> ignoreRanges = new();
 
     /// <summary>
     /// Transforms provided script line semantic model back to text form.
@@ -32,6 +34,18 @@ public class ScriptSerializer
             AppendLine(line);
             builder.Append('\n');
         }
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// Transforms provided mixed value semantic model back to text form.
+    /// </summary>
+    /// <param name="value">The value to transform.</param>
+    /// <param name="wrap">Whether to wrap in quotes when whitespace is detected in plain text.</param>
+    public string Serialize (IMixedValue[] value, bool wrap)
+    {
+        builder.Clear();
+        AppendMixed(value, wrap);
         return builder.ToString();
     }
 
@@ -68,7 +82,7 @@ public class ScriptSerializer
         if (genericLine.Prefix != null)
             AppendGenericPrefix(genericLine.Prefix);
         foreach (var content in genericLine.Content)
-            if (content is GenericText text) AppendGenericText(text);
+            if (content is GenericText text) AppendMixed(text.Text, false);
             else AppendInlinedCommand((InlinedCommand)content);
     }
 
@@ -92,8 +106,7 @@ public class ScriptSerializer
             builder.Append(Identifiers.ParameterAssign[0]);
         }
 
-        foreach (var value in parameter.Value)
-            AppendMixed(value, true);
+        AppendMixed(parameter.Value, true);
     }
 
     private void AppendGenericPrefix (GenericPrefix prefix)
@@ -107,12 +120,6 @@ public class ScriptSerializer
         builder.Append(Identifiers.AuthorAssign);
     }
 
-    private void AppendGenericText (GenericText text)
-    {
-        foreach (var value in text.Text)
-            AppendMixed(value, false);
-    }
-
     private void AppendInlinedCommand (InlinedCommand inlined)
     {
         builder.Append(Identifiers.InlinedOpen[0]);
@@ -120,18 +127,25 @@ public class ScriptSerializer
         builder.Append(Identifiers.InlinedClose[0]);
     }
 
-    private void AppendMixed (IMixedValue value, bool wrap)
+    private void AppendMixed (IEnumerable<IMixedValue> mixed, bool wrap)
     {
-        if (value is PlainText text)
-        {
-            var encoded = ValueCoder.Encode(text.Text, wrap: wrap);
-            builder.Append(encoded);
-        }
+        ignoreRanges.Clear();
+        mixedBuilder.Clear();
+        foreach (var value in mixed)
+            AppendMixed(value);
+        builder.Append(ValueCoder.Encode(mixedBuilder.ToString(), ignoreRanges, wrap));
+    }
+
+    private void AppendMixed (IMixedValue value)
+    {
+        if (value is PlainText text) mixedBuilder.Append(text.Text);
         else if (value is Expression expression)
         {
-            builder.Append(Identifiers.ExpressionOpen);
-            builder.Append(expression.Text);
-            builder.Append(Identifiers.ExpressionClose);
+            var startIndex = mixedBuilder.Length;
+            mixedBuilder.Append(Identifiers.ExpressionOpen);
+            mixedBuilder.Append(expression.Text);
+            mixedBuilder.Append(Identifiers.ExpressionClose);
+            ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
         }
     }
 }

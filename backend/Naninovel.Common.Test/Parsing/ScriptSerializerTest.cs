@@ -89,4 +89,19 @@ public class ScriptSerializerTest
     {
         Assert.Empty(serializer.Serialize(Array.Empty<IScriptLine>()));
     }
+
+    [Fact]
+    public void CanSerializeMixedValue ()
+    {
+        Assert.Equal(@"""\{\}{x < y}\[\]\\ ", serializer.Serialize(new IMixedValue[] {
+            new PlainText(@"""{}"),
+            new Expression("x < y"),
+            new PlainText(@"[]\ ")
+        }, false));
+        Assert.Equal(@"""\""\{\}{x < y}\[\]\\ """, serializer.Serialize(new IMixedValue[] {
+            new PlainText(@"""{}"),
+            new Expression("x < y"),
+            new PlainText(@"[]\ ")
+        }, true));
+    }
 }
