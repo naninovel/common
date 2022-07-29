@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -24,6 +25,8 @@ public class Command
     /// Parameters of the command describing its behaviour.
     /// </summary>
     public IReadOnlyList<Parameter> Parameters { get; }
+
+    public Command (string identifier) : this(identifier, Array.Empty<Parameter>()) { }
 
     public Command (string identifier, IReadOnlyList<Parameter> parameters)
     {

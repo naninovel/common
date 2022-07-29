@@ -24,6 +24,8 @@ public class GenericLine : IScriptLine
         Content = content;
     }
 
+    public GenericLine (IReadOnlyList<IGenericContent> content) : this(null, content) { }
+
     public override string ToString ()
     {
         var builder = new StringBuilder();

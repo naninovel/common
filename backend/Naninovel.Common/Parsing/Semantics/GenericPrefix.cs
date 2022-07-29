@@ -17,7 +17,7 @@ public class GenericPrefix
     /// </summary>
     public string Appearance { get; }
 
-    public GenericPrefix (string author, string appearance)
+    public GenericPrefix (string author, string appearance = null)
     {
         Author = author;
         Appearance = appearance;
