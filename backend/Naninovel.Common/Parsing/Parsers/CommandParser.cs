@@ -7,9 +7,9 @@ namespace Naninovel.Parsing;
 
 internal class CommandParser
 {
+    private readonly MixedValueParser valueParser = new(true);
     private readonly List<Parameter> parameters = new();
     private readonly List<IMixedValue> value = new();
-    private readonly Queue<Token> expressions = new();
     private LineWalker walker = null!;
     private string commandId = null!;
     private string paramId;
@@ -34,7 +34,6 @@ internal class CommandParser
     private void ResetParameterState ()
     {
         paramId = null;
-        expressions.Clear();
         value.Clear();
     }
 
@@ -57,10 +56,10 @@ internal class CommandParser
                 paramId = walker.Extract(token);
                 return true;
             case TokenType.Expression:
-                expressions.Enqueue(token);
+                valueParser.AddExpressionToken(token);
                 return true;
             case ParamValue:
-                AddValue(token);
+                value.AddRange(valueParser.Parse(token, walker));
                 return true;
             case NamelessParam:
             case NamedParam:
@@ -72,46 +71,6 @@ internal class CommandParser
                 walker.AddError(token);
                 return true;
             default: return true;
-        }
-    }
-
-    private void AddValue (Token valueToken)
-    {
-        var index = valueToken.StartIndex;
-        var textStartIndex = -1;
-        for (; index <= valueToken.EndIndex; index++)
-            if (ShouldProcessExpression()) ProcessExpression();
-            else if (!IsTextStarted()) textStartIndex = index;
-        if (IsTextStarted()) AddText(valueToken.EndIndex - textStartIndex + 1);
-
-        bool ShouldProcessExpression ()
-        {
-            return expressions.Count > 0 &&
-                   expressions.Peek().StartIndex == index;
-        }
-
-        void ProcessExpression ()
-        {
-            var expression = expressions.Dequeue();
-            if (IsTextStarted()) AddText(expression.StartIndex - textStartIndex);
-            AddExpression(expression);
-            index = expression.EndIndex;
-        }
-
-        bool IsTextStarted () => textStartIndex != -1;
-
-        void AddText (int endIndex)
-        {
-            var text = ValueCoder.Decode(walker.Extract(textStartIndex, endIndex));
-            value.Add(new PlainText(text));
-            textStartIndex = -1;
-        }
-
-        void AddExpression (Token expression)
-        {
-            var startIndex = expression.StartIndex + 1;
-            var length = expression.EndIndex - expression.StartIndex - 1;
-            value.Add(new Expression(walker.Extract(startIndex, length)));
         }
     }
 
