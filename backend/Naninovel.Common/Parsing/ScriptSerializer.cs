@@ -42,7 +42,7 @@ public class ScriptSerializer
     /// </summary>
     /// <param name="value">The value to transform.</param>
     /// <param name="wrap">Whether to wrap in quotes when whitespace is detected in plain text.</param>
-    public string Serialize (IMixedValue[] value, bool wrap)
+    public string Serialize (IEnumerable<IMixedValue> value, bool wrap)
     {
         builder.Clear();
         AppendMixed(value, wrap);
