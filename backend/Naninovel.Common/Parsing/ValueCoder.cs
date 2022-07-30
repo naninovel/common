@@ -29,11 +29,7 @@ public static class ValueCoder
         unwrap = unwrap && IsWrapped();
         if (unwrap) value = Unwrap();
         if (value.Length < 2) return value;
-        var expression = false;
-        for (int i = value.Length - 2; i >= 0; i--)
-            if (TryExpression(i) || TryRemove(i))
-                continue;
-        return value;
+        return UnescapeMixed(value, unwrap);
 
         bool IsWrapped () => value.Length >= 2 && value[0] == '"' && value[value.Length - 1] == '"';
 
@@ -42,6 +38,15 @@ public static class ValueCoder
             if (value.Length == 2) return string.Empty;
             return value.Substring(1, value.Length - 2);
         }
+    }
+
+    internal static string UnescapeMixed (string value, bool unescapeQuotes)
+    {
+        var expression = false;
+        for (int i = value.Length - 2; i >= 0; i--)
+            if (TryExpression(i) || TryRemove(i))
+                continue;
+        return value;
 
         bool TryExpression (int i)
         {
@@ -63,7 +68,7 @@ public static class ValueCoder
         {
             if (expression || value[i] != '\\' || IsEscaped(value, i)) return false;
             var prevChar = value[i + 1];
-            return unwrap && prevChar == '"' || controlChars.Contains(prevChar);
+            return unescapeQuotes && prevChar == '"' || controlChars.Contains(prevChar);
         }
     }
 
@@ -78,14 +83,14 @@ public static class ValueCoder
         IReadOnlyCollection<(int start, int length)> ignoredRanges = null, bool wrap = true)
     {
         if (string.IsNullOrEmpty(value)) return value;
-        wrap = wrap && IsAnySpaceUnwrapped();
+        wrap = wrap && IsAnySpaceUnwrappedOrContainUnclosedQuotes();
         for (int i = value.Length - 1; i >= 0; i--)
             if (ShouldEscape(i))
                 value = value.Insert(i, "\\");
         if (wrap) value = $"\"{value}\"";
         return value;
 
-        bool IsAnySpaceUnwrapped ()
+        bool IsAnySpaceUnwrappedOrContainUnclosedQuotes ()
         {
             bool wrapping = false, anySpace = false;
             for (int i = 0; i < value.Length; i++)
@@ -93,7 +98,7 @@ public static class ValueCoder
                 else if (!wrapping && char.IsWhiteSpace(value[i])) return true;
                 else if (value[i] == '"' && !IsEscaped(value, i)) wrapping = !wrapping;
                 else if (char.IsWhiteSpace(value[i])) anySpace = true;
-            return wrapping && anySpace;
+            return wrapping && anySpace || wrapping;
         }
 
         bool ShouldEscape (int i)

@@ -21,14 +21,25 @@ internal class MixedValueParser
     public IMixedValue[] Parse (Token valueToken, LineWalker walker)
     {
         value.Clear();
-        var index = valueToken.StartIndex;
+
+        var unescapeQuotes = unwrap && IsValueWrapped();
+        var startIndex = valueToken.StartIndex + (unescapeQuotes ? 1 : 0);
+        var endIndex = valueToken.EndIndex - (unescapeQuotes ? 1 : 0);
+
+        var index = startIndex;
         var textStartIndex = -1;
-        for (; index <= valueToken.EndIndex; index++)
+        for (; index <= endIndex; index++)
             if (ShouldProcessExpression()) ProcessExpression();
             else if (!IsTextStarted()) textStartIndex = index;
-        if (IsTextStarted()) AddText(valueToken.EndIndex - textStartIndex + 1);
+        if (IsTextStarted()) AddText(endIndex - textStartIndex + 1);
         expressions.Clear();
         return value.ToArray();
+
+        bool IsValueWrapped ()
+        {
+            return walker.GetCharAt(valueToken.StartIndex) == '\"' &&
+                   walker.GetCharAt(valueToken.EndIndex) == '\"';
+        }
 
         bool ShouldProcessExpression ()
         {
@@ -49,7 +60,7 @@ internal class MixedValueParser
         void AddText (int endIndex)
         {
             var text = walker.Extract(textStartIndex, endIndex);
-            var decoded = ValueCoder.Decode(text, unwrap);
+            var decoded = ValueCoder.UnescapeMixed(text, unescapeQuotes);
             value.Add(new PlainText(decoded));
             textStartIndex = -1;
         }

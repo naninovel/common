@@ -146,4 +146,28 @@ public class CommandLineParserTest
         Assert.Equal(@"x "" { } \", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
         Assert.Equal(@"""{x}\", (line.Command.Parameters[1].Value[0] as PlainText)!.Text);
     }
+
+    [Fact]
+    public void WrapIsNotRequiredWhenInlineSpaceIsInQuotes ()
+    {
+        var line = parser.Parse(@"@set remark=""Shouting \""Stop the car!\"" was a mistake.""");
+        Assert.Equal(@"remark=""Shouting \""Stop the car!\"" was a mistake.""",
+            (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void SingleQuoteValueIsParsedCorrectly ()
+    {
+        var line = parser.Parse(@"@c ""\"""" p:v");
+        Assert.Equal(@"""", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void ExpressionWithQuotesIsParsedCorrectly ()
+    {
+        var line = parser.Parse(@"@c "" \"" { Random(var, "" \"" "") } \"" "" p:v");
+        Assert.Equal(@" "" ", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
+        Assert.Equal(@" Random(var, "" \"" "") ", (line.Command.Parameters[0].Value[1] as Expression)!.Text);
+        Assert.Equal(@" "" ", (line.Command.Parameters[0].Value[2] as PlainText)!.Text);
+    }
 }

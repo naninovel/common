@@ -88,9 +88,9 @@ public class ValueCoderTest
     [Fact]
     public void ValueEncodedCorrectly ()
     {
-        const string value = @"{x}{x}""[x]x";
+        const string value = @"{x}{x}""[x]x""";
         var expressions = new[] { (3, 3) };
-        Assert.Equal(@"\{x\}{x}""\[x\]x", Encode(value, expressions));
+        Assert.Equal(@"\{x\}{x}""\[x\]x""", Encode(value, expressions));
     }
 
     [Fact]

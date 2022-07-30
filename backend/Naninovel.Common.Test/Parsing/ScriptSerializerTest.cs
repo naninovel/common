@@ -25,14 +25,14 @@ public class ScriptSerializerTest
     public void CanSerializeCommandLine ()
     {
         var param1 = new Parameter(null, new IMixedValue[] {
-            new PlainText(@"""{}"),
+            new PlainText(@"\{}"),
             new Expression("x < y"),
             new PlainText(@"\")
         });
         var param2 = new Parameter("p", new[] { new PlainText(@"x "" { } [ ] \") });
         var command = new Command("cmd", new[] { param1, param2 });
         var line = new CommandLine(command);
-        Assert.Equal(@"@cmd ""\{\}{x < y}\\ p:""x \"" \{ \} \[ \] \\""", serializer.Serialize(line));
+        Assert.Equal(@"@cmd \\\{\}{x < y}\\ p:""x \"" \{ \} \[ \] \\""", serializer.Serialize(line));
     }
 
     [Fact]
@@ -42,6 +42,22 @@ public class ScriptSerializerTest
         var nameless = new Parameter(null, new[] { new PlainText("foo") });
         var command = new Command("cmd", new[] { named, nameless });
         Assert.Equal("@cmd foo p:v", serializer.Serialize(new CommandLine(command)));
+    }
+
+    [Fact]
+    public void WhenStartingWithQuoteParameterValueIsWrapped ()
+    {
+        var param = new Parameter(null, new[] { new PlainText("\"") });
+        var command = new Command("c", new[] { param });
+        Assert.Equal(@"@c ""\""""", serializer.Serialize(new CommandLine(command)));
+    }
+
+    [Fact]
+    public void WhenParameterValueContainQuotesItIsWrapped ()
+    {
+        var param = new Parameter(null, new[] { new PlainText("x\"x") });
+        var command = new Command("c", new[] { param });
+        Assert.Equal(@"@c ""x\""x""", serializer.Serialize(new CommandLine(command)));
     }
 
     [Fact]
@@ -58,6 +74,22 @@ public class ScriptSerializerTest
         var text2 = new GenericText(new[] { new PlainText("x") });
         var line = new GenericLine(prefix, new IGenericContent[] { text1, inlined1, inlined2, text2 });
         Assert.Equal(@"auth.app: ""\{\}{x < y}\[\]\\ [i][cmd p:v]x", serializer.Serialize(line));
+    }
+
+    [Fact]
+    public void WhenStartingWithQuoteGenericTextIsNotWrapped ()
+    {
+        var text = new GenericText(new[] { new PlainText("\"") });
+        var line = new GenericLine(new[] { text });
+        Assert.Equal(@"""", serializer.Serialize(line));
+    }
+
+    [Fact]
+    public void WhenGenericTextContainQuotesItIsNotWrapped ()
+    {
+        var text = new GenericText(new[] { new PlainText("x\"x") });
+        var line = new GenericLine(new[] { text });
+        Assert.Equal("x\"x", serializer.Serialize(line));
     }
 
     [Fact]

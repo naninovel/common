@@ -18,6 +18,8 @@ internal class LineWalker
         this.errors = errors;
     }
 
+    public char GetCharAt (int index) => lineText[index];
+
     public string Extract (int startIndex, int length)
     {
         return lineText.Substring(startIndex, length);
