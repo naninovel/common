@@ -34,11 +34,14 @@ public class GenericLineParser
         switch (token.Type)
         {
             case AuthorId:
-                prefix = new GenericPrefix(walker.Extract(token), null);
+                prefix = new GenericPrefix(walker.Extract(token));
                 return true;
             case AuthorAppearance:
                 if (prefix?.Author != null)
                     prefix = new GenericPrefix(prefix.Author, walker.Extract(token));
+                return true;
+            case AuthorAssign:
+                valueParser.ClearAddedExpressions();
                 return true;
             case TokenType.GenericText:
                 AddText(token);
@@ -60,6 +63,7 @@ public class GenericLineParser
             var value = valueParser.Parse(textToken, walker);
             var text = new GenericText(value);
             content.Add(text);
+            valueParser.ClearAddedExpressions();
         }
 
         void AddInlined ()

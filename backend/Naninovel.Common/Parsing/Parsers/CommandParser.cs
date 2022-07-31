@@ -35,6 +35,7 @@ internal class CommandParser
     {
         paramId = null;
         value.Clear();
+        valueParser.ClearAddedExpressions();
     }
 
     private bool TryCommandId ()

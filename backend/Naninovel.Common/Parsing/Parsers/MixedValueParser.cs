@@ -18,6 +18,11 @@ internal class MixedValueParser
         expressions.Enqueue(expressionToken);
     }
 
+    public void ClearAddedExpressions ()
+    {
+        expressions.Clear();
+    }
+
     public IMixedValue[] Parse (Token valueToken, LineWalker walker)
     {
         value.Clear();
@@ -32,7 +37,6 @@ internal class MixedValueParser
             if (ShouldProcessExpression()) ProcessExpression();
             else if (!IsTextStarted()) textStartIndex = index;
         if (IsTextStarted()) AddText(endIndex - textStartIndex + 1);
-        expressions.Clear();
         return value.ToArray();
 
         bool IsValueWrapped ()

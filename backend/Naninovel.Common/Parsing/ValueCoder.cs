@@ -83,7 +83,7 @@ public static class ValueCoder
         IReadOnlyCollection<(int start, int length)> ignoredRanges = null, bool wrap = true)
     {
         if (string.IsNullOrEmpty(value)) return value;
-        wrap = wrap && IsAnySpaceUnwrappedOrContainUnclosedQuotes();
+        wrap = wrap && (value[0] == '\"' || IsAnySpaceUnwrappedOrContainUnclosedQuotes());
         for (int i = value.Length - 1; i >= 0; i--)
             if (ShouldEscape(i))
                 value = value.Insert(i, "\\");

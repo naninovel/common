@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using Xunit;
-using System.Linq;
-using static Naninovel.Parsing.TokenType;
+﻿using Xunit;
 using static Naninovel.Parsing.ErrorType;
-using static Naninovel.Parsing.ParsingErrors;
 
 namespace Naninovel.Parsing.Test;
 
@@ -84,5 +80,17 @@ public class GenericLineParserTest
     {
         var line = parser.Parse(@""" \{ \} "" \[ \] \\""");
         Assert.Equal(@""" { } "" [ ] \""", ((line.Content[0] as GenericText)!.Text[0] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void CurlyBracketsInPrefixAreParsedAsPlainText ()
+    {
+        // Required for backward compat with v1, where author ID can contain expressions.
+        var line = parser.Parse(@"{name}.{appearance}: My favourite drink is {drink}!");
+        Assert.Equal(@"{name}", line.Prefix.Author);
+        Assert.Equal(@"{appearance}", line.Prefix.Appearance);
+        Assert.Equal(@"My favourite drink is ", ((line.Content[0] as GenericText)!.Text[0] as PlainText)!.Text);
+        Assert.Equal(@"drink", ((line.Content[0] as GenericText)!.Text[1] as Expression)!.Text);
+        Assert.Equal(@"!", ((line.Content[0] as GenericText)!.Text[2] as PlainText)!.Text);
     }
 }

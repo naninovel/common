@@ -355,6 +355,19 @@ public static class LexerTestData
         T(
             "x.\": x",
             GenericText(0, 6)
+        ),
+        T(
+            "{x}: x",
+            ExpressionOpen(0, 1), ExpressionBody(1, 1),
+            ExpressionClose(2, 1), Expression(0, 3),
+            AuthorId(0, 3), AuthorAssign(3, 2), GenericText(5, 1)
+        ),
+        T(
+            "x.{x}: x",
+            ExpressionOpen(2, 1), ExpressionBody(3, 1),
+            ExpressionClose(4, 1), Expression(2, 3),
+            AuthorId(0, 1), AppearanceAssign(1, 1),
+            AuthorAppearance(2, 3), AuthorAssign(5, 2), GenericText(7, 1)
         )
     };
 

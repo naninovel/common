@@ -136,4 +136,16 @@ public class ScriptSerializerTest
             new PlainText(@"[]\ ")
         }, true));
     }
+
+    [Fact]
+    public void WhenStartingWithQuotesWithWrapEnabledValueIsWrapped ()
+    {
+        Assert.Equal(@"""\""x\""""", serializer.Serialize(new[] { new PlainText(@"""x""") }, true));
+    }
+
+    [Fact]
+    public void WhenStartingWithQuotesWithWrapDisabledValueIsNotWrapped ()
+    {
+        Assert.Equal(@"""x""", serializer.Serialize(new[] { new PlainText(@"""x""") }, false));
+    }
 }
