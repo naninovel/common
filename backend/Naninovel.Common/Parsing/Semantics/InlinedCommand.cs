@@ -4,7 +4,7 @@ namespace Naninovel.Parsing;
 /// Part of <see cref="GenericLine"/> containing a <see cref="Command"/>
 /// to be executed in the midst of printed text.
 /// </summary>
-public class InlinedCommand : IGenericContent
+public class InlinedCommand : ILineComponent, IGenericContent
 {
     /// <summary>
     /// The inlined command.

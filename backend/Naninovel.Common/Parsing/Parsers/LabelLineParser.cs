@@ -8,12 +8,12 @@ namespace Naninovel.Parsing;
 public class LabelLineParser
 {
     private readonly LineWalker walker = new();
-    private string label = null!;
+    private PlainText label = null!;
 
     public LabelLine Parse (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors = null, TokenResolver resolver = null)
     {
-        ResetState(lineText, tokens, errors);
+        ResetState(lineText, tokens, errors, resolver);
         if (!walker.Next(LineId, out _))
             walker.AddError(MissingLineId);
         else if (walker.Next(MissingLabel, out var missingError))
@@ -21,14 +21,20 @@ public class LabelLineParser
         else if (walker.Next(LabelText, out var labelToken))
             if (walker.Next(SpaceInLabel, out var spaceError))
                 walker.AddError(spaceError);
-            else label = walker.Extract(labelToken);
+            else ParseLabel(labelToken);
         return new LabelLine(label);
     }
 
     private void ResetState (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors, TokenResolver resolver)
     {
-        label = "";
-        walker.Reset(lineText, tokens, errors);
+        label = PlainText.Empty;
+        walker.Reset(lineText, tokens, errors, resolver);
+    }
+
+    private void ParseLabel (Token labelToken)
+    {
+        label = new(walker.Extract(labelToken));
+        walker.Associate(label, labelToken);
     }
 }

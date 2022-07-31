@@ -12,9 +12,9 @@ public class CommandLineParser
     private Command command = null!;
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors = null, TokenResolver resolver = null)
     {
-        ResetState(lineText, tokens, errors);
+        ResetState(lineText, tokens, errors, resolver);
         if (!walker.Next(LineId, out _))
             walker.AddError(MissingLineId);
         else command = commandParser.Parse(walker);
@@ -22,9 +22,9 @@ public class CommandLineParser
     }
 
     private void ResetState (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors, TokenResolver resolver)
     {
-        command = new("", Array.Empty<Parameter>());
-        walker.Reset(lineText, tokens, errors);
+        command = new(PlainText.Empty, Array.Empty<Parameter>());
+        walker.Reset(lineText, tokens, errors, resolver);
     }
 }

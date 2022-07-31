@@ -15,7 +15,7 @@ public class CommandLineParserTest
     public void WhenLineIdIsMissingErrorIsAddedAndCommandIsEmpty ()
     {
         var line = parser.Parse("foo");
-        Assert.Empty(line.Command.Identifier);
+        Assert.Empty(line.Command.Identifier.Text);
         Assert.Empty(line.Command.Parameters);
         Assert.True(parser.HasError(MissingLineId));
     }
@@ -24,7 +24,7 @@ public class CommandLineParserTest
     public void WhenMissingCommandIdErrorIsAddedAndCommandIsEmpty ()
     {
         var line = parser.Parse("@ ");
-        Assert.Empty(line.Command.Identifier);
+        Assert.Empty(line.Command.Identifier.Text);
         Assert.Empty(line.Command.Parameters);
         Assert.True(parser.HasError(MissingCommandId));
     }
@@ -42,7 +42,7 @@ public class CommandLineParserTest
     public void CanParseCommandIdentifier ()
     {
         var line = parser.Parse("@foo");
-        Assert.Equal("foo", line.Command.Identifier);
+        Assert.Equal("foo", line.Command.Identifier.Text);
         Assert.Empty(line.Command.Parameters);
         Assert.Empty(parser.Errors);
     }
@@ -51,7 +51,7 @@ public class CommandLineParserTest
     public void TrimsSpaceBeforeCommandIdentifier ()
     {
         var line = parser.Parse("@ \t foo");
-        Assert.Equal("foo", line.Command.Identifier);
+        Assert.Equal("foo", line.Command.Identifier.Text);
         Assert.Empty(line.Command.Parameters);
         Assert.Empty(parser.Errors);
     }
@@ -68,7 +68,7 @@ public class CommandLineParserTest
     {
         var line = parser.Parse("@c p:");
         Assert.True(parser.HasError(MissingParamValue));
-        Assert.Equal("p", line.Command.Parameters[0].Identifier);
+        Assert.Equal("p", line.Command.Parameters[0].Identifier.Text);
     }
 
     [Fact]
@@ -105,14 +105,14 @@ public class CommandLineParserTest
     public void ArbitraryCommandIsParsedCorrectly ()
     {
         var line = parser.Parse("@char k.Happy pos:{x},10 wait:false");
-        Assert.Equal("char", line.Command.Identifier);
+        Assert.Equal("char", line.Command.Identifier.Text);
         Assert.True(line.Command.Parameters[0].Nameless);
         Assert.False(line.Command.Parameters[0].Dynamic);
         Assert.Equal("k.Happy", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
-        Assert.Equal("pos", line.Command.Parameters[1].Identifier);
-        Assert.Equal("x", (line.Command.Parameters[1].Value[0] as Expression)!.Text);
+        Assert.Equal("pos", line.Command.Parameters[1].Identifier.Text);
+        Assert.Equal("x", (line.Command.Parameters[1].Value[0] as Expression)!.Body.Text);
         Assert.Equal(",10", (line.Command.Parameters[1].Value[1] as PlainText)!.Text);
-        Assert.Equal("wait", line.Command.Parameters[2].Identifier);
+        Assert.Equal("wait", line.Command.Parameters[2].Identifier.Text);
         Assert.Equal("false", (line.Command.Parameters[2].Value[0] as PlainText)!.Text);
     }
 
@@ -122,13 +122,13 @@ public class CommandLineParserTest
         var line = parser.Parse("@c {x} x:x{y}x{z}");
         Assert.True(line.Command.Parameters[0].Dynamic);
         Assert.Single(line.Command.Parameters[0].Value.OfType<Expression>());
-        Assert.Equal("x", (line.Command.Parameters[0].Value[0] as Expression)!.Text);
+        Assert.Equal("x", (line.Command.Parameters[0].Value[0] as Expression)!.Body.Text);
         Assert.True(line.Command.Parameters[1].Dynamic);
         Assert.Equal(2, line.Command.Parameters[1].Value.OfType<Expression>().Count());
         Assert.Equal("x", (line.Command.Parameters[1].Value[0] as PlainText)!.Text);
-        Assert.Equal("y", (line.Command.Parameters[1].Value[1] as Expression)!.Text);
+        Assert.Equal("y", (line.Command.Parameters[1].Value[1] as Expression)!.Body.Text);
         Assert.Equal("x", (line.Command.Parameters[1].Value[2] as PlainText)!.Text);
-        Assert.Equal("z", (line.Command.Parameters[1].Value[3] as Expression)!.Text);
+        Assert.Equal("z", (line.Command.Parameters[1].Value[3] as Expression)!.Body.Text);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class CommandLineParserTest
     {
         var line = parser.Parse(@"@c "" \"" { Random(var, "" \"" "") } \"" "" p:v");
         Assert.Equal(@" "" ", (line.Command.Parameters[0].Value[0] as PlainText)!.Text);
-        Assert.Equal(@" Random(var, "" \"" "") ", (line.Command.Parameters[0].Value[1] as Expression)!.Text);
+        Assert.Equal(@" Random(var, "" \"" "") ", (line.Command.Parameters[0].Value[1] as Expression)!.Body.Text);
         Assert.Equal(@" "" ", (line.Command.Parameters[0].Value[2] as PlainText)!.Text);
     }
 }

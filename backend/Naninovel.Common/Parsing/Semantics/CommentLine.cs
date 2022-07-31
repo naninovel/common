@@ -8,9 +8,9 @@ public class CommentLine : IScriptLine
     /// <summary>
     /// The annotation text.
     /// </summary>
-    public string Comment { get; }
+    public PlainText Comment { get; }
 
-    public CommentLine (string comment)
+    public CommentLine (PlainText comment)
     {
         Comment = comment;
     }

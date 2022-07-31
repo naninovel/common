@@ -73,7 +73,7 @@ internal class MixedValueParser
         {
             var startIndex = expression.StartIndex + 1;
             var length = expression.EndIndex - expression.StartIndex - 1;
-            value.Add(new Expression(walker.Extract(startIndex, length)));
+            value.Add(new Expression(new(walker.Extract(startIndex, length))));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Naninovel.Parsing;
 /// <summary>
 /// Parameter of a <see cref="Command"/> used to control the behaviour.
 /// </summary>
-public class Parameter
+public class Parameter : ILineComponent
 {
     /// <summary>
     /// Unique identifier of the parameter.
@@ -17,7 +17,7 @@ public class Parameter
     /// Not case-sensitive.
     /// In v1 can be either alias or name of the associated command field.
     /// </remarks>
-    public string Identifier { get; }
+    public PlainText Identifier { get; }
     /// <summary>
     /// Value of the parameter; can contain expressions.
     /// </summary>
@@ -28,17 +28,19 @@ public class Parameter
     /// <remarks>
     /// Command can have a single nameless parameter.
     /// </remarks>
-    public bool Nameless => string.IsNullOrEmpty(Identifier);
+    public bool Nameless => Identifier is null;
     /// <summary>
     /// Whether value of the parameter contains an expression and will be evaluated at runtime.
     /// </summary>
     public bool Dynamic => Value.Any(v => v is Expression);
 
-    public Parameter (string identifier, IReadOnlyList<IMixedValue> value)
+    public Parameter (PlainText identifier, IReadOnlyList<IMixedValue> value)
     {
         Identifier = identifier;
         Value = value;
     }
+
+    public Parameter (IReadOnlyList<IMixedValue> value) : this(null, value) { }
 
     public override string ToString ()
     {

@@ -11,8 +11,8 @@ internal class CommandParser
     private readonly List<Parameter> parameters = new();
     private readonly List<IMixedValue> value = new();
     private LineWalker walker = null!;
-    private string commandId = null!;
-    private string paramId;
+    private PlainText commandId = null!;
+    private PlainText paramId;
 
     public Command Parse (LineWalker walker)
     {
@@ -26,7 +26,7 @@ internal class CommandParser
     private void ResetCommandState (LineWalker walker)
     {
         this.walker = walker;
-        commandId = "";
+        commandId = PlainText.Empty;
         parameters.Clear();
         ResetParameterState();
     }
@@ -43,8 +43,8 @@ internal class CommandParser
         if (!walker.Next(CommandId | Error, MissingCommandId, out var token))
             walker.AddError(MissingCommandTokens);
         else if (token.IsError(MissingCommandId)) walker.AddError(token);
-        else commandId = walker.Extract(token);
-        return !string.IsNullOrEmpty(commandId);
+        else commandId = new(walker.Extract(token));
+        return commandId != PlainText.Empty;
     }
 
     private bool TryParameter ()
@@ -54,7 +54,7 @@ internal class CommandParser
         switch (token.Type)
         {
             case ParamId:
-                paramId = walker.Extract(token);
+                paramId = new(walker.Extract(token));
                 return true;
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);

@@ -1,21 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
 internal class LineWalker
 {
-    private string lineText;
-    private IReadOnlyList<Token> tokens;
+    private string lineText = "";
+    private IReadOnlyList<Token> tokens = Array.Empty<Token>();
     private ICollection<ParseError> errors;
+    private TokenResolver resolver;
     private int index = -1;
 
-    public void Reset (string lineText, IReadOnlyList<Token> tokens, ICollection<ParseError> errors = null)
+    public void Reset (string lineText, IReadOnlyList<Token> tokens,
+        ICollection<ParseError> errors, TokenResolver resolver)
     {
         index = -1;
         this.lineText = lineText;
         this.tokens = tokens;
         this.errors = errors;
+        this.resolver = resolver;
     }
 
     public char GetCharAt (int index) => lineText[index];
@@ -38,6 +42,11 @@ internal class LineWalker
     public void AddError (Token token)
     {
         errors?.Add(new ParseError(token));
+    }
+
+    public void Associate (ILineComponent component, Token token)
+    {
+        resolver?.Associate(component, token);
     }
 
     public bool Next (TokenType types, ErrorType errors, out Token token)

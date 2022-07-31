@@ -7,23 +7,29 @@ namespace Naninovel.Parsing;
 public class CommentLineParser
 {
     private readonly LineWalker walker = new();
-    private string comment = null!;
+    private PlainText comment = null!;
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors = null, TokenResolver resolver = null)
     {
-        ResetState(lineText, tokens, errors);
+        ResetState(lineText, tokens, errors, resolver);
         if (!walker.Next(LineId, out _))
             walker.AddError(MissingLineId);
         else if (walker.Next(CommentText, out var commentToken))
-            comment = walker.Extract(commentToken);
+            ParseComment(commentToken);
         return new CommentLine(comment);
     }
 
     private void ResetState (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors, TokenResolver resolver)
     {
-        comment = "";
-        walker.Reset(lineText, tokens, errors);
+        comment = PlainText.Empty;
+        walker.Reset(lineText, tokens, errors, resolver);
+    }
+
+    private void ParseComment (Token commentToken)
+    {
+        comment = new(walker.Extract(commentToken));
+        walker.Associate(comment, commentToken);
     }
 }

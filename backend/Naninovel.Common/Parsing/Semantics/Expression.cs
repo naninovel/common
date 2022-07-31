@@ -3,20 +3,20 @@
 /// <summary>
 /// Script expression evaluated at runtime.
 /// </summary>
-public class Expression : IMixedValue
+public class Expression : ILineComponent, IMixedValue
 {
     /// <summary>
-    /// The evaluated content of the expression.
+    /// The evaluated body of the expression.
     /// </summary>
-    public string Text { get; }
+    public PlainText Body { get; }
 
-    public Expression (string text)
+    public Expression (PlainText body)
     {
-        Text = text;
+        Body = body;
     }
 
     public override string ToString ()
     {
-        return $"{Identifiers.ExpressionOpen}{Text}{Identifiers.ExpressionClose}";
+        return $"{Identifiers.ExpressionOpen}{Body}{Identifiers.ExpressionClose}";
     }
 }

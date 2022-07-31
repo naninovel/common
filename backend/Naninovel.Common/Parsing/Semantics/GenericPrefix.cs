@@ -11,13 +11,13 @@ public class GenericPrefix
     /// <summary>
     /// Author (actor) identifier to associate with the printed text.
     /// </summary>
-    public string Author { get; }
+    public PlainText Author { get; }
     /// <summary>
     /// Optional (can be null) appearance of the author actor to apply.
     /// </summary>
-    public string Appearance { get; }
+    public PlainText Appearance { get; }
 
-    public GenericPrefix (string author, string appearance = null)
+    public GenericPrefix (PlainText author, PlainText appearance = null)
     {
         Author = author;
         Appearance = appearance;
@@ -25,8 +25,8 @@ public class GenericPrefix
 
     public override string ToString ()
     {
-        var builder = new StringBuilder(Author);
-        if (!string.IsNullOrEmpty(Appearance))
+        var builder = new StringBuilder(Author.Text);
+        if (Appearance != null)
         {
             builder.Append(Identifiers.AuthorAppearance);
             builder.Append(Appearance);

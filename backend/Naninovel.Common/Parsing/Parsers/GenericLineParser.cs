@@ -12,17 +12,17 @@ public class GenericLineParser
     private GenericPrefix prefix;
 
     public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors = null, TokenResolver resolver = null)
     {
-        ResetState(lineText, tokens, errors);
+        ResetState(lineText, tokens, errors, resolver);
         while (TryNext()) continue;
         return new GenericLine(prefix, content.ToArray());
     }
 
     private void ResetState (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null)
+        ICollection<ParseError> errors, TokenResolver resolver)
     {
-        walker.Reset(lineText, tokens, errors);
+        walker.Reset(lineText, tokens, errors, resolver);
         content.Clear();
         prefix = null;
     }
@@ -34,11 +34,11 @@ public class GenericLineParser
         switch (token.Type)
         {
             case AuthorId:
-                prefix = new GenericPrefix(walker.Extract(token));
+                prefix = new GenericPrefix(new(walker.Extract(token)));
                 return true;
             case AuthorAppearance:
                 if (prefix?.Author != null)
-                    prefix = new GenericPrefix(prefix.Author, walker.Extract(token));
+                    prefix = new GenericPrefix(prefix.Author, new(walker.Extract(token)));
                 return true;
             case AuthorAssign:
                 valueParser.ClearAddedExpressions();

@@ -11,35 +11,35 @@ public class LabelLineParserTest
     [Fact]
     public void ParsesLabelText ()
     {
-        Assert.Equal("foo", parser.Parse("#foo").Label);
+        Assert.Equal("foo", parser.Parse("#foo").Label.Text);
         Assert.Empty(parser.Errors);
     }
 
     [Fact]
     public void WhenLabelMissingErrorIsAddedAndLabelIsEmpty ()
     {
-        Assert.Equal("", parser.Parse("# ").Label);
+        Assert.Equal("", parser.Parse("# ").Label.Text);
         Assert.True(parser.HasError(MissingLabel));
     }
 
     [Fact]
     public void TrimsLabelText ()
     {
-        Assert.Equal("foo", parser.Parse(" #  foo \t").Label);
+        Assert.Equal("foo", parser.Parse(" #  foo \t").Label.Text);
         Assert.Empty(parser.Errors);
     }
 
     [Fact]
     public void WhenLineIdIsMissingErrorIsAddedAndLabelIsEmpty ()
     {
-        Assert.Equal("", parser.Parse("foo").Label);
+        Assert.Equal("", parser.Parse("foo").Label.Text);
         Assert.True(parser.HasError(MissingLineId));
     }
 
     [Fact]
     public void WhenSpaceInLabelErrorIsAddedAndLabelIsEmpty ()
     {
-        Assert.Equal("", parser.Parse("# foo bar").Label);
+        Assert.Equal("", parser.Parse("# foo bar").Label.Text);
         Assert.True(parser.HasError(SpaceInLabel));
     }
 }

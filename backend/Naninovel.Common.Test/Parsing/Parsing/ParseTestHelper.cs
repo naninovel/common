@@ -8,11 +8,12 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
 {
     public List<Token> Tokens { get; } = new();
     public List<ParseError> Errors { get; } = new();
+    public TokenResolver Resolver { get; } = new();
 
-    private readonly Func<string, IReadOnlyList<Token>, ICollection<ParseError>, TLine> parse;
+    private readonly Func<string, IReadOnlyList<Token>, ICollection<ParseError>, TokenResolver, TLine> parse;
     private readonly Lexer lexer = new();
 
-    public ParseTestHelper (Func<string, IReadOnlyList<Token>, ICollection<ParseError>, TLine> parse)
+    public ParseTestHelper (Func<string, IReadOnlyList<Token>, ICollection<ParseError>, TokenResolver, TLine> parse)
     {
         this.parse = parse;
     }
@@ -21,7 +22,7 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
     {
         Tokens.Clear();
         lexer.TokenizeLine(lineText, Tokens);
-        return parse(lineText, Tokens, Errors);
+        return parse(lineText, Tokens, Errors, Resolver);
     }
 
     public bool HasError (string message)
@@ -32,5 +33,10 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
     public bool HasError (ErrorType error)
     {
         return Errors.Any(e => e.Message == LexingErrors.GetFor(error));
+    }
+
+    public Token? Resolve (ILineComponent component)
+    {
+        return Resolver.Resolve(component);
     }
 }

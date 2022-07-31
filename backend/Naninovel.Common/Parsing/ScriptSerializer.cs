@@ -112,7 +112,7 @@ public class ScriptSerializer
     private void AppendGenericPrefix (GenericPrefix prefix)
     {
         builder.Append(prefix.Author);
-        if (!string.IsNullOrEmpty(prefix.Appearance))
+        if (prefix.Appearance != null)
         {
             builder.Append(Identifiers.AuthorAppearance[0]);
             builder.Append(prefix.Appearance);
@@ -138,12 +138,12 @@ public class ScriptSerializer
 
     private void AppendMixed (IMixedValue value)
     {
-        if (value is PlainText text) mixedBuilder.Append(text.Text);
+        if (value is PlainText text) mixedBuilder.Append(text);
         else if (value is Expression expression)
         {
             var startIndex = mixedBuilder.Length;
             mixedBuilder.Append(Identifiers.ExpressionOpen);
-            mixedBuilder.Append(expression.Text);
+            mixedBuilder.Append(expression.Body);
             mixedBuilder.Append(Identifiers.ExpressionClose);
             ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
         }

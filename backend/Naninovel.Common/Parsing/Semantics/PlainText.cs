@@ -1,14 +1,12 @@
 ﻿namespace Naninovel.Parsing;
 
 /// <summary>
-/// Text interpreted as-is at runtime.
+/// Represents plain text content.
 /// </summary>
-/// <remarks>
-/// The type is used to distinct text parts of composite values
-/// from dynamically-evaluated <see cref="Expression"/>.
-/// </remarks>
-public class PlainText : IMixedValue
+public class PlainText : ILineComponent, IMixedValue
 {
+    public static readonly PlainText Empty = new("");
+
     /// <summary>
     /// The text content.
     /// </summary>
