@@ -64,7 +64,7 @@ public class ScriptParser
             LineType.Comment => commentParser.Parse(lineText, tokens),
             LineType.Label => labelParser.Parse(lineText, tokens),
             LineType.Command => commandParser.Parse(lineText, tokens),
-            _ => genericParser.Parse(lineText, tokens),
+            _ => genericParser.Parse(lineText, tokens)
         };
     }
 }
