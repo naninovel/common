@@ -6,24 +6,23 @@ public readonly struct Token : IEquatable<Token>
 {
     public readonly TokenType Type;
     public readonly ErrorType Error;
-    public readonly int StartIndex;
-    public readonly int Length;
-    public int EndIndex => StartIndex + Length - 1;
+    public readonly LineRange Range;
+
+    public int StartIndex => Range.StartIndex;
+    public int EndIndex => Range.EndIndex;
+    public int Length => Range.Length;
 
     public Token (TokenType type, int startIndex, int length)
-        : this(type, default, startIndex, length) { }
+        : this(type, default, new LineRange(startIndex, length)) { }
 
     public Token (ErrorType error, int startIndex, int length)
-        : this(TokenType.Error, error, startIndex, length) { }
+        : this(TokenType.Error, error, new(startIndex, length)) { }
 
-    private Token (TokenType type, ErrorType error, int startIndex, int length)
+    private Token (TokenType type, ErrorType error, LineRange range)
     {
-        if (startIndex < 0) throw new ArgumentOutOfRangeException(nameof(startIndex));
-        if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
         Type = type;
         Error = error;
-        StartIndex = startIndex;
-        Length = length;
+        Range = range;
     }
 
     public bool IsError (ErrorType error) => Type == TokenType.Error && Error == error;
@@ -31,17 +30,17 @@ public readonly struct Token : IEquatable<Token>
     public override string ToString ()
     {
         var type = Type == TokenType.Error ? $"Error#{Error}" : Type.ToString();
-        return $"{type} ({StartIndex}-{EndIndex})";
+        return $"{type} ({Range})";
     }
-
-    public override bool Equals (object obj) => obj is Token other && Equals(other);
 
     public bool Equals (Token other)
     {
-        return Type == other.Type &&
-               Error == other.Error &&
-               StartIndex == other.StartIndex &&
-               Length == other.Length;
+        return Type == other.Type && Error == other.Error && Range.Equals(other.Range);
+    }
+
+    public override bool Equals (object obj)
+    {
+        return obj is Token other && Equals(other);
     }
 
     public override int GetHashCode ()
@@ -50,8 +49,7 @@ public readonly struct Token : IEquatable<Token>
         {
             var hashCode = (int)Type;
             hashCode = (hashCode * 397) ^ (int)Error;
-            hashCode = (hashCode * 397) ^ StartIndex;
-            hashCode = (hashCode * 397) ^ Length;
+            hashCode = (hashCode * 397) ^ Range.GetHashCode();
             return hashCode;
         }
     }

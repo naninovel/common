@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 /// An optional construct of <see cref="GenericLine"/> used
 /// to associate printed text with an author.
 /// </summary>
-public class GenericPrefix
+public class GenericPrefix : ILineComponent
 {
     /// <summary>
     /// Author (actor) identifier to associate with the printed text.

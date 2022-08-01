@@ -61,19 +61,25 @@ internal class MixedValueParser
 
         bool IsTextStarted () => textStartIndex != -1;
 
-        void AddText (int endIndex)
+        void AddText (int length)
         {
-            var text = walker.Extract(textStartIndex, endIndex);
-            var decoded = ValueCoder.UnescapeMixed(text, unescapeQuotes);
-            value.Add(new PlainText(decoded));
+            var text = walker.Extract(textStartIndex, length);
+            var plain = new PlainText(ValueCoder.UnescapeMixed(text, unescapeQuotes));
+            walker.Associate(plain, new LineRange(textStartIndex, length));
+            value.Add(plain);
             textStartIndex = -1;
         }
 
-        void AddExpression (Token expression)
+        void AddExpression (Token expressionToken)
         {
-            var startIndex = expression.StartIndex + 1;
-            var length = expression.EndIndex - expression.StartIndex - 1;
-            value.Add(new Expression(new(walker.Extract(startIndex, length))));
+            var bodyStart = expressionToken.StartIndex + 1;
+            var bodyLength = expressionToken.EndIndex - expressionToken.StartIndex - 1;
+            var body = new PlainText(walker.Extract(bodyStart, bodyLength));
+            if (bodyLength > 0)
+                walker.Associate(body, new LineRange(bodyStart, bodyLength));
+            var expression = new Expression(body);
+            walker.Associate(expression, expressionToken);
+            value.Add(expression);
         }
     }
 }

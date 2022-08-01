@@ -33,4 +33,12 @@ public class CommentLineParserTest
         Assert.Equal("", parser.Parse("foo").Comment.Text);
         Assert.True(parser.HasError(ParsingErrors.MissingLineId));
     }
+
+    [Fact]
+    public void RangesAreAssociatedCorrectly ()
+    {
+        var parser = new ParseTestHelper<CommentLine>((e, a) => new CommentLineParser(e, a).Parse);
+        var line = parser.Parse("; comment");
+        Assert.Equal(new(2, 7), parser.Resolve(line.Comment));
+    }
 }

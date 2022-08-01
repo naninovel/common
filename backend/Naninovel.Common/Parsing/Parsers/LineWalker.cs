@@ -47,9 +47,14 @@ internal class LineWalker
         errorHandler?.HandleError(new(token));
     }
 
+    public void Associate (ILineComponent component, LineRange range)
+    {
+        associator?.Associate(component, range);
+    }
+
     public void Associate (ILineComponent component, Token token)
     {
-        associator?.Associate(component, token);
+        Associate(component, token.Range);
     }
 
     public bool Next (TokenType types, ErrorType errors, out Token token)

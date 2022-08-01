@@ -42,4 +42,11 @@ public class LabelLineParserTest
         Assert.Equal("", parser.Parse("# foo bar").Label.Text);
         Assert.True(parser.HasError(SpaceInLabel));
     }
+
+    [Fact]
+    public void RangesAreAssociatedCorrectly ()
+    {
+        var line = parser.Parse("# label");
+        Assert.Equal(new(2, 5), parser.Resolve(line.Label));
+    }
 }

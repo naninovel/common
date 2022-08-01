@@ -7,11 +7,13 @@ namespace Naninovel.Parsing;
 
 internal class CommandParser
 {
+    private static readonly Command emptyBody = new(PlainText.Empty);
     private readonly MixedValueParser valueParser = new(true);
     private readonly List<Parameter> parameters = new();
     private readonly List<IMixedValue> value = new();
     private LineWalker walker = null!;
-    private PlainText commandId = null!;
+    private Command commandBody = emptyBody;
+    private PlainText commandId = PlainText.Empty;
     private PlainText paramId;
 
     public Command Parse (LineWalker walker)
@@ -20,13 +22,14 @@ internal class CommandParser
         if (TryCommandId())
             while (TryParameter())
                 continue;
-        return new Command(commandId, parameters.ToArray());
+        return commandBody;
     }
 
     private void ResetCommandState (LineWalker walker)
     {
         this.walker = walker;
         commandId = PlainText.Empty;
+        commandBody = emptyBody;
         parameters.Clear();
         ResetParameterState();
     }
@@ -43,8 +46,14 @@ internal class CommandParser
         if (!walker.Next(CommandId | Error, MissingCommandId, out var token))
             walker.Error(MissingCommandTokens);
         else if (token.IsError(MissingCommandId)) walker.Error(token);
-        else commandId = new(walker.Extract(token));
+        else ParseCommandId(token);
         return commandId != PlainText.Empty;
+    }
+
+    private void ParseCommandId (Token commandIdToken)
+    {
+        commandId = new(walker.Extract(commandIdToken));
+        walker.Associate(commandId, commandIdToken);
     }
 
     private bool TryParameter ()
@@ -54,7 +63,7 @@ internal class CommandParser
         switch (token.Type)
         {
             case ParamId:
-                paramId = new(walker.Extract(token));
+                ParseParameterId(token);
                 return true;
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
@@ -64,9 +73,10 @@ internal class CommandParser
                 return true;
             case NamelessParam:
             case NamedParam:
-                AddParameter();
+                ParseParameter(token);
                 return true;
             case CommandBody:
+                ParseCommandBody(token);
                 return false;
             case Error:
                 walker.Error(token);
@@ -75,9 +85,23 @@ internal class CommandParser
         }
     }
 
-    private void AddParameter ()
+    private void ParseParameterId (Token paramIdToken)
     {
-        parameters.Add(new(paramId, value.ToArray()));
+        paramId = new(walker.Extract(paramIdToken));
+        walker.Associate(paramId, paramIdToken);
+    }
+
+    private void ParseParameter (Token paramToken)
+    {
+        var param = new Parameter(paramId, value.ToArray());
+        parameters.Add(param);
+        walker.Associate(param, paramToken);
         ResetParameterState();
+    }
+
+    private void ParseCommandBody (Token bodyToken)
+    {
+        commandBody = new Command(commandId, parameters.ToArray());
+        walker.Associate(commandBody, bodyToken);
     }
 }

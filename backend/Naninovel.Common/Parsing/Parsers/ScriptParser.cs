@@ -21,7 +21,7 @@ public class ScriptParser
     /// Creates a new parser instance.
     /// </summary>
     /// <param name="errorHandler">Optional handler for parsing errors.</param>
-    /// <param name="associator">Optional handler for associating lex tokens and parse models.</param>
+    /// <param name="associator">Optional handler for associating parse models with text ranges.</param>
     public ScriptParser (IErrorHandler errorHandler = null, IAssociator associator = null)
     {
         commandParser = new(errorHandler, associator);

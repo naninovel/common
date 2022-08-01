@@ -169,4 +169,19 @@ public class CommandLineParserTest
         Assert.Equal(@" Random(var, "" \"" "") ", (line.Command.Parameters[0].Value[1] as Expression)!.Body.Text);
         Assert.Equal(@" "" ", (line.Command.Parameters[0].Value[2] as PlainText)!.Text);
     }
+
+    [Fact]
+    public void RangesAreAssociatedCorrectly ()
+    {
+        var line = parser.Parse("@c v p:v{x}");
+        Assert.Equal(new(1, 10), parser.Resolve(line.Command));
+        Assert.Equal(new(1, 1), parser.Resolve(line.Command.Identifier));
+        Assert.Equal(new(3, 1), parser.Resolve(line.Command.Parameters[0]));
+        Assert.Equal(new(3, 1), parser.Resolve(line.Command.Parameters[0].Value[0] as PlainText));
+        Assert.Equal(new(5, 6), parser.Resolve(line.Command.Parameters[1]));
+        Assert.Equal(new(5, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
+        Assert.Equal(new(7, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
+        Assert.Equal(new(8, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
+        Assert.Equal(new(9, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
+    }
 }
