@@ -24,12 +24,12 @@ public class ScriptSerializerTest
     [Fact]
     public void CanSerializeCommandLine ()
     {
-        var param1 = new Parameter(new IMixedValue[] {
+        var param1 = new Parameter(new(new IMixedValue[] {
             new PlainText(@"\{}"),
             new Expression(new("x < y")),
             new PlainText(@"\")
-        });
-        var param2 = new Parameter(new("p"), new[] { new PlainText(@"x "" { } [ ] \") });
+        }));
+        var param2 = new Parameter(new("p"), new(new[] { new PlainText(@"x "" { } [ ] \") }));
         var command = new Command(new("cmd"), new[] { param1, param2 });
         var line = new CommandLine(command);
         Assert.Equal(@"@cmd \\\{\}{x < y}\\ p:""x \"" \{ \} \[ \] \\""", serializer.Serialize(line));
@@ -38,8 +38,8 @@ public class ScriptSerializerTest
     [Fact]
     public void NamelessParameterIsWrittenFirst ()
     {
-        var named = new Parameter(new("p"), new[] { new PlainText("v") });
-        var nameless = new Parameter(new[] { new PlainText("foo") });
+        var named = new Parameter(new("p"), new(new[] { new PlainText("v") }));
+        var nameless = new Parameter(new(new[] { new PlainText("foo") }));
         var command = new Command(new("cmd"), new[] { named, nameless });
         Assert.Equal("@cmd foo p:v", serializer.Serialize(new CommandLine(command)));
     }
@@ -47,7 +47,7 @@ public class ScriptSerializerTest
     [Fact]
     public void WhenStartingWithQuoteParameterValueIsWrapped ()
     {
-        var param = new Parameter(new[] { new PlainText("\"") });
+        var param = new Parameter(new(new[] { new PlainText("\"") }));
         var command = new Command(new("c"), new[] { param });
         Assert.Equal(@"@c ""\""""", serializer.Serialize(new CommandLine(command)));
     }
@@ -55,7 +55,7 @@ public class ScriptSerializerTest
     [Fact]
     public void WhenParameterValueContainQuotesItIsWrapped ()
     {
-        var param = new Parameter(new[] { new PlainText("x\"x") });
+        var param = new Parameter(new(new[] { new PlainText("x\"x") }));
         var command = new Command(new("c"), new[] { param });
         Assert.Equal(@"@c ""x\""x""", serializer.Serialize(new CommandLine(command)));
     }
@@ -65,7 +65,7 @@ public class ScriptSerializerTest
     {
         var prefix = new GenericPrefix(new("auth"), new("app"));
         var inlined1 = new InlinedCommand(new(new("i")));
-        var inlined2 = new InlinedCommand(new(new("cmd"), new[] { new Parameter(new("p"), new[] { new PlainText("v") }) }));
+        var inlined2 = new InlinedCommand(new(new("cmd"), new[] { new Parameter(new("p"), new(new[] { new PlainText("v") })) }));
         var text1 = new GenericText(new IMixedValue[] {
             new PlainText(@"""{}"),
             new Expression(new("x < y")),

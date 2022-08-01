@@ -8,25 +8,25 @@ public class SemanticsTest
     [Fact]
     public void WhenParamIdentifierMissingNamelessIsTrue ()
     {
-        Assert.True(new Parameter(null, Array.Empty<IMixedValue>()).Nameless);
+        Assert.True(new Parameter(new(Array.Empty<IMixedValue>())).Nameless);
     }
 
     [Fact]
     public void WhenParamIdentifierSpecifiedNamelessIsFalse ()
     {
-        Assert.False(new Parameter(new("foo"), Array.Empty<IMixedValue>()).Nameless);
+        Assert.False(new Parameter(new("foo"), new(Array.Empty<IMixedValue>())).Nameless);
     }
 
     [Fact]
     public void WhenParamValueContainsExpressionDynamicIsTrue ()
     {
-        Assert.True(new Parameter(null, new[] { new Expression(PlainText.Empty) }).Dynamic);
+        Assert.True(new Parameter(new(new[] { new Expression(PlainText.Empty) })).Value.Dynamic);
     }
 
     [Fact]
     public void WhenParamValueDoesntContainExpressionDynamicIsFalse ()
     {
-        Assert.False(new Parameter(null, new[] { new PlainText("") }).Dynamic);
+        Assert.False(new Parameter(new(new[] { new PlainText("") })).Value.Dynamic);
     }
 
     [Fact]
@@ -46,8 +46,8 @@ public class SemanticsTest
     [Fact]
     public void CommandLineToStringIsCorrect ()
     {
-        var param1 = new Parameter(null, new IMixedValue[] { new PlainText("v1"), new Expression(new("e")) });
-        var param2 = new Parameter(new("p2"), new[] { new PlainText("v2") });
+        var param1 = new Parameter(new(new IMixedValue[] { new PlainText("v1"), new Expression(new("e")) }));
+        var param2 = new Parameter(new("p2"), new(new[] { new PlainText("v2") }));
         var line = new CommandLine(new(new("c"), new[] { param1, param2 }));
         Assert.Equal("@c v1{e} p2:v2", line.ToString());
     }

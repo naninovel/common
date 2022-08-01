@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static Naninovel.Parsing.TokenType;
 using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
@@ -8,12 +9,13 @@ namespace Naninovel.Parsing;
 internal class CommandParser
 {
     private static readonly Command emptyBody = new(PlainText.Empty);
+    private static readonly ParameterValue emptyValue = new(Array.Empty<IMixedValue>());
     private readonly MixedValueParser valueParser = new(true);
     private readonly List<Parameter> parameters = new();
-    private readonly List<IMixedValue> value = new();
     private LineWalker walker = null!;
     private Command commandBody = emptyBody;
     private PlainText commandId = PlainText.Empty;
+    private ParameterValue paramValue = emptyValue;
     private PlainText paramId;
 
     public Command Parse (LineWalker walker)
@@ -37,7 +39,7 @@ internal class CommandParser
     private void ResetParameterState ()
     {
         paramId = null;
-        value.Clear();
+        paramValue = emptyValue;
         valueParser.ClearAddedExpressions();
     }
 
@@ -69,7 +71,7 @@ internal class CommandParser
                 valueParser.AddExpressionToken(token);
                 return true;
             case ParamValue:
-                value.AddRange(valueParser.Parse(token, walker));
+                ParseParameterValue(token);
                 return true;
             case NamelessParam:
             case NamedParam:
@@ -91,9 +93,15 @@ internal class CommandParser
         walker.Associate(paramId, paramIdToken);
     }
 
+    private void ParseParameterValue (Token valueToken)
+    {
+        paramValue = new ParameterValue(valueParser.Parse(valueToken, walker));
+        walker.Associate(paramValue, valueToken);
+    }
+
     private void ParseParameter (Token paramToken)
     {
-        var param = new Parameter(paramId, value.ToArray());
+        var param = new Parameter(paramId, paramValue);
         parameters.Add(param);
         walker.Associate(param, paramToken);
         ResetParameterState();

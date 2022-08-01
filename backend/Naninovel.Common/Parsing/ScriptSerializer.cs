@@ -82,7 +82,7 @@ public class ScriptSerializer
         if (genericLine.Prefix != null)
             AppendGenericPrefix(genericLine.Prefix);
         foreach (var content in genericLine.Content)
-            if (content is GenericText text) AppendMixed(text.Text, false);
+            if (content is GenericText text) AppendMixed(text.Mixed, false);
             else AppendInlinedCommand((InlinedCommand)content);
     }
 
@@ -106,7 +106,7 @@ public class ScriptSerializer
             builder.Append(Identifiers.ParameterAssign[0]);
         }
 
-        AppendMixed(parameter.Value, true);
+        AppendMixed(parameter.Value.Mixed, true);
     }
 
     private void AppendGenericPrefix (GenericPrefix prefix)

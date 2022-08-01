@@ -11,17 +11,17 @@ public class GenericText : ILineComponent, IGenericContent
     /// <summary>
     /// The text to print; can contain script expressions.
     /// </summary>
-    public IReadOnlyList<IMixedValue> Text { get; }
+    public IReadOnlyList<IMixedValue> Mixed { get; }
 
-    public GenericText (IReadOnlyList<IMixedValue> text)
+    public GenericText (IReadOnlyList<IMixedValue> mixed)
     {
-        Text = text;
+        Mixed = mixed;
     }
 
     public override string ToString ()
     {
         var builder = new StringBuilder();
-        foreach (var value in Text)
+        foreach (var value in Mixed)
             builder.Append(value);
         return builder.ToString();
     }

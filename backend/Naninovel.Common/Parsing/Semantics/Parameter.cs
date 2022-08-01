@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Naninovel.Parsing;
@@ -19,9 +17,9 @@ public class Parameter : ILineComponent
     /// </remarks>
     public PlainText Identifier { get; }
     /// <summary>
-    /// Value of the parameter; can contain expressions.
+    /// Value of the parameter.
     /// </summary>
-    public IReadOnlyList<IMixedValue> Value { get; }
+    public ParameterValue Value { get; }
     /// <summary>
     /// Whether the parameter doesn't have identifier specified.
     /// </summary>
@@ -29,18 +27,14 @@ public class Parameter : ILineComponent
     /// Command can have a single nameless parameter.
     /// </remarks>
     public bool Nameless => Identifier is null;
-    /// <summary>
-    /// Whether value of the parameter contains an expression and will be evaluated at runtime.
-    /// </summary>
-    public bool Dynamic => Value.Any(v => v is Expression);
 
-    public Parameter (PlainText identifier, IReadOnlyList<IMixedValue> value)
+    public Parameter (PlainText identifier, ParameterValue value)
     {
         Identifier = identifier;
         Value = value;
     }
 
-    public Parameter (IReadOnlyList<IMixedValue> value) : this(null, value) { }
+    public Parameter (ParameterValue value) : this(null, value) { }
 
     public override string ToString ()
     {
@@ -50,8 +44,7 @@ public class Parameter : ILineComponent
             builder.Append(Identifier);
             builder.Append(Identifiers.ParameterAssign);
         }
-        foreach (var value in Value)
-            builder.Append(value);
+        builder.Append(Value);
         return builder.ToString();
     }
 }
