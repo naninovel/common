@@ -7,24 +7,27 @@ namespace Naninovel.Parsing;
 
 public class CommandLineParser
 {
-    private readonly LineWalker walker = new();
     private readonly CommandParser commandParser = new();
+    private readonly LineWalker walker;
     private Command command = null!;
 
-    public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null, TokenResolver resolver = null)
+    public CommandLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
     {
-        ResetState(lineText, tokens, errors, resolver);
+        walker = new(errorHandler, associator);
+    }
+
+    public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens)
+    {
+        ResetState(lineText, tokens);
         if (!walker.Next(LineId, out _))
-            walker.AddError(MissingLineId);
+            walker.Error(MissingLineId);
         else command = commandParser.Parse(walker);
         return new CommandLine(command);
     }
 
-    private void ResetState (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors, TokenResolver resolver)
+    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
     {
         command = new(PlainText.Empty, Array.Empty<Parameter>());
-        walker.Reset(lineText, tokens, errors, resolver);
+        walker.Reset(lineText, tokens);
     }
 }

@@ -3,14 +3,14 @@
 namespace Naninovel.Parsing;
 
 /// <summary>
-/// Allows keeping track of <see cref="Token"/> associated with <see cref="ILineComponent"/>.
+/// Allows mapping <see cref="Token"/> to associated <see cref="ILineComponent"/>.
 /// </summary>
-public class TokenResolver
+public class TokenMapper : IAssociator
 {
     private readonly Dictionary<ILineComponent, Token> map = new();
 
     /// <summary>
-    /// Associates provided line component instance with the specified token.
+    /// Maps provided token to the specified line component instance.
     /// </summary>
     public void Associate (ILineComponent component, Token token)
     {
@@ -18,7 +18,7 @@ public class TokenResolver
     }
 
     /// <summary>
-    /// Attempts to resolve token associated with the provided line component instance.
+    /// Attempts to resolve token mapped to the provided line component instance.
     /// </summary>
     /// <returns>Associated token or null.</returns>
     public Token? Resolve (ILineComponent component)
@@ -27,7 +27,7 @@ public class TokenResolver
     }
 
     /// <summary>
-    /// Discards stored associations.
+    /// Discards stored data.
     /// </summary>
     public void Clear ()
     {

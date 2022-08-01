@@ -5,10 +5,10 @@ namespace Naninovel.Parsing.Test;
 
 public class TokenResolverTest
 {
-    private readonly ParseTestHelper<CommentLine> commentParser = new(new CommentLineParser().Parse);
-    private readonly ParseTestHelper<LabelLine> labelParser = new(new LabelLineParser().Parse);
-    private readonly ParseTestHelper<CommandLine> commandParser = new(new CommandLineParser().Parse);
-    private readonly ParseTestHelper<GenericLine> genericParser = new(new GenericLineParser().Parse);
+    private readonly ParseTestHelper<CommentLine> commentParser = new((e, a) => new CommentLineParser(e, a).Parse);
+    private readonly ParseTestHelper<LabelLine> labelParser = new((e, a) => new LabelLineParser(e, a).Parse);
+    private readonly ParseTestHelper<CommandLine> commandParser = new((e, a) => new CommandLineParser(e, a).Parse);
+    private readonly ParseTestHelper<GenericLine> genericParser = new((e, a) => new GenericLineParser(e, a).Parse);
 
     [Fact]
     public void CommentLineComponentsAssociatedCorrectly ()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 
 namespace Naninovel.Parsing.Test;
 
@@ -8,21 +9,25 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
 {
     public List<Token> Tokens { get; } = new();
     public List<ParseError> Errors { get; } = new();
-    public TokenResolver Resolver { get; } = new();
+    public Dictionary<ILineComponent, Token> Associations { get; } = new();
 
-    private readonly Func<string, IReadOnlyList<Token>, ICollection<ParseError>, TokenResolver, TLine> parse;
+    private readonly Func<string, IReadOnlyList<Token>, TLine> parse;
     private readonly Lexer lexer = new();
 
-    public ParseTestHelper (Func<string, IReadOnlyList<Token>, ICollection<ParseError>, TokenResolver, TLine> parse)
+    public ParseTestHelper (Func<IErrorHandler, IAssociator, Func<string, IReadOnlyList<Token>, TLine>> ctor)
     {
-        this.parse = parse;
+        var errorHandler = new Mock<IErrorHandler>();
+        errorHandler.Setup(h => h.HandleError(Capture.In(Errors)));
+        var associator = new Mock<IAssociator>();
+        associator.Setup(a => a.Associate(It.IsAny<ILineComponent>(), It.IsAny<Token>())).Callback(Associations.Add);
+        parse = ctor(errorHandler.Object, associator.Object);
     }
 
     public TLine Parse (string lineText)
     {
         Tokens.Clear();
         lexer.TokenizeLine(lineText, Tokens);
-        return parse(lineText, Tokens, Errors, Resolver);
+        return parse(lineText, Tokens);
     }
 
     public bool HasError (string message)
@@ -37,6 +42,6 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
 
     public Token? Resolve (ILineComponent component)
     {
-        return Resolver.Resolve(component);
+        return Associations.TryGetValue(component, out var token) ? token : null;
     }
 }

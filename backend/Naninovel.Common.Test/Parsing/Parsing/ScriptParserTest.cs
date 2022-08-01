@@ -1,11 +1,16 @@
-﻿using System.Collections.Generic;
-using Xunit;
+﻿using Xunit;
 
 namespace Naninovel.Parsing.Test;
 
 public class ScriptParserTest
 {
-    private readonly ScriptParser parser = new();
+    private readonly ErrorCollector errors = new();
+    private readonly ScriptParser parser;
+
+    public ScriptParserTest ()
+    {
+        parser = new(errors);
+    }
 
     [Fact]
     public void WhenSplitNullReturnsEmptyString ()
@@ -47,8 +52,7 @@ Generic text line
     [Fact]
     public void LexingErrorPreserved ()
     {
-        var errors = new List<ParseError>();
-        parser.ParseLine("# x  x", errors);
+        parser.ParseLine("# x  x");
         Assert.Single(errors);
         Assert.Equal(LexingErrors.GetFor(ErrorType.SpaceInLabel), errors[0].Message);
         Assert.Equal(3, errors[0].StartIndex);

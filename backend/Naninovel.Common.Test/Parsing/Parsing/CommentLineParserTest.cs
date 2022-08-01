@@ -4,7 +4,7 @@ namespace Naninovel.Parsing.Test;
 
 public class CommentLineParserTest
 {
-    private readonly ParseTestHelper<CommentLine> parser = new(new CommentLineParser().Parse);
+    private readonly ParseTestHelper<CommentLine> parser = new((e, a) => new CommentLineParser(e, a).Parse);
 
     [Fact]
     public void ParsesCommentText ()

@@ -5,24 +5,27 @@ namespace Naninovel.Parsing;
 
 public class GenericLineParser
 {
-    private readonly LineWalker walker = new();
     private readonly CommandParser commandParser = new();
     private readonly MixedValueParser valueParser = new(false);
     private readonly List<IGenericContent> content = new();
+    private readonly LineWalker walker;
     private GenericPrefix prefix;
 
-    public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors = null, TokenResolver resolver = null)
+    public GenericLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
     {
-        ResetState(lineText, tokens, errors, resolver);
+        walker = new(errorHandler, associator);
+    }
+
+    public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens)
+    {
+        ResetState(lineText, tokens);
         while (TryNext()) continue;
         return new GenericLine(prefix, content.ToArray());
     }
 
-    private void ResetState (string lineText, IReadOnlyList<Token> tokens,
-        ICollection<ParseError> errors, TokenResolver resolver)
+    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
     {
-        walker.Reset(lineText, tokens, errors, resolver);
+        walker.Reset(lineText, tokens);
         content.Clear();
         prefix = null;
     }
@@ -53,7 +56,7 @@ public class GenericLineParser
                 AddInlined();
                 return true;
             case Error:
-                walker.AddError(token);
+                walker.Error(token);
                 return true;
             default: return true;
         }

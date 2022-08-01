@@ -6,7 +6,7 @@ namespace Naninovel.Parsing.Test;
 
 public class LabelLineParserTest
 {
-    private readonly ParseTestHelper<LabelLine> parser = new(new LabelLineParser().Parse);
+    private readonly ParseTestHelper<LabelLine> parser = new((e, a) => new LabelLineParser(e, a).Parse);
 
     [Fact]
     public void ParsesLabelText ()

@@ -5,7 +5,7 @@ namespace Naninovel.Parsing.Test;
 
 public class GenericLineParserTest
 {
-    private readonly ParseTestHelper<GenericLine> parser = new(new GenericLineParser().Parse);
+    private readonly ParseTestHelper<GenericLine> parser = new((e, a) => new GenericLineParser(e, a).Parse);
 
     [Fact]
     public void WhenMissingInlinedCommandIdErrorIsAdded ()

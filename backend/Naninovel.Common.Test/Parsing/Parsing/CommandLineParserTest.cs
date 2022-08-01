@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using Xunit;
-using System.Linq;
 using static Naninovel.Parsing.TokenType;
 using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
@@ -9,7 +8,7 @@ namespace Naninovel.Parsing.Test;
 
 public class CommandLineParserTest
 {
-    private readonly ParseTestHelper<CommandLine> parser = new(new CommandLineParser().Parse);
+    private readonly ParseTestHelper<CommandLine> parser = new((e, a) => new CommandLineParser(e, a).Parse);
 
     [Fact]
     public void WhenLineIdIsMissingErrorIsAddedAndCommandIsEmpty ()
@@ -32,9 +31,9 @@ public class CommandLineParserTest
     [Fact]
     public void WhenCommandTokensMissingErrorIsAdded ()
     {
-        var errors = new List<ParseError>();
-        var parser = new CommandLineParser();
-        parser.Parse("@", new[] { new Token(LineId, 0, 1) }, errors);
+        var errors = new ErrorCollector();
+        var parser = new CommandLineParser(errors);
+        parser.Parse("@", new[] { new Token(LineId, 0, 1) });
         Assert.Contains(MissingCommandTokens, errors.Select(e => e.Message));
     }
 

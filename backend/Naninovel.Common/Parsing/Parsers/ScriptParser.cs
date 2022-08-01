@@ -12,10 +12,23 @@ public class ScriptParser
 
     private readonly Lexer lexer = new();
     private readonly List<Token> tokens = new();
-    private readonly CommandLineParser commandParser = new();
-    private readonly CommentLineParser commentParser = new();
-    private readonly GenericLineParser genericParser = new();
-    private readonly LabelLineParser labelParser = new();
+    private readonly CommandLineParser commandParser;
+    private readonly CommentLineParser commentParser;
+    private readonly GenericLineParser genericParser;
+    private readonly LabelLineParser labelParser;
+
+    /// <summary>
+    /// Creates a new parser instance.
+    /// </summary>
+    /// <param name="errorHandler">Optional handler for parsing errors.</param>
+    /// <param name="associator">Optional handler for associating lex tokens and parse models.</param>
+    public ScriptParser (IErrorHandler errorHandler = null, IAssociator associator = null)
+    {
+        commandParser = new(errorHandler, associator);
+        commentParser = new(errorHandler, associator);
+        genericParser = new(errorHandler, associator);
+        labelParser = new(errorHandler, associator);
+    }
 
     /// <summary>
     /// Splits provided script text into individual lines.
@@ -31,13 +44,12 @@ public class ScriptParser
     /// Parses provided script text to semantic models.
     /// </summary>
     /// <param name="scriptText">The script text to parse.</param>
-    /// <param name="errors">When provided, will add parse errors to the collection.</param>
-    public List<IScriptLine> ParseText (string scriptText, ICollection<ParseError> errors = default)
+    public List<IScriptLine> ParseText (string scriptText)
     {
         var lines = new List<IScriptLine>();
         var textLines = SplitText(scriptText);
         foreach (var textLine in textLines)
-            lines.Add(ParseLine(textLine, errors));
+            lines.Add(ParseLine(textLine));
         return lines;
     }
 
@@ -45,15 +57,14 @@ public class ScriptParser
     /// Parses an individual script text line to the corresponding semantic model.
     /// </summary>
     /// <param name="lineText">The script text line to parse.</param>
-    /// <param name="errors">When provided, will add parse errors to the collection.</param>
-    public IScriptLine ParseLine (string lineText, ICollection<ParseError> errors = default)
+    public IScriptLine ParseLine (string lineText)
     {
         tokens.Clear();
         return lexer.TokenizeLine(lineText, tokens) switch {
-            LineType.Comment => commentParser.Parse(lineText, tokens, errors),
-            LineType.Label => labelParser.Parse(lineText, tokens, errors),
-            LineType.Command => commandParser.Parse(lineText, tokens, errors),
-            _ => genericParser.Parse(lineText, tokens, errors),
+            LineType.Comment => commentParser.Parse(lineText, tokens),
+            LineType.Label => labelParser.Parse(lineText, tokens),
+            LineType.Command => commandParser.Parse(lineText, tokens),
+            _ => genericParser.Parse(lineText, tokens),
         };
     }
 }
