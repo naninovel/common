@@ -15,10 +15,10 @@ public class HandlersTest
     }
 
     [Fact]
-    public void WhenNotFoundMapperResolvesToNull ()
+    public void WhenNotFoundMapperResolvesToFalse ()
     {
         var component = new Mock<ILineComponent>().Object;
-        Assert.Null(new RangeMapper().Resolve(component));
+        Assert.False(new RangeMapper().TryResolve(component, out _));
     }
 
     [Fact]
@@ -28,7 +28,8 @@ public class HandlersTest
         var range = new LineRange();
         var mapper = new RangeMapper();
         mapper.Associate(component, range);
-        Assert.Equal(range, mapper.Resolve(component));
+        Assert.True(mapper.TryResolve(component, out var result));
+        Assert.Equal(range, result);
     }
 
     [Fact]
@@ -39,6 +40,6 @@ public class HandlersTest
         var mapper = new RangeMapper();
         mapper.Associate(component, range);
         mapper.Clear();
-        Assert.Null(mapper.Resolve(component));
+        Assert.False(mapper.TryResolve(component, out _));
     }
 }

@@ -20,10 +20,9 @@ public class RangeMapper : IAssociator
     /// <summary>
     /// Attempts to resolve a range associated with the provided component instance.
     /// </summary>
-    /// <returns>Associated range or null.</returns>
-    public LineRange? Resolve (ILineComponent component)
+    public bool TryResolve (ILineComponent component, out LineRange range)
     {
-        return map.TryGetValue(component, out var range) ? range : null;
+        return map.TryGetValue(component, out range);
     }
 
     /// <summary>
