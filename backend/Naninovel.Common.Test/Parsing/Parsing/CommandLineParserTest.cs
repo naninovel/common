@@ -249,4 +249,11 @@ public class CommandLineParserTest
         var line = parser.Parse(@"@c a="" \"" "";b="" \"" """);
         Assert.Equal(@"a="" \"" "";b="" \"" """, (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
     }
+
+    [Fact]
+    public void UnescapesEscapedQuotesCorrectly ()
+    {
+        var line = parser.Parse(@"@c ""a=\"" \\\"" \"";b=\"" \\\"" \""""");
+        Assert.Equal(@"a="" \"" "";b="" \"" """, (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+    }
 }

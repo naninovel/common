@@ -162,9 +162,9 @@ public class ScriptSerializerTest
     }
 
     [Fact]
-    public void WhenAllSpacesWrappedDoesntWrap ()
+    public void EscapesEscapedQuotesCorrectly ()
     {
-        Assert.Equal(@"a="" \"" "";b="" \"" """, serializer.Serialize(new IMixedValue[] {
+        Assert.Equal(@"""a=\"" \\\"" \"";b=\"" \\\"" \""""", serializer.Serialize(new IMixedValue[] {
             new PlainText(@"a="" \"" "";b="" \"" """)
         }, true));
     }

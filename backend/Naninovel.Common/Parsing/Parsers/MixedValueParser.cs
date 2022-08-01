@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using static Naninovel.Parsing.Utilities;
 
 namespace Naninovel.Parsing;
 
@@ -64,7 +65,7 @@ internal class MixedValueParser
         void AddText (int length)
         {
             var text = walker.Extract(textStartIndex, length);
-            var plain = new PlainText(ValueCoder.UnescapeMixed(text, unescapeQuotes));
+            var plain = new PlainText(UnescapePlain(text, unescapeQuotes));
             walker.Associate(plain, new LineRange(textStartIndex, length));
             value.Add(plain);
             textStartIndex = -1;
@@ -80,6 +81,21 @@ internal class MixedValueParser
             var expression = new Expression(body);
             walker.Associate(expression, expressionToken);
             value.Add(expression);
+        }
+    }
+
+    private static string UnescapePlain (string value, bool unescapeQuotes)
+    {
+        for (int i = value.Length - 2; i >= 0; i--)
+            if (ShouldRemove(i))
+                value = value.Remove(i, 1);
+        return value;
+
+        bool ShouldRemove (int i)
+        {
+            if (value[i] != '\\' || IsEscaped(value, i)) return false;
+            var prevChar = value[i + 1];
+            return unescapeQuotes && prevChar == '"' || IsControlChar(prevChar);
         }
     }
 }

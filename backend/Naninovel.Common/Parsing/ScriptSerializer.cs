@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static Naninovel.Parsing.Utilities;
 
 namespace Naninovel.Parsing;
 
@@ -133,7 +134,7 @@ public class ScriptSerializer
         mixedBuilder.Clear();
         foreach (var value in mixed)
             AppendMixed(value);
-        builder.Append(ValueCoder.Encode(mixedBuilder.ToString(), ignoreRanges, wrap));
+        builder.Append(Encode(mixedBuilder.ToString(), wrap));
     }
 
     private void AppendMixed (IMixedValue value)
@@ -146,6 +147,40 @@ public class ScriptSerializer
             mixedBuilder.Append(expression.Body);
             mixedBuilder.Append(Identifiers.ExpressionClose);
             ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
+        }
+    }
+
+    private string Encode (string value, bool wrap = true)
+    {
+        wrap = wrap && (value[0] == '\"' || IsAnySpaceOrUnclosedQuotes());
+        for (int i = value.Length - 1; i >= 0; i--)
+            if (ShouldEscape(i))
+                value = value.Insert(i, "\\");
+        if (wrap) value = $"\"{value}\"";
+        return value;
+
+        bool IsAnySpaceOrUnclosedQuotes ()
+        {
+            var wrapping = false;
+            for (int i = 0; i < value.Length; i++)
+                if (IsIgnored(ignoreRanges, i)) continue;
+                else if (char.IsWhiteSpace(value[i])) return true;
+                else if (value[i] == '"' && !IsEscaped(value, i)) wrapping = !wrapping;
+            return wrapping;
+        }
+
+        bool ShouldEscape (int i)
+        {
+            if (IsIgnored(ignoreRanges, i)) return false;
+            return IsControlChar(value[i]) || wrap && value[i] == '"';
+        }
+
+        static bool IsIgnored (IEnumerable<(int start, int length)> ignoredRanges, int i)
+        {
+            foreach (var (start, length) in ignoredRanges)
+                if (i >= start && i < start + length)
+                    return true;
+            return false;
         }
     }
 }
