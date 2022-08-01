@@ -148,4 +148,24 @@ public class ScriptSerializerTest
     {
         Assert.Equal(@"""x""", serializer.Serialize(new[] { new PlainText(@"""x""") }, false));
     }
+
+    [Fact]
+    public void WrappedMixedIsSerializedCorrectly ()
+    {
+        Assert.Equal(@""" { x }\\\""\{ \"" \}\\\""{ "" } \{ x \} """, serializer.Serialize(new IMixedValue[] {
+            new PlainText(@" "),
+            new Expression(new(" x ")),
+            new PlainText(@"\""{ "" }\"""),
+            new Expression(new(@" "" ")),
+            new PlainText(@" { x } ")
+        }, true));
+    }
+
+    [Fact]
+    public void WhenAllSpacesWrappedDoesntWrap ()
+    {
+        Assert.Equal(@"a="" \"" "";b="" \"" """, serializer.Serialize(new IMixedValue[] {
+            new PlainText(@"a="" \"" "";b="" \"" """)
+        }, true));
+    }
 }

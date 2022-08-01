@@ -186,4 +186,67 @@ public class CommandLineParserTest
         Assert.Equal(new(8, 3), parser.Resolve(line.Command.Parameters[1].Value.Mixed[1] as Expression));
         Assert.Equal(new(9, 1), parser.Resolve((line.Command.Parameters[1].Value.Mixed[1] as Expression)!.Body));
     }
+
+    [Fact]
+    public void WhenUnclosedQuotesInValueAllFollowingContentIsParsedAsValue ()
+    {
+        var line = parser.Parse(@"@c "" ");
+        Assert.Equal(@""" ", (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void EscapedEmptyContentIsParsedAsEmptyValue ()
+    {
+        var line = parser.Parse(@"@c """"");
+        Assert.Empty(line.Command.Parameters[0].Value.Mixed);
+    }
+
+    [Fact]
+    public void UnwrapsWhitespaceInValue ()
+    {
+        var line = parser.Parse(@"@c ""a \"" c""");
+        Assert.Equal(@"a "" c", (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void WhenMissingExpressionCloseErrorIsAddedButOtherContentIsParsed ()
+    {
+        var line = parser.Parse(@"@c \[x{x\[ }x\{xx\}""\\{");
+        Assert.Equal(@"[x", (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+        Assert.Equal(@"x\[ ", (line.Command.Parameters[0].Value.Mixed[1] as Expression)!.Body.Text);
+        Assert.Equal(@"x{xx}""\", (line.Command.Parameters[0].Value.Mixed[2] as PlainText)!.Text);
+        parser.HasError(MissingExpressionBody);
+    }
+
+    [Fact]
+    public void EscapedQuotesAreUnescaped ()
+    {
+        var line = parser.Parse(@"@c ""x\""\, \""x { \"" }x\\""");
+        Assert.Equal(@"x""\, ""x ", (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+        Assert.Equal(@" \"" ", (line.Command.Parameters[0].Value.Mixed[1] as Expression)!.Body.Text);
+        Assert.Equal(@"x\", (line.Command.Parameters[0].Value.Mixed[2] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void PreviousEscapesAreRespected ()
+    {
+        var line = parser.Parse(@"@c \\{ \\\ }\\\[");
+        Assert.Equal(@"\", (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+        Assert.Equal(@" \\\ ", (line.Command.Parameters[0].Value.Mixed[1] as Expression)!.Body.Text);
+        Assert.Equal(@"\[", (line.Command.Parameters[0].Value.Mixed[2] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void WhenWrappedWithoutSpacesValueIsUnwrapped ()
+    {
+        var line = parser.Parse(@"@c ""\""x\""""");
+        Assert.Equal(@"""x""", (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+    }
+
+    [Fact]
+    public void WhenAllSpacesWrappedDoesntUnwrap ()
+    {
+        var line = parser.Parse(@"@c a="" \"" "";b="" \"" """);
+        Assert.Equal(@"a="" \"" "";b="" \"" """, (line.Command.Parameters[0].Value.Mixed[0] as PlainText)!.Text);
+    }
 }

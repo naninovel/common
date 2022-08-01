@@ -83,6 +83,15 @@ public class GenericLineParserTest
     }
 
     [Fact]
+    public void PreviousEscapesAreRespected ()
+    {
+        var line = parser.Parse(@"\\{ \\\ }\\\[");
+        Assert.Equal(@"\", ((line.Content[0] as GenericText)!.Mixed[0] as PlainText)!.Text);
+        Assert.Equal(@" \\\ ", ((line.Content[0] as GenericText)!.Mixed[1] as Expression)!.Body.Text);
+        Assert.Equal(@"\[", ((line.Content[0] as GenericText)!.Mixed[2] as PlainText)!.Text);
+    }
+
+    [Fact]
     public void CurlyBracketsInPrefixAreParsedAsPlainText ()
     {
         // Required for backward compat with v1, where prefix can contain expressions.

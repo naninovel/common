@@ -109,28 +109,6 @@ public static class ValueCoder
     }
 
     /// <summary>
-    /// Escapes un-escaped quotes in the provided value and wraps it in quotes.
-    /// </summary>
-    /// <param name="value">The value to wrap.</param>
-    /// <param name="ignoredRanges">The ranges to ignore when wrapping (eg, expressions).</param>
-    public static string Wrap (string value,
-        IReadOnlyCollection<(int start, int length)> ignoredRanges = null)
-    {
-        if (value is null) return null;
-        if (value == "") return "\"\"";
-        for (int i = value.Length - 1; i >= 0; i--)
-            if (ShouldEscape(i))
-                value = value.Insert(i, "\\");
-        return $"\"{value}\"";
-
-        bool ShouldEscape (int i)
-        {
-            if (IsIgnored(ignoredRanges, i)) return false;
-            return value[i] == '"' && !IsEscaped(value, i);
-        }
-    }
-
-    /// <summary>
     /// Splits (decoded) list value into individual items.
     /// </summary>
     /// <param name="value">The decoded list value to split.</param>

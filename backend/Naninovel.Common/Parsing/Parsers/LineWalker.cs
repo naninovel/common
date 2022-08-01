@@ -29,6 +29,7 @@ internal class LineWalker
 
     public string Extract (int startIndex, int length)
     {
+        if (startIndex < 0 || startIndex >= lineText.Length || length <= 0) return "";
         return lineText.Substring(startIndex, length);
     }
 
