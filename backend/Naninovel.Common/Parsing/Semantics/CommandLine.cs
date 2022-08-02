@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 public class CommandLine : IScriptLine
 {
     /// <summary>
-    /// The command contained in the line.
+    /// The command body contained in the line.
     /// </summary>
     public Command Command { get; }
 

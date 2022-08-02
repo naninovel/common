@@ -7,7 +7,7 @@ namespace Naninovel.Parsing;
 public class InlinedCommand : ILineComponent, IGenericContent
 {
     /// <summary>
-    /// The inlined command.
+    /// The inlined command body.
     /// </summary>
     public Command Command { get; }
 
