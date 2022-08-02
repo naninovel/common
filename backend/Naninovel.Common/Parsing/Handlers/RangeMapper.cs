@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace Naninovel.Parsing;
 
 /// <summary>
 /// Allows mapping <see cref="ILineComponent"/> to associated <see cref="LineRange"/>.
 /// </summary>
-public class RangeMapper : IAssociator
+public class RangeMapper : IAssociator, IEnumerable<KeyValuePair<ILineComponent, LineRange>>
 {
     private readonly Dictionary<ILineComponent, LineRange> map = new();
 
@@ -31,5 +32,15 @@ public class RangeMapper : IAssociator
     public void Clear ()
     {
         map.Clear();
+    }
+
+    public IEnumerator<KeyValuePair<ILineComponent, LineRange>> GetEnumerator ()
+    {
+        return map.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator ()
+    {
+        return GetEnumerator();
     }
 }
