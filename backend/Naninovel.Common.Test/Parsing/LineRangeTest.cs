@@ -18,12 +18,6 @@ public class LineRangeTest
     }
 
     [Fact]
-    public void WhenLengthIsEqualZeroExceptionIsThrown ()
-    {
-        Assert.Throws<ArgumentException>(() => new LineRange(0, 0));
-    }
-
-    [Fact]
     public void EqualityWorksCorrectly ()
     {
         Assert.False(new LineRange(0, 1).Equals(new LineRange(1, 1)));

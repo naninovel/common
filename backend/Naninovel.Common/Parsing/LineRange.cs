@@ -23,7 +23,7 @@ public readonly struct LineRange : IEquatable<LineRange>
     public LineRange (int startIndex, int length)
     {
         if (startIndex < 0) throw new ArgumentException("Start index should be greater or equal to zero.", nameof(startIndex));
-        if (length <= 0) throw new ArgumentException("Length should be greater than zero.", nameof(length));
+        if (length < 0) throw new ArgumentException("Length should be greater or equal to zero.", nameof(length));
         StartIndex = startIndex;
         Length = length;
     }
