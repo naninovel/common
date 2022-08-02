@@ -54,7 +54,7 @@ internal class CommandParser
 
     private void ParseCommandId (Token commandIdToken)
     {
-        commandId = new(walker.Extract(commandIdToken));
+        commandId = walker.Extract(commandIdToken);
         walker.Associate(commandId, commandIdToken);
     }
 
@@ -89,7 +89,7 @@ internal class CommandParser
 
     private void ParseParameterId (Token paramIdToken)
     {
-        paramId = new(walker.Extract(paramIdToken));
+        paramId = walker.Extract(paramIdToken);
         walker.Associate(paramId, paramIdToken);
     }
 

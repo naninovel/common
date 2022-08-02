@@ -37,7 +37,7 @@ public class LabelLineParser
 
     private void ParseLabel (Token labelToken)
     {
-        label = new(walker.Extract(labelToken));
+        label = walker.Extract(labelToken);
         walker.Associate(label, labelToken);
     }
 }

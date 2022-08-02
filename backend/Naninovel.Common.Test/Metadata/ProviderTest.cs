@@ -76,6 +76,15 @@ public class ProviderTest
     }
 
     [Fact]
+    public void CanUseNullToRepresentNamelessParameter ()
+    {
+        var param = new Parameter { Id = "bar", Nameless = true };
+        var meta = new Project { Commands = new[] { new Command { Id = "foo", Parameters = new[] { param } } } };
+        provider.Update(meta);
+        Assert.Equal(param, provider.FindParameter("foo", null));
+    }
+
+    [Fact]
     public void CanCreateProviderWithMeta ()
     {
         var provider = new MetadataProvider(new() {

@@ -32,7 +32,7 @@ public class CommentLineParser
 
     private void ParseComment (Token commentToken)
     {
-        comment = new(walker.Extract(commentToken));
+        comment = walker.Extract(commentToken);
         walker.Associate(comment, commentToken);
     }
 }
