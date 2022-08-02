@@ -7,9 +7,10 @@ namespace Naninovel.Parsing;
 
 public class CommandLineParser
 {
+    private static readonly Command emptyBody = new(PlainText.Empty, Array.Empty<Parameter>());
     private readonly CommandParser commandParser = new();
     private readonly LineWalker walker;
-    private Command command = null!;
+    private Command command = emptyBody;
 
     public CommandLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
     {
@@ -27,7 +28,7 @@ public class CommandLineParser
 
     private void ResetState (string lineText, IReadOnlyList<Token> tokens)
     {
-        command = new(PlainText.Empty, Array.Empty<Parameter>());
+        command = emptyBody;
         walker.Reset(lineText, tokens);
     }
 }
