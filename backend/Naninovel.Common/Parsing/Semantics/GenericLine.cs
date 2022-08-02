@@ -14,7 +14,7 @@ public class GenericLine : IScriptLine
     /// </summary>
     public GenericPrefix Prefix { get; }
     /// <summary>
-    /// The text to print; can contain inlined commands.
+    /// The text to print; can contain inlined commands and expressions.
     /// </summary>
     public IReadOnlyList<IGenericContent> Content { get; }
 
