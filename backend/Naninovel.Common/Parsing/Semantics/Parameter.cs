@@ -17,9 +17,9 @@ public class Parameter : ILineComponent
     /// </remarks>
     public PlainText Identifier { get; }
     /// <summary>
-    /// Value of the parameter.
+    /// Value of the parameter; can contain expressions.
     /// </summary>
-    public ParameterValue Value { get; }
+    public MixedValue Value { get; }
     /// <summary>
     /// Whether the parameter doesn't have identifier specified.
     /// </summary>
@@ -28,13 +28,13 @@ public class Parameter : ILineComponent
     /// </remarks>
     public bool Nameless => Identifier is null;
 
-    public Parameter (PlainText identifier, ParameterValue value)
+    public Parameter (PlainText identifier, MixedValue value)
     {
         Identifier = identifier;
         Value = value;
     }
 
-    public Parameter (ParameterValue value) : this(null, value) { }
+    public Parameter (MixedValue value) : this(null, value) { }
 
     public override string ToString ()
     {

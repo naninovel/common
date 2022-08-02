@@ -8,13 +8,13 @@ public class SemanticsTest
     [Fact]
     public void WhenParamIdentifierMissingNamelessIsTrue ()
     {
-        Assert.True(new Parameter(new(Array.Empty<IMixedValue>())).Nameless);
+        Assert.True(new Parameter(new(Array.Empty<IValueComponent>())).Nameless);
     }
 
     [Fact]
     public void WhenParamIdentifierSpecifiedNamelessIsFalse ()
     {
-        Assert.False(new Parameter(new("foo"), new(Array.Empty<IMixedValue>())).Nameless);
+        Assert.False(new Parameter(new("foo"), new(Array.Empty<IValueComponent>())).Nameless);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class SemanticsTest
     [Fact]
     public void CommandLineToStringIsCorrect ()
     {
-        var param1 = new Parameter(new(new IMixedValue[] { new PlainText("v1"), new Expression(new("e")) }));
+        var param1 = new Parameter(new(new IValueComponent[] { new PlainText("v1"), new Expression(new("e")) }));
         var param2 = new Parameter(new("p2"), new(new[] { new PlainText("v2") }));
         var line = new CommandLine(new(new("c"), new[] { param1, param2 }));
         Assert.Equal("@c v1{e} p2:v2", line.ToString());
@@ -56,9 +56,24 @@ public class SemanticsTest
     public void GenericLineToStringIsCorrect ()
     {
         var line = new GenericLine(new GenericPrefix(new("a"), new("b")), new IGenericContent[] {
-            new GenericText(new[] { new PlainText(new("x")) }),
+            new MixedValue(new[] { new PlainText(new("x")) }),
             new InlinedCommand(new(new("i"), Array.Empty<Parameter>()))
         });
         Assert.Equal("a.b: x[i]", line.ToString());
+    }
+
+    [Fact]
+    public void MixedValueToStringIsCorrect ()
+    {
+        Assert.Equal("foo{bar}", new MixedValue(new IValueComponent[] {
+            new PlainText("foo"),
+            new Expression(new("bar"))
+        }).ToString());
+    }
+
+    [Fact]
+    public void MixedValueCountEqualsItemCount ()
+    {
+        Assert.Equal(2, new MixedValue(new[] { new PlainText(""), new PlainText("") }).Count);
     }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents plain text content.
 /// </summary>
-public class PlainText : ILineComponent, IMixedValue
+public class PlainText : ILineComponent, IValueComponent
 {
     public static readonly PlainText Empty = new("");
 

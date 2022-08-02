@@ -9,13 +9,13 @@ namespace Naninovel.Parsing;
 internal class CommandParser
 {
     private static readonly Command emptyBody = new(PlainText.Empty);
-    private static readonly ParameterValue emptyValue = new(Array.Empty<IMixedValue>());
+    private static readonly MixedValue emptyValue = new(Array.Empty<IValueComponent>());
     private readonly MixedValueParser valueParser = new(true);
     private readonly List<Parameter> parameters = new();
     private LineWalker walker = null!;
     private Command commandBody = emptyBody;
     private PlainText commandId = PlainText.Empty;
-    private ParameterValue paramValue = emptyValue;
+    private MixedValue paramValue = emptyValue;
     private PlainText paramId;
 
     public Command Parse (LineWalker walker)
@@ -95,7 +95,7 @@ internal class CommandParser
 
     private void ParseParameterValue (Token valueToken)
     {
-        paramValue = new ParameterValue(valueParser.Parse(valueToken, walker));
+        paramValue = new MixedValue(valueParser.Parse(valueToken, walker));
         walker.Associate(paramValue, valueToken);
     }
 

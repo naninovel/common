@@ -27,7 +27,7 @@ public class GenericLineParserTest
     public void WhenEmptyExpressionErrorIsAddedAndExpressionIsEmpty ()
     {
         var line = parser.Parse("{}");
-        Assert.Equal("", ((line.Content[0] as GenericText)!.Mixed[0] as Expression)!.Body.Text);
+        Assert.Equal("", ((line.Content[0] as MixedValue)![0] as Expression)!.Body.Text);
         Assert.True(parser.HasError(MissingExpressionBody));
     }
 
@@ -58,37 +58,37 @@ public class GenericLineParserTest
         var line = parser.Parse("k.h: x[i] {y}.");
         Assert.Equal("k", line.Prefix.Author.Text);
         Assert.Equal("h", line.Prefix.Appearance.Text);
-        Assert.Equal("x", ((line.Content[0] as GenericText)!.Mixed[0] as PlainText)!.Text);
+        Assert.Equal("x", ((line.Content[0] as MixedValue)![0] as PlainText)!.Text);
         Assert.Equal("i", (line.Content[1] as InlinedCommand)?.Command.Identifier.Text);
-        Assert.Equal(" ", ((line.Content[2] as GenericText)!.Mixed[0] as PlainText)!.Text);
-        Assert.Equal("y", ((line.Content[2] as GenericText)!.Mixed[1] as Expression)!.Body.Text);
-        Assert.Equal(".", ((line.Content[2] as GenericText)!.Mixed[2] as PlainText)!.Text);
+        Assert.Equal(" ", ((line.Content[2] as MixedValue)![0] as PlainText)!.Text);
+        Assert.Equal("y", ((line.Content[2] as MixedValue)![1] as Expression)!.Body.Text);
+        Assert.Equal(".", ((line.Content[2] as MixedValue)![2] as PlainText)!.Text);
     }
 
     [Fact]
     public void ArbitraryGenericLineWithExpressionsIsParsed ()
     {
         var line = parser.Parse("x{y}[z {w}]");
-        Assert.Equal("x", ((line.Content[0] as GenericText)!.Mixed[0] as PlainText)!.Text);
-        Assert.Equal("y", ((line.Content[0] as GenericText)!.Mixed[1] as Expression)!.Body.Text);
+        Assert.Equal("x", ((line.Content[0] as MixedValue)![0] as PlainText)!.Text);
+        Assert.Equal("y", ((line.Content[0] as MixedValue)![1] as Expression)!.Body.Text);
         Assert.Equal("z", (line.Content[1] as InlinedCommand)?.Command.Identifier.Text);
-        Assert.Equal("w", ((line.Content[1] as InlinedCommand)?.Command.Parameters[0].Value.Mixed[0] as Expression)!.Body.Text);
+        Assert.Equal("w", ((line.Content[1] as InlinedCommand)?.Command.Parameters[0].Value[0] as Expression)!.Body.Text);
     }
 
     [Fact]
     public void PlainTextIdDecoded ()
     {
         var line = parser.Parse(@""" \{ \} "" \[ \] \\""");
-        Assert.Equal(@""" { } "" [ ] \""", ((line.Content[0] as GenericText)!.Mixed[0] as PlainText)!.Text);
+        Assert.Equal(@""" { } "" [ ] \""", ((line.Content[0] as MixedValue)![0] as PlainText)!.Text);
     }
 
     [Fact]
     public void PreviousEscapesAreRespected ()
     {
         var line = parser.Parse(@"\\{ \\\ }\\\[");
-        Assert.Equal(@"\", ((line.Content[0] as GenericText)!.Mixed[0] as PlainText)!.Text);
-        Assert.Equal(@" \\\ ", ((line.Content[0] as GenericText)!.Mixed[1] as Expression)!.Body.Text);
-        Assert.Equal(@"\[", ((line.Content[0] as GenericText)!.Mixed[2] as PlainText)!.Text);
+        Assert.Equal(@"\", ((line.Content[0] as MixedValue)![0] as PlainText)!.Text);
+        Assert.Equal(@" \\\ ", ((line.Content[0] as MixedValue)![1] as Expression)!.Body.Text);
+        Assert.Equal(@"\[", ((line.Content[0] as MixedValue)![2] as PlainText)!.Text);
     }
 
     [Fact]
@@ -98,9 +98,9 @@ public class GenericLineParserTest
         var line = parser.Parse(@"{name}.{appearance}: My favourite drink is {drink}!");
         Assert.Equal(@"{name}", line.Prefix.Author.Text);
         Assert.Equal(@"{appearance}", line.Prefix.Appearance.Text);
-        Assert.Equal(@"My favourite drink is ", ((line.Content[0] as GenericText)!.Mixed[0] as PlainText)!.Text);
-        Assert.Equal(@"drink", ((line.Content[0] as GenericText)!.Mixed[1] as Expression)!.Body.Text);
-        Assert.Equal(@"!", ((line.Content[0] as GenericText)!.Mixed[2] as PlainText)!.Text);
+        Assert.Equal(@"My favourite drink is ", ((line.Content[0] as MixedValue)![0] as PlainText)!.Text);
+        Assert.Equal(@"drink", ((line.Content[0] as MixedValue)![1] as Expression)!.Body.Text);
+        Assert.Equal(@"!", ((line.Content[0] as MixedValue)![2] as PlainText)!.Text);
     }
 
     [Fact]
@@ -110,16 +110,16 @@ public class GenericLineParserTest
         Assert.Equal(new(0, 5), parser.Resolve(line.Prefix));
         Assert.Equal(new(0, 1), parser.Resolve(line.Prefix.Author));
         Assert.Equal(new(2, 1), parser.Resolve(line.Prefix.Appearance));
-        Assert.Equal(new(5, 4), parser.Resolve(line.Content[0] as GenericText));
-        Assert.Equal(new(5, 1), parser.Resolve((line.Content[0] as GenericText)!.Mixed[0] as PlainText));
-        Assert.Equal(new(6, 3), parser.Resolve((line.Content[0] as GenericText)!.Mixed[1] as Expression));
-        Assert.Equal(new(7, 1), parser.Resolve(((line.Content[0] as GenericText)!.Mixed[1] as Expression)!.Body));
+        Assert.Equal(new(5, 4), parser.Resolve(line.Content[0] as MixedValue));
+        Assert.Equal(new(5, 1), parser.Resolve((line.Content[0] as MixedValue)![0] as PlainText));
+        Assert.Equal(new(6, 3), parser.Resolve((line.Content[0] as MixedValue)![1] as Expression));
+        Assert.Equal(new(7, 1), parser.Resolve(((line.Content[0] as MixedValue)![1] as Expression)!.Body));
         Assert.Equal(new(9, 7), parser.Resolve(line.Content[1] as InlinedCommand));
         Assert.Equal(new(10, 5), parser.Resolve((line.Content[1] as InlinedCommand)!.Command));
         Assert.Equal(new(10, 1), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Identifier));
         Assert.Equal(new(12, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0]));
         Assert.Equal(new(12, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value));
-        Assert.Equal(new(12, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value.Mixed[0] as Expression));
-        Assert.Equal(new(13, 1), parser.Resolve(((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value.Mixed[0] as Expression)!.Body));
+        Assert.Equal(new(12, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression));
+        Assert.Equal(new(13, 1), parser.Resolve(((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression)!.Body));
     }
 }

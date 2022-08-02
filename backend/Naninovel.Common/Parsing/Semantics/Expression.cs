@@ -3,7 +3,7 @@
 /// <summary>
 /// Script expression evaluated at runtime.
 /// </summary>
-public class Expression : ILineComponent, IMixedValue
+public class Expression : ILineComponent, IValueComponent
 {
     /// <summary>
     /// The evaluated body of the expression.

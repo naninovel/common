@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 internal class MixedValueParser
 {
     private readonly bool unwrap;
-    private readonly List<IMixedValue> value = new();
+    private readonly List<IValueComponent> value = new();
     private readonly Queue<Token> expressions = new();
 
     public MixedValueParser (bool unwrap)
@@ -24,7 +24,7 @@ internal class MixedValueParser
         expressions.Clear();
     }
 
-    public IMixedValue[] Parse (Token valueToken, LineWalker walker)
+    public MixedValue Parse (Token valueToken, LineWalker walker)
     {
         value.Clear();
 
@@ -38,7 +38,7 @@ internal class MixedValueParser
             if (ShouldProcessExpression()) ProcessExpression();
             else if (!IsTextStarted()) textStartIndex = index;
         if (IsTextStarted()) AddText(endIndex - textStartIndex + 1);
-        return value.ToArray();
+        return new MixedValue(value);
 
         bool IsValueWrapped ()
         {

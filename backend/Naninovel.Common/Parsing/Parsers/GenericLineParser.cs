@@ -48,7 +48,7 @@ public class GenericLineParser
             case AuthorAssign:
                 ParsePrefix(token);
                 return true;
-            case TokenType.GenericText:
+            case GenericText:
                 ParseGenericText(token);
                 return true;
             case TokenType.Expression:
@@ -89,7 +89,7 @@ public class GenericLineParser
     private void ParseGenericText (Token textToken)
     {
         var value = valueParser.Parse(textToken, walker);
-        var text = new GenericText(value);
+        var text = new MixedValue(value);
         content.Add(text);
         walker.Associate(text, textToken);
         valueParser.ClearAddedExpressions();

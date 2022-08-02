@@ -43,7 +43,7 @@ public class ScriptSerializer
     /// </summary>
     /// <param name="value">The value to transform.</param>
     /// <param name="wrap">Whether to wrap in quotes when whitespace is detected in plain text.</param>
-    public string Serialize (IEnumerable<IMixedValue> value, bool wrap)
+    public string Serialize (IEnumerable<IValueComponent> value, bool wrap)
     {
         builder.Clear();
         AppendMixed(value, wrap);
@@ -83,7 +83,7 @@ public class ScriptSerializer
         if (genericLine.Prefix != null)
             AppendGenericPrefix(genericLine.Prefix);
         foreach (var content in genericLine.Content)
-            if (content is GenericText text) AppendMixed(text.Mixed, false);
+            if (content is MixedValue text) AppendMixed(text, false);
             else AppendInlinedCommand((InlinedCommand)content);
     }
 
@@ -107,7 +107,7 @@ public class ScriptSerializer
             builder.Append(Identifiers.ParameterAssign[0]);
         }
 
-        AppendMixed(parameter.Value.Mixed, true);
+        AppendMixed(parameter.Value, true);
     }
 
     private void AppendGenericPrefix (GenericPrefix prefix)
@@ -128,19 +128,19 @@ public class ScriptSerializer
         builder.Append(Identifiers.InlinedClose[0]);
     }
 
-    private void AppendMixed (IEnumerable<IMixedValue> mixed, bool wrap)
+    private void AppendMixed (IEnumerable<IValueComponent> mixed, bool wrap)
     {
         ignoreRanges.Clear();
         mixedBuilder.Clear();
-        foreach (var value in mixed)
-            AppendMixed(value);
+        foreach (var component in mixed)
+            AppendComponent(component);
         builder.Append(Encode(mixedBuilder.ToString(), wrap));
     }
 
-    private void AppendMixed (IMixedValue value)
+    private void AppendComponent (IValueComponent component)
     {
-        if (value is PlainText text) mixedBuilder.Append(text);
-        else if (value is Expression expression)
+        if (component is PlainText text) mixedBuilder.Append(text);
+        else if (component is Expression expression)
         {
             var startIndex = mixedBuilder.Length;
             mixedBuilder.Append(Identifiers.ExpressionOpen);
