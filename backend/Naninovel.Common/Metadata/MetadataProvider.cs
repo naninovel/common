@@ -66,7 +66,7 @@ public class MetadataProvider
     {
         return FindCommand(commandAliasOrId)?.Parameters?
             .FirstOrDefault(p => p.Nameless && string.IsNullOrEmpty(paramAliasOrId) ||
-                                 string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
+                                 !string.IsNullOrEmpty(p.Alias) && string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
                                  string.Equals(p.Id, paramAliasOrId, StringComparison.OrdinalIgnoreCase));
     }
 

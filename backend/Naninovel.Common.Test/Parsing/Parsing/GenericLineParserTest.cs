@@ -46,10 +46,11 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void WhenDelimitedButMissingAppearanceErrorIsAdded ()
+    public void WhenDelimitedAndMissingAppearanceErrorIsAddedButAuthorIsParsed ()
     {
-        parser.Parse("x.: y");
+        var line = parser.Parse("x.: y");
         Assert.True(parser.HasError(MissingAppearance));
+        Assert.Equal("x", line.Prefix.Author);
     }
 
     [Fact]

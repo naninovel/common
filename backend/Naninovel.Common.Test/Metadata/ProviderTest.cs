@@ -85,6 +85,17 @@ public class ProviderTest
     }
 
     [Fact]
+    public void WhenMetaHasNoAliasButIsNotNamelessItsNotConsideredNameless ()
+    {
+        var param1 = new Parameter { Id = "1" };
+        var param2 = new Parameter { Id = "2", Alias = "" };
+        var meta = new Project { Commands = new[] { new Command { Id = "cmd", Parameters = new[] { param1, param2 } } } };
+        provider.Update(meta);
+        Assert.Null(provider.FindParameter("cmd", null));
+        Assert.Null(provider.FindParameter("cmd", ""));
+    }
+
+    [Fact]
     public void CanCreateProviderWithMeta ()
     {
         var provider = new MetadataProvider(new() {
