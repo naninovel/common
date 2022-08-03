@@ -2,31 +2,43 @@
 
 namespace Naninovel.Parsing.Test;
 
-public class CommentLineParserTest : LineParserTest<CommentLineParser, CommentLine>
+public class CommentLineParserTest
 {
-    protected override string ExampleLine => "; Comment Text";
+    private readonly ParseTestHelper<CommentLine> parser = new((e, a) => new CommentLineParser(e, a).Parse);
 
     [Fact]
-    public void CommentLineParsed ()
+    public void ParsesCommentText ()
     {
-        var line = Parse(ExampleLine);
-        Assert.Equal("Comment Text", line.CommentText);
+        Assert.Equal("foo", parser.Parse(";foo").Comment);
+        Assert.Empty(parser.Errors);
     }
 
     [Fact]
-    public void WhenMissingTextIsEmpty ()
+    public void CanParseEmptyComment ()
     {
-        var line = Parse("; ");
-        Assert.Equal(string.Empty, line.CommentText);
+        Assert.Equal("", parser.Parse("; ").Comment);
+        Assert.Empty(parser.Errors);
     }
-        
+
     [Fact]
-    public void IndexesEvaluatedCorrectly ()
+    public void TrimsCommentText ()
     {
-        var line = Parse("; x");
-        Assert.Equal(0, line.StartIndex);
-        Assert.Equal(3, line.Length);
-        Assert.Equal(2, line.CommentText.StartIndex);
-        Assert.Equal(1, line.CommentText.Length);
+        Assert.Equal("x\tx x", parser.Parse(" ;  x\tx x \t").Comment);
+        Assert.Empty(parser.Errors);
+    }
+
+    [Fact]
+    public void WhenLineIdIsMissingErrorIsAddedAndTextIsEmpty ()
+    {
+        Assert.Equal("", parser.Parse("foo").Comment);
+        Assert.True(parser.HasError(ParsingErrors.MissingLineId));
+    }
+
+    [Fact]
+    public void RangesAreAssociatedCorrectly ()
+    {
+        var parser = new ParseTestHelper<CommentLine>((e, a) => new CommentLineParser(e, a).Parse);
+        var line = parser.Parse("; comment");
+        Assert.Equal(new(2, 7), parser.Resolve(line.Comment));
     }
 }

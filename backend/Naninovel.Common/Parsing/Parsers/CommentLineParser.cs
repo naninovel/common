@@ -1,17 +1,38 @@
+﻿using System.Collections.Generic;
+using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommentLineParser : LineParser<CommentLine>
+public class CommentLineParser
 {
-    protected override void Parse (CommentLine line)
+    private readonly LineWalker walker;
+    private PlainText comment = null!;
+
+    public CommentLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
     {
-        if (TryNext(CommentText, out var token))
-            line.CommentText.Assign(Extract(token), token.StartIndex);
+        walker = new(errorHandler, associator);
     }
 
-    protected override void ClearLine (CommentLine line)
+    public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {
-        ClearLineText(line.CommentText);
+        ResetState(lineText, tokens);
+        if (!walker.Next(LineId, out _))
+            walker.Error(MissingLineId);
+        else if (walker.Next(CommentText, out var commentToken))
+            ParseComment(commentToken);
+        return new CommentLine(comment);
+    }
+
+    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
+    {
+        comment = PlainText.Empty;
+        walker.Reset(lineText, tokens);
+    }
+
+    private void ParseComment (Token commentToken)
+    {
+        comment = walker.Extract(commentToken);
+        walker.Associate(comment, commentToken);
     }
 }

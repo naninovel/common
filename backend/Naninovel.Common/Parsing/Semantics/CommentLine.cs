@@ -1,8 +1,19 @@
 namespace Naninovel.Parsing;
 
-public class CommentLine : LineContent, IScriptLine
+/// <summary>
+/// Represents a script line used for annotations; ignored at playback.
+/// </summary>
+public class CommentLine : IScriptLine
 {
-    public LineText CommentText { get; } = new();
+    /// <summary>
+    /// The annotation text.
+    /// </summary>
+    public PlainText Comment { get; }
 
-    public override string ToString () => $"{Identifiers.CommentLine} {CommentText}";
+    public CommentLine (PlainText comment)
+    {
+        Comment = comment;
+    }
+
+    public override string ToString () => $"{Identifiers.CommentLine} {Comment}";
 }

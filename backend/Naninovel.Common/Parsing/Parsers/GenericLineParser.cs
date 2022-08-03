@@ -1,0 +1,110 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using static Naninovel.Parsing.TokenType;
+
+namespace Naninovel.Parsing;
+
+public class GenericLineParser
+{
+    private readonly CommandParser commandParser = new();
+    private readonly MixedValueParser valueParser = new(false);
+    private readonly List<IGenericContent> content = new();
+    private readonly LineWalker walker;
+    private PlainText authorId, authorAppearance;
+    private GenericPrefix prefix;
+
+    public GenericLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
+    {
+        walker = new(errorHandler, associator);
+    }
+
+    public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens)
+    {
+        ResetState(lineText, tokens);
+        while (TryNext()) continue;
+        return new GenericLine(prefix, content.ToArray());
+    }
+
+    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
+    {
+        walker.Reset(lineText, tokens);
+        content.Clear();
+        authorId = authorAppearance = null;
+        prefix = null;
+    }
+
+    private bool TryNext ()
+    {
+        if (!walker.Next(out var token)) return false;
+
+        switch (token.Type)
+        {
+            case AuthorId:
+                ParseAuthorId(token);
+                return true;
+            case AuthorAppearance:
+                ParseAuthorAppearance(token);
+                return true;
+            case AuthorAssign:
+                ParsePrefix(token);
+                return true;
+            case GenericText:
+                ParseGenericText(token);
+                return true;
+            case TokenType.Expression:
+                valueParser.AddExpressionToken(token);
+                return true;
+            case InlinedOpen:
+                ParseInlined();
+                return true;
+            case Inlined:
+                AssociateInlined(token);
+                return true;
+            case Error:
+                walker.Error(token);
+                return true;
+            default: return true;
+        }
+    }
+
+    private void ParseAuthorId (Token authorIdToken)
+    {
+        authorId = new PlainText(walker.Extract(authorIdToken));
+        walker.Associate(authorId, authorIdToken);
+    }
+
+    private void ParseAuthorAppearance (Token authorAppearanceToken)
+    {
+        authorAppearance = new PlainText(walker.Extract(authorAppearanceToken));
+        walker.Associate(authorAppearance, authorAppearanceToken);
+    }
+
+    private void ParsePrefix (Token authorAssignToken)
+    {
+        valueParser.ClearAddedExpressions();
+        prefix = new GenericPrefix(authorId, authorAppearance);
+        walker.Associate(prefix, new LineRange(0, authorAssignToken.EndIndex + 1));
+    }
+
+    private void ParseGenericText (Token textToken)
+    {
+        var value = valueParser.Parse(textToken, walker);
+        var text = new MixedValue(value);
+        content.Add(text);
+        walker.Associate(text, textToken);
+        valueParser.ClearAddedExpressions();
+    }
+
+    private void ParseInlined ()
+    {
+        var command = commandParser.Parse(walker);
+        var inlined = new InlinedCommand(command);
+        content.Add(inlined);
+    }
+
+    private void AssociateInlined (Token inlinedToken)
+    {
+        if (content.LastOrDefault() is InlinedCommand inlined)
+            walker.Associate(inlined, inlinedToken);
+    }
+}

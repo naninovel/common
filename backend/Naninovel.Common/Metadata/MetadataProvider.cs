@@ -48,6 +48,7 @@ public class MetadataProvider
     /// Attempts to find a command, which has either specified ID or alias.
     /// Returns null when such command is not found.
     /// </summary>
+    /// <param name="aliasOrId">Alias or ID of the command.</param>
     public Command FindCommand (string aliasOrId)
     {
         if (commandByAlias.TryGetValue(aliasOrId, out var byAlias)) return byAlias;
@@ -59,11 +60,13 @@ public class MetadataProvider
     /// Attempts to find a parameter of a command, which has either specified ID or alias.
     /// Returns null when such parameter or command are not found.
     /// </summary>
+    /// <param name="commandAliasOrId">Alias or ID of the parameter's command.</param>
+    /// <param name="paramAliasOrId">Alias or ID of the parameter; use empty or null for nameless.</param>
     public Parameter FindParameter (string commandAliasOrId, string paramAliasOrId)
     {
         return FindCommand(commandAliasOrId)?.Parameters?
-            .FirstOrDefault(p => p.Nameless && paramAliasOrId == string.Empty ||
-                                 string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
+            .FirstOrDefault(p => p.Nameless && string.IsNullOrEmpty(paramAliasOrId) ||
+                                 !string.IsNullOrEmpty(p.Alias) && string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
                                  string.Equals(p.Id, paramAliasOrId, StringComparison.OrdinalIgnoreCase));
     }
 

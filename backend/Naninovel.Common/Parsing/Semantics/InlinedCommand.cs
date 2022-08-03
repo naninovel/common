@@ -1,8 +1,23 @@
 namespace Naninovel.Parsing;
 
-public class InlinedCommand : LineContent, IGenericContent
+/// <summary>
+/// Part of <see cref="GenericLine"/> containing a <see cref="Command"/>
+/// to be executed in the midst of printed text.
+/// </summary>
+public class InlinedCommand : ILineComponent, IGenericContent
 {
-    public Command Command { get; } = new();
+    /// <summary>
+    /// The inlined command body.
+    /// </summary>
+    public Command Command { get; }
 
-    public override string ToString () => $"[{Command}]";
+    public InlinedCommand (Command command)
+    {
+        Command = command;
+    }
+
+    public override string ToString ()
+    {
+        return $"{Identifiers.InlinedOpen}{Command}{Identifiers.InlinedClose}";
+    }
 }

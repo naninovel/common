@@ -1,54 +1,52 @@
 ﻿using Xunit;
 using static Naninovel.Parsing.ErrorType;
+using static Naninovel.Parsing.ParsingErrors;
 
 namespace Naninovel.Parsing.Test;
 
-public class LabelLineParserTest : LineParserTest<LabelLineParser, LabelLine>
+public class LabelLineParserTest
 {
-    protected override string ExampleLine => "# Label";
+    private readonly ParseTestHelper<LabelLine> parser = new((e, a) => new LabelLineParser(e, a).Parse);
 
     [Fact]
-    public void LabelLineParsed ()
+    public void ParsesLabelText ()
     {
-        var line = Parse(ExampleLine);
-        Assert.Equal("Label", line.LabelText);
+        Assert.Equal("foo", parser.Parse("#foo").Label.Text);
+        Assert.Empty(parser.Errors);
     }
 
     [Fact]
-    public void WhenSpaceErrorIsAdded ()
+    public void WhenLabelMissingErrorIsAddedAndLabelIsEmpty ()
     {
-        Parse("# Label With Spaces");
-        Assert.True(HasError(SpaceInLabel));
+        Assert.Equal("", parser.Parse("# ").Label.Text);
+        Assert.True(parser.HasError(MissingLabel));
     }
 
     [Fact]
-    public void WhenSpaceLabelIsTrimmed ()
+    public void TrimsLabelText ()
     {
-        var line = Parse("# Label With Spaces");
-        Assert.Equal("Label", line.LabelText);
+        Assert.Equal("foo", parser.Parse(" #  foo \t").Label.Text);
+        Assert.Empty(parser.Errors);
     }
 
     [Fact]
-    public void WhenMissingErrorIsAdded ()
+    public void WhenLineIdIsMissingErrorIsAddedAndLabelIsEmpty ()
     {
-        Parse("# ");
-        Assert.True(HasError(MissingLabel));
+        Assert.Equal("", parser.Parse("foo").Label.Text);
+        Assert.True(parser.HasError(MissingLineId));
     }
 
     [Fact]
-    public void WhenMissingLabelIsEmpty ()
+    public void WhenSpaceInLabelErrorIsAddedAndLabelIsEmpty ()
     {
-        var line = Parse("# ");
-        Assert.Equal(string.Empty, line.LabelText);
+        Assert.Equal("", parser.Parse("# foo bar").Label.Text);
+        Assert.True(parser.HasError(SpaceInLabel));
     }
 
     [Fact]
-    public void IndexesEvaluatedCorrectly ()
+    public void RangesAreAssociatedCorrectly ()
     {
-        var line = Parse("# x");
-        Assert.Equal(0, line.StartIndex);
-        Assert.Equal(3, line.Length);
-        Assert.Equal(2, line.LabelText.StartIndex);
-        Assert.Equal(1, line.LabelText.Length);
+        var line = parser.Parse("# label");
+        Assert.Equal(new(2, 5), parser.Resolve(line.Label));
     }
 }

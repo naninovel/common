@@ -48,14 +48,9 @@ internal class LexState
         return IsIndexValid(Index) && text[Index] == @char;
     }
 
-    public bool IsPrevious (char @char)
-    {
-        return IsIndexValid(Index - 1) && text[Index - 1] == @char;
-    }
-
     public bool IsUnescaped (char @char)
     {
-        return Is(@char) && !IsPrevious('\\');
+        return Is(@char) && !Utilities.IsEscaped(text, Index);
     }
 
     private bool IsIndexValid (int index)

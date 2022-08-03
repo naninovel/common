@@ -1,8 +1,19 @@
 namespace Naninovel.Parsing;
 
-public class LabelLine : LineContent, IScriptLine
+/// <summary>
+/// Represents a script line used to identify playback navigation point.
+/// </summary>
+public class LabelLine : IScriptLine
 {
-    public LineText LabelText { get; } = new();
+    /// <summary>
+    /// The identifier of the label.
+    /// </summary>
+    public PlainText Label { get; }
 
-    public override string ToString () => $"{Identifiers.LabelLine} {LabelText}";
+    public LabelLine (PlainText label)
+    {
+        Label = label;
+    }
+
+    public override string ToString () => $"{Identifiers.LabelLine} {Label}";
 }

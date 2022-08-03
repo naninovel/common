@@ -1,19 +1,43 @@
-﻿using static Naninovel.Parsing.ErrorType;
+﻿using System.Collections.Generic;
+using static Naninovel.Parsing.ErrorType;
+using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class LabelLineParser : LineParser<LabelLine>
+public class LabelLineParser
 {
-    protected override void Parse (LabelLine line)
+    private readonly LineWalker walker;
+    private PlainText label = null!;
+
+    public LabelLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
     {
-        if (!TryNext(LabelText, out var token)) AddError(new Token(MissingLabel, 0, 1));
-        else line.LabelText.Assign(Extract(token), token.StartIndex);
-        if (TryNext(SpaceInLabel, out token)) AddError(token);
+        walker = new(errorHandler, associator);
     }
 
-    protected override void ClearLine (LabelLine line)
+    public LabelLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {
-        ClearLineText(line.LabelText);
+        ResetState(lineText, tokens);
+        if (!walker.Next(LineId, out _))
+            walker.Error(MissingLineId);
+        else if (walker.Next(MissingLabel, out var missingError))
+            walker.Error(missingError);
+        else if (walker.Next(LabelText, out var labelToken))
+            if (walker.Next(SpaceInLabel, out var spaceError))
+                walker.Error(spaceError);
+            else ParseLabel(labelToken);
+        return new LabelLine(label);
+    }
+
+    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
+    {
+        label = PlainText.Empty;
+        walker.Reset(lineText, tokens);
+    }
+
+    private void ParseLabel (Token labelToken)
+    {
+        label = walker.Extract(labelToken);
+        walker.Associate(label, labelToken);
     }
 }
