@@ -7,7 +7,7 @@ using DotNetJS;
 using Microsoft.JSInterop;
 using Naninovel.Bridging;
 using Naninovel.Metadata;
-using static Naninovel.Common.Bindings.Utilities;
+using static Naninovel.Common.Bindings.JSLogger;
 
 namespace Naninovel.Common.Bindings.Bridging;
 
@@ -28,7 +28,7 @@ public static partial class Bridging
         Bridging.preferredPort = preferredPort;
         while (tcs is { IsCancellationRequested: false })
             try { await ConnectToServerAsync(tcs.Token); }
-            catch (Exception e) { Log($"Bridging error: {e.Message}"); }
+            catch (Exception e) { LogError($"Bridging error: {e.Message}"); }
     }
 
     [JSInvokable]
@@ -84,10 +84,10 @@ public static partial class Bridging
 
     private static async Task MaintainConnectionAsync (ConnectionStatus status)
     {
-        Log($"Connected to {status.ServerInfo.Name} bridging server.");
+        LogInfo($"Connected to {status.ServerInfo.Name} bridging server.");
         try { await status.MaintainTask; }
         catch (OperationCanceledException) { }
-        catch (Exception e) { Log($"Bridging maintain error: {e.Message}"); }
-        finally { Log($"Disconnected from {status.ServerInfo.Name} bridging server."); }
+        catch (Exception e) { LogError($"Bridging maintain error: {e.Message}"); }
+        finally { LogInfo($"Disconnected from {status.ServerInfo.Name} bridging server."); }
     }
 }

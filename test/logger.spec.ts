@@ -1,12 +1,29 @@
-﻿import { log, injectLogger } from "../src";
+﻿import { injectLogger, log, warn, error } from "../src";
 
 test("can log without injecting", () => {
     expect(() => log("")).not.toThrow();
+    expect(() => error("")).not.toThrow();
+    expect(() => warn("")).not.toThrow();
 });
 
-test("can inject custom logger", () => {
-    let message = "";
-    injectLogger(msg => message = msg);
+test("can inject custom loggers", () => {
+    let infoMsg, warnMsg, errMsg;
+    injectLogger(msg => infoMsg = msg, wrn => warnMsg = wrn, err => errMsg = err);
     log("foo");
-    expect(message).toEqual("foo");
+    warn("bar");
+    error("nya");
+    expect(infoMsg).toEqual("foo");
+    expect(warnMsg).toEqual("bar");
+    expect(errMsg).toEqual("nya");
+});
+
+test("when only info logger is injected, others re-use it", () => {
+    let infoMsg;
+    injectLogger(msg => infoMsg = msg);
+    log("foo");
+    expect(infoMsg).toEqual("foo");
+    warn("bar");
+    expect(infoMsg).toEqual("bar");
+    error("nya");
+    expect(infoMsg).toEqual("nya");
 });
