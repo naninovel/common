@@ -41,14 +41,16 @@ public static class Injection
             registry.GetType().GetMethod("Register")!.Invoke(registry, new[] { observer });
         return provider;
 
-        static bool IsObserverRegistry (Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObserverRegistry<>);
-        }
+        bool IsObserverRegistry (Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObserverRegistry<>);
+        bool CanBeRegistered (Type type, object registry) => registry.GetType().GetGenericArguments()[0].IsAssignableFrom(type);
+    }
 
-        static bool CanBeRegistered (Type type, object registry)
-        {
-            return registry.GetType().GetGenericArguments()[0].IsAssignableFrom(type);
-        }
+    public static IServiceProvider Register<TRegistrar, THandler> (this IServiceProvider provider,
+        Func<TRegistrar, Action<THandler>> resolve) where TRegistrar : notnull
+    {
+        var registrar = provider.GetRequiredService<TRegistrar>();
+        foreach (var handler in provider.GetAll<THandler>())
+            resolve(registrar)(handler);
+        return provider;
     }
 }
