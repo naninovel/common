@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="../Naninovel.Common/Naninovel.Common.csproj"/>
+        <ProjectReference Include="../Naninovel.Common.Bindings/Naninovel.Common.Bindings.csproj"/>
     </ItemGroup>
 
 </Project>
