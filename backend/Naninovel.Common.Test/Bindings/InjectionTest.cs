@@ -24,14 +24,14 @@ public class InjectionTest
     {
         var provider = new ServiceCollection()
             .AddObserving<IMockObserver>()
-            .AddSingleton<MockNotifier>()
-            .AddSingleton<MockObserver>()
+            .AddSingleton<IMockNotifier, MockNotifier>()
+            .AddSingleton<IMockObserverService, MockObserver>()
             .BuildServiceProvider()
             .RegisterObservers();
-        provider.GetRequiredService<MockNotifier>().Notify();
-        await provider.GetRequiredService<MockNotifier>().NotifyAsync();
-        Assert.True(provider.GetRequiredService<MockObserver>().HandleInvoked);
-        Assert.True(provider.GetRequiredService<MockObserver>().HandleAsyncInvoked);
+        provider.GetRequiredService<IMockNotifier>().Notify();
+        await provider.GetRequiredService<IMockNotifier>().NotifyAsync();
+        Assert.True(provider.GetRequiredService<IMockObserverService>().HandleInvoked);
+        Assert.True(provider.GetRequiredService<IMockObserverService>().HandleAsyncInvoked);
     }
 
     [Fact]

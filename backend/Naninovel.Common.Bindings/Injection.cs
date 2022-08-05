@@ -37,12 +37,12 @@ public static class Injection
     public static IServiceProvider RegisterObservers (this IServiceProvider provider)
     {
         foreach (var registry in provider.GetAll(IsObserverRegistry))
-        foreach (var observer in provider.GetAll(t => CanBeRegistered(t, registry)))
+        foreach (var observer in provider.GetAll().Where(s => CanBeRegistered(s, registry)))
             registry.GetType().GetMethod("Register")!.Invoke(registry, new[] { observer });
         return provider;
 
         bool IsObserverRegistry (Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObserverRegistry<>);
-        bool CanBeRegistered (Type type, object registry) => registry.GetType().GetGenericArguments()[0].IsAssignableFrom(type);
+        bool CanBeRegistered (object service, object registry) => registry.GetType().GetGenericArguments()[0].IsInstanceOfType(service);
     }
 
     public static IServiceProvider Register<TRegistrar, THandler> (this IServiceProvider provider,

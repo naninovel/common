@@ -5,7 +5,19 @@ namespace Naninovel.Bindings.Test;
 
 public interface IMockGenericObserver<T> { }
 
-public class MockObserver : IMockObserver
+public interface IMockNotifier
+{
+    void Notify ();
+    Task NotifyAsync ();
+}
+
+public interface IMockObserverService
+{
+    bool HandleInvoked { get; }
+    bool HandleAsyncInvoked { get; }
+}
+
+public class MockObserver : IMockObserverService, IMockObserver
 {
     public bool HandleInvoked { get; private set; }
     public bool HandleAsyncInvoked { get; private set; }
@@ -19,7 +31,7 @@ public class MockObserver : IMockObserver
     }
 }
 
-public class MockNotifier
+public class MockNotifier : IMockNotifier
 {
     private readonly IObserverNotifier<IMockObserver> notifier;
 
