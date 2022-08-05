@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Naninovel.Common.Bindings;
 using Naninovel.Observing.Test;
 using Xunit;
@@ -31,5 +32,17 @@ public class InjectionTest
         await provider.GetRequiredService<MockNotifier>().NotifyAsync();
         Assert.True(provider.GetRequiredService<MockObserver>().HandleInvoked);
         Assert.True(provider.GetRequiredService<MockObserver>().HandleAsyncInvoked);
+    }
+
+    [Fact]
+    public void RegistersImplicitDependencies ()
+    {
+        var registrar = new Mock<IRegistrar>();
+        new ServiceCollection()
+            .AddSingleton<IRegistrar>(registrar.Object)
+            .AddSingleton<IService, Service>()
+            .BuildServiceProvider()
+            .Register<IRegistrar, IHandler<HandlerSpecifier>>(c => c.Register);
+        registrar.Verify(c => c.Register(It.IsAny<Service>()), Times.Once);
     }
 }

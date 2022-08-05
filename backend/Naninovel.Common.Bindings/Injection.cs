@@ -14,14 +14,15 @@ public static class Injection
 
     public static IEnumerable<T> GetAll<T> (this IServiceProvider provider)
     {
-        return GetAll(provider, typeof(T).IsAssignableFrom).Cast<T>();
+        return GetAll(provider).OfType<T>();
     }
 
-    public static IEnumerable<object> GetAll (this IServiceProvider provider, Predicate<Type> predicate)
+    public static IEnumerable<object> GetAll (this IServiceProvider provider, Predicate<Type>? predicate = null)
     {
         var site = callSiteProperty.GetValue(provider);
         var desc = descriptorsField.GetValue(site) as ServiceDescriptor[];
-        var types = desc!.Select(s => s.ServiceType).Where(predicate.Invoke);
+        var types = desc!.Select(s => s.ServiceType);
+        if (predicate != null) types = types.Where(predicate.Invoke);
         return types.Select(provider.GetRequiredService);
     }
 
