@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../Naninovel.Common/Naninovel.Common.csproj"/>
+        <ProjectReference Include="../Naninovel.Common.Modern/Naninovel.Common.Modern.csproj"/>
     </ItemGroup>
 
 </Project>

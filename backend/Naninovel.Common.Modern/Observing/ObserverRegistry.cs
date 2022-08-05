@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Naninovel.Observing;
+namespace Naninovel;
 
 /// <inheritdoc cref="IObserverRegistry{TObserver}"/>
 public class ObserverRegistry<TObserver> : IObserverRegistry<TObserver>

@@ -1,4 +1,4 @@
-﻿namespace Naninovel.Observing;
+﻿namespace Naninovel;
 
 /// <summary>
 /// Allows subscribing and unsubscribing observers

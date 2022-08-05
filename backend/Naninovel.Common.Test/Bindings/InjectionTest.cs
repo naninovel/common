@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Naninovel.Common.Bindings;
-using Naninovel.Observing;
 using Naninovel.Observing.Test;
 using Xunit;
 

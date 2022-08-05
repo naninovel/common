@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Naninovel.Observing;
+namespace Naninovel;
 
 /// <inheritdoc cref="IObserverNotifier{TObserver}"/>
 public class ObserverNotifier<TObserver> : IObserverNotifier<TObserver>

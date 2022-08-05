@@ -1,16 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <LangVersion>10</LangVersion>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageId>Naninovel.Common</PackageId>
+        <PackageId>Naninovel.Common.Modern</PackageId>
         <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</Version>
         <Authors>Elringus</Authors>
         <Company>ReWaffle LLC</Company>
-        <PackageDescription>Systems used by multiple consumers: runtime, editor, language server, etc. Including Unity v1 runtime.</PackageDescription>
+        <PackageDescription>Systems used by multiple modern .NET consumers: runtime, editor, language server, etc. Excluding v1 Unity runtime.</PackageDescription>
         <RepositoryUrl>https://github.com/Naninovel/Common</RepositoryUrl>
         <NoWarn>1591,1573</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Naninovel.Common/Naninovel.Common.csproj"/>
+    </ItemGroup>
 
 </Project>

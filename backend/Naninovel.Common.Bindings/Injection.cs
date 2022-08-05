@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Naninovel.Observing;
 
 namespace Naninovel.Common.Bindings;
 

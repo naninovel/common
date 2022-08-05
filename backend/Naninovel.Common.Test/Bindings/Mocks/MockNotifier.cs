@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Naninovel.Observing;
 using Naninovel.Observing.Test;
 
 namespace Naninovel.Bindings.Test;

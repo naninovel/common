@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Naninovel.Observing;
+namespace Naninovel;
 
 /// <summary>
 /// Allows notifying observers registered via <see cref="IObserverRegistry{TObserver}"/>.
