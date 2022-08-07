@@ -60,7 +60,7 @@ public class GenericLineParser
             case Inlined:
                 AssociateInlined(token);
                 return true;
-            case Error:
+            case TokenType.Error:
                 walker.Error(token);
                 return true;
             default: return true;

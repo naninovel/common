@@ -45,7 +45,7 @@ internal class CommandParser
 
     private bool TryCommandId ()
     {
-        if (!walker.Next(CommandId | Error, MissingCommandId, out var token))
+        if (!walker.Next(CommandId | TokenType.Error, MissingCommandId, out var token))
             walker.Error(MissingCommandTokens);
         else if (token.IsError(MissingCommandId)) walker.Error(token);
         else ParseCommandId(token);
@@ -80,7 +80,7 @@ internal class CommandParser
             case CommandBody:
                 ParseCommandBody(token);
                 return false;
-            case Error:
+            case TokenType.Error:
                 walker.Error(token);
                 return true;
             default: return true;
