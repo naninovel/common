@@ -4,7 +4,7 @@ namespace Naninovel.Metadata;
 
 public static class ConstantEvaluator
 {
-    public delegate string GetParamValue (string id, int? index = null);
+    public delegate string? GetParamValue (string id, int? index = null);
 
     private const char expressionStartSymbol = '{';
     private const char expressionEndSymbol = '}';
