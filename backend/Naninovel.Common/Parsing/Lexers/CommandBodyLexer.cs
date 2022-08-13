@@ -6,7 +6,7 @@ internal class CommandBodyLexer
 {
     private readonly CommandParameterLexer parameterLexer;
 
-    private LexState state;
+    private LexState state = null!;
     private int bodyStartIndex;
     private bool inlined;
 
@@ -27,13 +27,13 @@ internal class CommandBodyLexer
 
     public void AddCommandBody (LexState state, bool inlined)
     {
-        ResetState(state, inlined);
+        Reset(state, inlined);
         AddIdentifier();
         AddParameters();
         AddBody();
     }
 
-    private void ResetState (LexState state, bool inlined)
+    private void Reset (LexState state, bool inlined)
     {
         this.state = state;
         this.inlined = inlined;

@@ -13,7 +13,7 @@ public class Parameter
     /// Optional short version of the identifier used to reference
     /// the parameter in scenario scripts.
     /// </summary>
-    public string Alias { get; set; }
+    public string? Alias { get; set; }
     /// <summary>
     /// Whether the parameter can be specified without the identifier.
     /// </summary>
@@ -37,19 +37,19 @@ public class Parameter
     /// <summary>
     /// Optional information about the context in which the value is used.
     /// </summary>
-    public ValueContext ValueContext { get; set; }
+    public ValueContext? ValueContext { get; set; }
     /// <summary>
     /// When value container is of a named type, represents context of the named part.
     /// </summary>
-    public ValueContext NamedValueContext { get; set; }
+    public ValueContext? NamedValueContext { get; set; }
     /// <summary>
     /// The value the parameter has when it's not explicitly specified in script.
     /// </summary>
-    public string DefaultValue { get; set; }
+    public string? DefaultValue { get; set; }
     /// <summary>
     /// Human-readable description of the parameter.
     /// </summary>
-    public string Summary { get; set; }
+    public string? Summary { get; set; }
 
     /// <summary>
     /// User-facing formatted identifier of the parameter.

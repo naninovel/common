@@ -23,9 +23,9 @@ public class MixedValue : IReadOnlyList<IValueComponent>, ILineComponent, IGener
         this.components = components.ToArray();
     }
 
-    public static implicit operator MixedValue (IValueComponent[] components)
+    public static implicit operator MixedValue (IValueComponent[]? components)
     {
-        if (components is null) return null;
+        if (components is null) return null!;
         return new(components);
     }
 

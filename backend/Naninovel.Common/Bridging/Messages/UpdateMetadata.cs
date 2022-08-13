@@ -10,5 +10,5 @@ public class UpdateMetadata : IServerMessage
     /// <summary>
     /// The actual project metadata.
     /// </summary>
-    public Project Metadata { get; set; }
+    public Project Metadata { get; set; } = null!;
 }

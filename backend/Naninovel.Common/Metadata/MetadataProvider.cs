@@ -33,13 +33,13 @@ public class MetadataProvider
     /// </summary>
     public void Update (Project meta)
     {
-        ResetState();
-        actors.AddRange(meta.Actors ?? Array.Empty<Actor>());
-        commands.AddRange(meta.Commands ?? Array.Empty<Command>());
-        constants.AddRange(meta.Constants ?? Array.Empty<Constant>());
-        resources.AddRange(meta.Resources ?? Array.Empty<Resource>());
-        variables.AddRange(meta.Variables ?? Array.Empty<string>());
-        functions.AddRange(meta.Functions ?? Array.Empty<string>());
+        Reset();
+        actors.AddRange(meta.Actors);
+        commands.AddRange(meta.Commands);
+        constants.AddRange(meta.Constants);
+        resources.AddRange(meta.Resources);
+        variables.AddRange(meta.Variables);
+        functions.AddRange(meta.Functions);
         foreach (var command in Commands)
             IndexCommand(command);
     }
@@ -49,7 +49,7 @@ public class MetadataProvider
     /// Returns null when such command is not found.
     /// </summary>
     /// <param name="aliasOrId">Alias or ID of the command.</param>
-    public Command FindCommand (string aliasOrId)
+    public Command? FindCommand (string aliasOrId)
     {
         if (commandByAlias.TryGetValue(aliasOrId, out var byAlias)) return byAlias;
         if (commandById.TryGetValue(aliasOrId, out var byId)) return byId;
@@ -62,15 +62,15 @@ public class MetadataProvider
     /// </summary>
     /// <param name="commandAliasOrId">Alias or ID of the parameter's command.</param>
     /// <param name="paramAliasOrId">Alias or ID of the parameter; use empty or null for nameless.</param>
-    public Parameter FindParameter (string commandAliasOrId, string paramAliasOrId)
+    public Parameter? FindParameter (string commandAliasOrId, string paramAliasOrId)
     {
-        return FindCommand(commandAliasOrId)?.Parameters?
+        return FindCommand(commandAliasOrId)?.Parameters
             .FirstOrDefault(p => p.Nameless && string.IsNullOrEmpty(paramAliasOrId) ||
                                  !string.IsNullOrEmpty(p.Alias) && string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
                                  string.Equals(p.Id, paramAliasOrId, StringComparison.OrdinalIgnoreCase));
     }
 
-    private void ResetState ()
+    private void Reset ()
     {
         actors.Clear();
         commands.Clear();
@@ -86,6 +86,6 @@ public class MetadataProvider
     {
         commandById[command.Id] = command;
         if (!string.IsNullOrEmpty(command.Alias))
-            commandByAlias[command.Alias] = command;
+            commandByAlias[command.Alias!] = command;
     }
 }

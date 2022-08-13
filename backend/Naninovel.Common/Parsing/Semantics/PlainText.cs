@@ -22,12 +22,12 @@ public class PlainText : ILineComponent, IValueComponent, IEnumerable<char>
 
     public static implicit operator string (PlainText plainText)
     {
-        return plainText?.Text;
+        return plainText.Text;
     }
 
-    public static implicit operator PlainText (string @string)
+    public static implicit operator PlainText (string? @string)
     {
-        if (@string is null) return null;
+        if (@string is null) return null!;
         if (@string == string.Empty) return Empty;
         return new(@string);
     }

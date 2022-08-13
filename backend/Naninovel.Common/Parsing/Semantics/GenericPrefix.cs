@@ -15,9 +15,9 @@ public class GenericPrefix : ILineComponent
     /// <summary>
     /// Optional (can be null) appearance of the author actor to apply.
     /// </summary>
-    public PlainText Appearance { get; }
+    public PlainText? Appearance { get; }
 
-    public GenericPrefix (PlainText author, PlainText appearance = null)
+    public GenericPrefix (PlainText author, PlainText? appearance = null)
     {
         Author = author;
         Appearance = appearance;

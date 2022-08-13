@@ -13,7 +13,7 @@ public class NamedValueParser
     /// </summary>
     /// <param name="value">The decoded named value to split.</param>
     /// <returns>Name and value pair; each could be null when not assigned (skipped).</returns>
-    public (string name, string value) Parse (string value)
+    public (string? name, string? value) Parse (string value)
     {
         if (string.IsNullOrEmpty(value)) return (null, null);
         var delimiterIndex = FindDelimiterIndex(value);
@@ -21,7 +21,7 @@ public class NamedValueParser
         var name = delimiterIndex == 0 ? null : value.Substring(0, delimiterIndex);
         var namedValue = delimiterIndex == value.Length - 1 ? null
             : value.Substring(delimiterIndex + 1, value.Length - (delimiterIndex + 1));
-        return (Unescape(name), Unescape(namedValue));
+        return (name is null ? null : Unescape(name), namedValue is null ? null : Unescape(namedValue));
     }
 
     private static string Unescape (string value) => UnescapeCharacter(value, NamedDelimiter);

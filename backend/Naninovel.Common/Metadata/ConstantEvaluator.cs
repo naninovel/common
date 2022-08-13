@@ -42,7 +42,7 @@ public static class ConstantEvaluator
         return "";
     }
 
-    private static string EvaluateAtom (string atom, string script, GetParamValue getParamValue)
+    private static string? EvaluateAtom (string atom, string script, GetParamValue getParamValue)
     {
         if (atom == scriptSymbol) return script;
         if (!atom.StartsWith(paramIdSymbol.ToString())) return null;

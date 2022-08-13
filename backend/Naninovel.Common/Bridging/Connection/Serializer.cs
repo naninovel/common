@@ -8,8 +8,8 @@ public static class Serializer
 {
     public class Content
     {
-        public string MessageType { get; set; }
-        public string SerializedMessage { get; set; }
+        public string MessageType { get; set; } = "";
+        public string SerializedMessage { get; set; } = "";
     }
 
     public static string Serialize (IMessage message)
@@ -32,7 +32,7 @@ public static class Serializer
         }
         catch (InvalidOperationException)
         {
-            message = null;
+            message = null!;
             return false;
         }
     }
@@ -41,8 +41,7 @@ public static class Serializer
         where T : class, IMessage
     {
         TryDeserialize(serializedMessage, out var baseMessage);
-        message = baseMessage as T;
-        return message != null;
+        return (message = (baseMessage as T)!) != null;
     }
 
     private static string SerializeXml (object data)

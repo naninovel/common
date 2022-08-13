@@ -16,7 +16,7 @@ internal class CommandParser
     private Command commandBody = emptyBody;
     private PlainText commandId = PlainText.Empty;
     private MixedValue paramValue = emptyValue;
-    private PlainText paramId;
+    private PlainText? paramId;
 
     public Command Parse (LineWalker walker)
     {

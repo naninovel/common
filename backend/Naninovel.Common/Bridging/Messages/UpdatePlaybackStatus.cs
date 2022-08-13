@@ -8,5 +8,5 @@ public class UpdatePlaybackStatus : IServerMessage
     /// <summary>
     /// The actual script playback status.
     /// </summary>
-    public PlaybackStatus PlaybackStatus { get; set; }
+    public PlaybackStatus PlaybackStatus { get; set; } = null!;
 }
