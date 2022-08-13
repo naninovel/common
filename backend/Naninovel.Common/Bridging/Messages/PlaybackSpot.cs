@@ -8,7 +8,7 @@ public class PlaybackSpot
     /// <summary>
     /// Identifier of the scenario script.
     /// </summary>
-    public string ScriptName { get; set; }
+    public string ScriptName { get; set; } = null!;
     /// <summary>
     /// Zero-based index of the script line.
     /// </summary>

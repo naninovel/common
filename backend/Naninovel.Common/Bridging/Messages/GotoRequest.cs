@@ -8,5 +8,5 @@ public class GotoRequest : IClientMessage
     /// <summary>
     /// The script playback spot to play.
     /// </summary>
-    public PlaybackSpot PlaybackSpot { get; set; }
+    public PlaybackSpot PlaybackSpot { get; set; } = null!;
 }

@@ -12,5 +12,5 @@ public class PlaybackStatus
     /// <summary>
     /// Current script playback spot, if any.
     /// </summary>
-    public PlaybackSpot PlayedSpot { get; set; }
+    public PlaybackSpot PlayedSpot { get; set; } = null!;
 }

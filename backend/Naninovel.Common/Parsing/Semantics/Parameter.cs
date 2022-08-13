@@ -15,7 +15,7 @@ public class Parameter : ILineComponent
     /// Not case-sensitive.
     /// In v1 can be either alias or name of the associated command field.
     /// </remarks>
-    public PlainText Identifier { get; }
+    public PlainText? Identifier { get; }
     /// <summary>
     /// Value of the parameter; can contain expressions.
     /// </summary>
@@ -28,7 +28,7 @@ public class Parameter : ILineComponent
     /// </remarks>
     public bool Nameless => Identifier is null;
 
-    public Parameter (PlainText identifier, MixedValue value)
+    public Parameter (PlainText? identifier, MixedValue value)
     {
         Identifier = identifier;
         Value = value;
@@ -41,7 +41,7 @@ public class Parameter : ILineComponent
         var builder = new StringBuilder();
         if (!Nameless)
         {
-            builder.Append(Identifier);
+            builder.Append(Identifier!);
             builder.Append(Identifiers.ParameterAssign);
         }
         builder.Append(Value);

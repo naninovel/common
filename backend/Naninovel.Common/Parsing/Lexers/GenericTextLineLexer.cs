@@ -9,7 +9,7 @@ internal class GenericTextLineLexer
     private readonly ExpressionLexer expressionLexer;
     private readonly CommandBodyLexer commandLexer;
 
-    private LexState state;
+    private LexState state = null!;
     private bool authorAdded;
     private bool canAddAuthor;
     private int startIndex;
@@ -25,7 +25,7 @@ internal class GenericTextLineLexer
 
     public LineType AddGenericTextLine (LexState state)
     {
-        ResetState(state);
+        Reset(state);
         while (!state.EndReached)
             if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression())
                 Move();
@@ -33,7 +33,7 @@ internal class GenericTextLineLexer
         return LineType.GenericText;
     }
 
-    private void ResetState (LexState state)
+    private void Reset (LexState state)
     {
         this.state = state;
         authorAdded = false;

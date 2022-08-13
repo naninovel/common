@@ -10,22 +10,22 @@ public class GenericLineParser
     private readonly MixedValueParser valueParser = new(false);
     private readonly List<IGenericContent> content = new();
     private readonly LineWalker walker;
-    private PlainText authorId, authorAppearance;
-    private GenericPrefix prefix;
+    private PlainText? authorId, authorAppearance;
+    private GenericPrefix? prefix;
 
-    public GenericLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
+    public GenericLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }
 
     public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {
-        ResetState(lineText, tokens);
+        Reset(lineText, tokens);
         while (TryNext()) continue;
         return new GenericLine(prefix, content.ToArray());
     }
 
-    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
+    private void Reset (string lineText, IReadOnlyList<Token> tokens)
     {
         walker.Reset(lineText, tokens);
         content.Clear();
@@ -82,7 +82,7 @@ public class GenericLineParser
     private void ParsePrefix (Token authorAssignToken)
     {
         valueParser.ClearAddedExpressions();
-        prefix = new GenericPrefix(authorId, authorAppearance);
+        prefix = new GenericPrefix(authorId!, authorAppearance);
         walker.Associate(prefix, new LineRange(0, authorAssignToken.EndIndex + 1));
     }
 

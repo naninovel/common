@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <LangVersion>10</LangVersion>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>Naninovel.Common</PackageId>
         <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</Version>

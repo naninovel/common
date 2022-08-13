@@ -6,9 +6,9 @@ namespace Naninovel.Metadata;
 
 internal static class Utilities
 {
-    public static string BuildLabel (string alias, string id)
+    public static string BuildLabel (string? alias, string id)
     {
-        if (!string.IsNullOrEmpty(alias)) return ToFirstLower(alias);
+        if (!string.IsNullOrEmpty(alias)) return ToFirstLower(alias!);
         return ToFirstLower(id);
     }
 

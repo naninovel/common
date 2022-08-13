@@ -8,5 +8,5 @@ public class ConnectionAccepted : IServerMessage
     /// <summary>
     /// Name of the server that accepted the connection.
     /// </summary>
-    public string ServerName { get; set; }
+    public string ServerName { get; set; } = "";
 }

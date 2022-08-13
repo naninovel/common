@@ -7,16 +7,16 @@ namespace Naninovel.Parsing;
 public class CommentLineParser
 {
     private readonly LineWalker walker;
-    private PlainText comment = null!;
+    private PlainText comment = PlainText.Empty;
 
-    public CommentLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
+    public CommentLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {
-        ResetState(lineText, tokens);
+        Reset(lineText, tokens);
         if (!walker.Next(LineId, out _))
             walker.Error(MissingLineId);
         else if (walker.Next(CommentText, out var commentToken))
@@ -24,7 +24,7 @@ public class CommentLineParser
         return new CommentLine(comment);
     }
 
-    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
+    private void Reset (string lineText, IReadOnlyList<Token> tokens)
     {
         comment = PlainText.Empty;
         walker.Reset(lineText, tokens);

@@ -22,7 +22,7 @@ public class ScriptParser
     /// </summary>
     /// <param name="errorHandler">Optional handler for parsing errors.</param>
     /// <param name="associator">Optional handler for associating parse models with text ranges.</param>
-    public ScriptParser (IErrorHandler errorHandler = null, IAssociator associator = null)
+    public ScriptParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
     {
         commandParser = new(errorHandler, associator);
         commentParser = new(errorHandler, associator);
@@ -34,7 +34,7 @@ public class ScriptParser
     /// Splits provided script text into individual lines.
     /// </summary>
     /// <param name="scriptText">The script text to split.</param>
-    public static string[] SplitText (string scriptText)
+    public static string[] SplitText (string? scriptText)
     {
         return scriptText?.Trim('\uFEFF', '\u200B') // Remove BOM and zero-width space.
             .Split(lineBreakSymbols, StringSplitOptions.None) ?? new[] { string.Empty };

@@ -103,7 +103,7 @@ public class ScriptSerializer
 
         if (!parameter.Nameless)
         {
-            builder.Append(parameter.Identifier);
+            builder.Append(parameter.Identifier!);
             builder.Append(Identifiers.ParameterAssign[0]);
         }
 

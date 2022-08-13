@@ -4,7 +4,7 @@ namespace Naninovel.Metadata;
 
 public static class ConstantEvaluator
 {
-    public delegate string GetParamValue (string id, int? index = null);
+    public delegate string? GetParamValue (string id, int? index = null);
 
     private const char expressionStartSymbol = '{';
     private const char expressionEndSymbol = '}';
@@ -42,7 +42,7 @@ public static class ConstantEvaluator
         return "";
     }
 
-    private static string EvaluateAtom (string atom, string script, GetParamValue getParamValue)
+    private static string? EvaluateAtom (string atom, string script, GetParamValue getParamValue)
     {
         if (atom == scriptSymbol) return script;
         if (!atom.StartsWith(paramIdSymbol.ToString())) return null;

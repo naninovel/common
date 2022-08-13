@@ -13,7 +13,7 @@ public class Connection : IDisposable
     private readonly CancellationTokenSource cts = new();
 
     internal Connection (ITransport transport,
-        Subscriber subscriber = default, Waiter waiter = default)
+        Subscriber? subscriber = default, Waiter? waiter = default)
     {
         this.transport = transport;
         this.subscriber = subscriber ?? new Subscriber();

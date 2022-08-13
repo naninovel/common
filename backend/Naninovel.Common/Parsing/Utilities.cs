@@ -27,7 +27,6 @@ internal static class Utilities
 
     public static string UnescapeCharacter (string content, string character)
     {
-        if (content is null) return null;
         var escaped = "\\" + character;
         return content.Contains(escaped) ?
             content.Replace(escaped, character) : content;

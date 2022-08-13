@@ -12,21 +12,21 @@ public class CommandLineParser
     private readonly LineWalker walker;
     private Command command = emptyBody;
 
-    public CommandLineParser (IErrorHandler errorHandler = null, IAssociator associator = null)
+    public CommandLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {
-        ResetState(lineText, tokens);
+        Reset(lineText, tokens);
         if (!walker.Next(LineId, out _))
             walker.Error(MissingLineId);
         else command = commandParser.Parse(walker);
         return new CommandLine(command);
     }
 
-    private void ResetState (string lineText, IReadOnlyList<Token> tokens)
+    private void Reset (string lineText, IReadOnlyList<Token> tokens)
     {
         command = emptyBody;
         walker.Reset(lineText, tokens);

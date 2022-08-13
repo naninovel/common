@@ -6,7 +6,7 @@ internal class CommandParameterLexer
 {
     private readonly ExpressionLexer expressionLexer;
 
-    private LexState state;
+    private LexState state = null!;
     private int startIndex;
     private int idEndIndex;
     private bool quoted;
@@ -19,14 +19,14 @@ internal class CommandParameterLexer
 
     public void AddParameters (LexState state, bool inlined)
     {
-        ResetState(state);
+        Reset(state);
         while (!CommandBodyLexer.IsEndReached(state, inlined))
             if (!TryToggleQuoted() && !TryAddExpression() && !TryAddIdentifier() && !TryAddValue())
                 state.Move();
         AddFinalValue();
     }
 
-    private void ResetState (LexState state)
+    private void Reset (LexState state)
     {
         this.state = state;
         addedNameless = false;

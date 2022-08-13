@@ -7,15 +7,15 @@ namespace Naninovel.Bridging;
 
 public class Server : IDisposable
 {
-    public event Action<Connection> OnClientConnected;
-    public event Action<Connection> OnClientDisconnected;
-    public event Action<Exception, Connection> OnClientException;
+    public event Action<Connection>? OnClientConnected;
+    public event Action<Connection>? OnClientDisconnected;
+    public event Action<Exception, Connection>? OnClientException;
 
     public string Name { get; }
     public bool Listening => listener.Listening;
     public int ListenedPort { get; private set; }
     public int ConnectionsCount => connections.Count;
-    public Task WaitForExit { get; private set; }
+    public Task? WaitForExit { get; private set; }
 
     private readonly IServerTransport listener;
     private readonly Connections connections = new();

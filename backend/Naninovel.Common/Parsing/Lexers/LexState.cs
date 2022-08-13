@@ -13,8 +13,8 @@ internal class LexState
     public bool IsNotSpace => IsIndexValid(Index) && !char.IsWhiteSpace(text[Index]);
     public bool IsPreviousSpace => IsIndexValid(Index - 1) && char.IsWhiteSpace(text[Index - 1]);
 
-    private string text;
-    private ICollection<Token> tokens;
+    private string text = "";
+    private ICollection<Token> tokens = Array.Empty<Token>();
 
     public void Reset (string text, ICollection<Token> tokens)
     {

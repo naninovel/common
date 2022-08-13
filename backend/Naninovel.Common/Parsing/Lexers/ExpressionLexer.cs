@@ -4,7 +4,7 @@ namespace Naninovel.Parsing;
 
 internal class ExpressionLexer
 {
-    private LexState state;
+    private LexState state = null!;
     private int startIndex;
     private bool hasBody;
 
@@ -15,7 +15,7 @@ internal class ExpressionLexer
 
     public void AddExpression (LexState state)
     {
-        ResetState(state);
+        Reset(state);
         AddOpening();
         AddBody();
         AddClosing();
@@ -23,7 +23,7 @@ internal class ExpressionLexer
         CheckMissingBody();
     }
 
-    private void ResetState (LexState state)
+    private void Reset (LexState state)
     {
         this.state = state;
         startIndex = state.Index;

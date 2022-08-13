@@ -8,7 +8,7 @@ public class Client : IDisposable
 {
     private readonly Connection connection;
     private readonly IClientTransport transport;
-    private Task maintainTask;
+    private Task? maintainTask;
 
     public Client (IClientTransport transport)
     {

@@ -12,5 +12,5 @@ public class ValueContext
     /// <summary>
     /// Optional, further specified type of the context.
     /// </summary>
-    public string SubType { get; set; }
+    public string? SubType { get; set; }
 }
