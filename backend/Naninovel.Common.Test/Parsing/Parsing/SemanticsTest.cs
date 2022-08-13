@@ -122,6 +122,21 @@ public class SemanticsTest
     }
 
     [Fact]
+    public void WhenConvertedFromNullPlainTextStringIsNull ()
+    {
+        string @string = (PlainText)null;
+        Assert.Null(@string);
+    }
+
+    [Fact]
+    public void WhenConvertedFromEmptyPlainTextStringIsEmpty ()
+    {
+        string @string = PlainText.Empty;
+        Assert.IsType<string>(@string);
+        Assert.Empty(@string);
+    }
+
+    [Fact]
     public void PlainTextHasImplicitConversionFromString ()
     {
         PlainText plain = "foo";

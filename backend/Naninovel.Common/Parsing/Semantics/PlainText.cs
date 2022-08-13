@@ -20,9 +20,9 @@ public class PlainText : ILineComponent, IValueComponent, IEnumerable<char>
         Text = text;
     }
 
-    public static implicit operator string (PlainText plainText)
+    public static implicit operator string (PlainText? plainText)
     {
-        return plainText.Text;
+        return plainText?.Text!;
     }
 
     public static implicit operator PlainText (string? @string)
