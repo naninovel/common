@@ -53,4 +53,29 @@ public static class Injection
             resolve(registrar)(handler);
         return provider;
     }
+
+    public static IServiceProvider Register<TRegistrar> (this IServiceProvider provider,
+        Type genericHandler, string registerMethodName, int specifierIndex = 0) where TRegistrar : notnull
+    {
+        var registerMethod = typeof(TRegistrar).GetMethod(registerMethodName)!;
+        var registrar = provider.GetRequiredService<TRegistrar>();
+        foreach (var service in provider.GetAll<object>())
+            if (TryGetHandlerType(service, out var handlerType))
+                RegisterHandler(service, handlerType);
+        return provider;
+
+        bool TryGetHandlerType (object service, out Type handlerType)
+        {
+            handlerType = service.GetType().GetInterfaces()
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == genericHandler)!;
+            return handlerType != null!;
+        }
+
+        void RegisterHandler (object handler, Type handlerType)
+        {
+            var specifier = handlerType.GetGenericArguments()[specifierIndex];
+            var method = registerMethod.MakeGenericMethod(specifier);
+            method.Invoke(registrar, new[] { handler });
+        }
+    }
 }

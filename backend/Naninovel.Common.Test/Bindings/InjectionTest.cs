@@ -40,9 +40,25 @@ public class InjectionTest
         var registrar = new Mock<IRegistrar>();
         new ServiceCollection()
             .AddSingleton<IRegistrar>(registrar.Object)
-            .AddSingleton<IService, Service>()
+            .AddSingleton<IServiceA, ServiceA>()
+            .AddSingleton<IServiceB, ServiceB>()
             .BuildServiceProvider()
-            .Register<IRegistrar, IHandler<HandlerSpecifier>>(c => c.Register);
-        registrar.Verify(c => c.Register(It.IsAny<Service>()), Times.Once);
+            .Register<IRegistrar, IHandler<HandlerSpecifierA>>(c => c.Register);
+        registrar.Verify(c => c.Register(It.IsAny<ServiceA>()), Times.Once);
+        registrar.Verify(c => c.Register(It.IsAny<ServiceB>()), Times.Never);
+    }
+
+    [Fact]
+    public void CanRegisterGenericHandlers ()
+    {
+        var registrar = new Mock<IRegistrar>();
+        new ServiceCollection()
+            .AddSingleton<IRegistrar>(registrar.Object)
+            .AddSingleton<IServiceA, ServiceA>()
+            .AddSingleton<IServiceB, ServiceB>()
+            .BuildServiceProvider()
+            .Register<IRegistrar>(typeof(IHandler<>), nameof(IRegistrar.Register));
+        registrar.Verify(c => c.Register(It.IsAny<ServiceA>()), Times.Once);
+        registrar.Verify(c => c.Register(It.IsAny<ServiceB>()), Times.Once);
     }
 }
