@@ -60,16 +60,12 @@ public static class Injection
         var registerMethod = typeof(TRegistrar).GetMethod(registerMethodName)!;
         var registrar = provider.GetRequiredService<TRegistrar>();
         foreach (var service in provider.GetAll<object>())
-            if (TryGetHandlerType(service, out var handlerType))
-                RegisterHandler(service, handlerType);
+        foreach (var handler in GetHandlerTypes(service))
+            RegisterHandler(service, handler);
         return provider;
 
-        bool TryGetHandlerType (object service, out Type handlerType)
-        {
-            handlerType = service.GetType().GetInterfaces()
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == genericHandler)!;
-            return handlerType != null!;
-        }
+        Type[] GetHandlerTypes (object service) => service.GetType().GetInterfaces()
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == genericHandler).ToArray();
 
         void RegisterHandler (object handler, Type handlerType)
         {

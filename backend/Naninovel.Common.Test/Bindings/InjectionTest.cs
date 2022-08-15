@@ -10,7 +10,7 @@ namespace Naninovel.Bindings.Test;
 public class InjectionTest
 {
     [Fact]
-    public void AddsObserverRegistryAndNotifierForTheProvidedObserver ()
+    public void AddsRegistryAndNotifierForEachObservation ()
     {
         var provider = new ServiceCollection()
             .AddObserving<IMockObserver>()
@@ -20,7 +20,7 @@ public class InjectionTest
     }
 
     [Fact]
-    public async Task RegistersAllObservers ()
+    public async Task CanRegisterObservers ()
     {
         var provider = new ServiceCollection()
             .AddObserving<IMockObserver>()
@@ -35,17 +35,21 @@ public class InjectionTest
     }
 
     [Fact]
-    public void RegistersImplicitDependencies ()
+    public void CanRegisterHandlers ()
     {
         var registrar = new Mock<IRegistrar>();
         new ServiceCollection()
             .AddSingleton<IRegistrar>(registrar.Object)
             .AddSingleton<IServiceA, ServiceA>()
             .AddSingleton<IServiceB, ServiceB>()
+            .AddSingleton<IServiceC, ServiceC>()
             .BuildServiceProvider()
-            .Register<IRegistrar, IHandler<HandlerSpecifierA>>(c => c.Register);
+            .Register<IRegistrar, IHandler<HandlerSpecifierA>>(c => c.Register)
+            .Register<IRegistrar, IHandler<HandlerSpecifierB>>(c => c.Register);
         registrar.Verify(c => c.Register(It.IsAny<ServiceA>()), Times.Once);
-        registrar.Verify(c => c.Register(It.IsAny<ServiceB>()), Times.Never);
+        registrar.Verify(c => c.Register(It.IsAny<ServiceB>()), Times.Once);
+        registrar.Verify(c => c.Register<HandlerSpecifierA>(It.IsAny<ServiceC>()), Times.Once);
+        registrar.Verify(c => c.Register<HandlerSpecifierB>(It.IsAny<ServiceC>()), Times.Once);
     }
 
     [Fact]
@@ -56,9 +60,12 @@ public class InjectionTest
             .AddSingleton<IRegistrar>(registrar.Object)
             .AddSingleton<IServiceA, ServiceA>()
             .AddSingleton<IServiceB, ServiceB>()
+            .AddSingleton<IServiceC, ServiceC>()
             .BuildServiceProvider()
             .Register<IRegistrar>(typeof(IHandler<>), nameof(IRegistrar.Register));
         registrar.Verify(c => c.Register(It.IsAny<ServiceA>()), Times.Once);
         registrar.Verify(c => c.Register(It.IsAny<ServiceB>()), Times.Once);
+        registrar.Verify(c => c.Register<HandlerSpecifierA>(It.IsAny<ServiceC>()), Times.Once);
+        registrar.Verify(c => c.Register<HandlerSpecifierB>(It.IsAny<ServiceC>()), Times.Once);
     }
 }
