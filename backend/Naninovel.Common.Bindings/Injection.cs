@@ -55,7 +55,7 @@ public static class Injection
     }
 
     public static IServiceProvider Register<TRegistrar> (this IServiceProvider provider,
-        Type genericHandler, string registerMethodName, int specifierIndex = 0) where TRegistrar : notnull
+        Type genericHandler, string registerMethodName = "Register", int specifierIndex = 0) where TRegistrar : notnull
     {
         var registerMethod = typeof(TRegistrar).GetMethod(registerMethodName)!;
         var registrar = provider.GetRequiredService<TRegistrar>();

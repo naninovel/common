@@ -62,7 +62,7 @@ public class InjectionTest
             .AddSingleton<IServiceB, ServiceB>()
             .AddSingleton<IServiceC, ServiceC>()
             .BuildServiceProvider()
-            .Register<IRegistrar>(typeof(IHandler<>), nameof(IRegistrar.Register));
+            .Register<IRegistrar>(typeof(IHandler<>));
         registrar.Verify(c => c.Register(It.IsAny<ServiceA>()), Times.Once);
         registrar.Verify(c => c.Register(It.IsAny<ServiceB>()), Times.Once);
         registrar.Verify(c => c.Register<HandlerSpecifierA>(It.IsAny<ServiceC>()), Times.Once);
