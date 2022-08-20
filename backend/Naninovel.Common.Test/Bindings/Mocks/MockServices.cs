@@ -1,17 +1,25 @@
 ﻿namespace Naninovel.Bindings.Test;
 
 public interface IHandlerSpecifier { }
-public interface IHandler<T> where T : IHandlerSpecifier { }
-public interface IServiceA { }
-public interface IServiceB { }
-public interface IServiceC { }
+public interface IHandlerOne<T> where T : IHandlerSpecifier { }
+public interface IHandlerTwo<T> where T : IHandlerSpecifier { }
+public interface IServiceOneA { }
+public interface IServiceOneB { }
+public interface IServiceOneC { }
+public interface IServiceTwoA { }
+public interface IServiceTwoB { }
+public interface IServiceTwoC { }
 public record HandlerSpecifierA : IHandlerSpecifier;
 public record HandlerSpecifierB : IHandlerSpecifier;
-public class ServiceA : IServiceA, IHandler<HandlerSpecifierA> { }
-public class ServiceB : IServiceB, IHandler<HandlerSpecifierB> { }
-public class ServiceC : IServiceC, IHandler<HandlerSpecifierA>, IHandler<HandlerSpecifierB> { }
+public class ServiceOneA : IServiceOneA, IHandlerOne<HandlerSpecifierA> { }
+public class ServiceOneB : IServiceOneB, IHandlerOne<HandlerSpecifierB> { }
+public class ServiceOneC : IServiceOneC, IHandlerOne<HandlerSpecifierA>, IHandlerOne<HandlerSpecifierB> { }
+public class ServiceTwoA : IServiceTwoA, IHandlerTwo<HandlerSpecifierA> { }
+public class ServiceTwoB : IServiceTwoB, IHandlerTwo<HandlerSpecifierB> { }
+public class ServiceTwoC : IServiceTwoC, IHandlerTwo<HandlerSpecifierA>, IHandlerTwo<HandlerSpecifierB> { }
 
 public interface IRegistrar
 {
-    void Register<T> (IHandler<T> handler) where T : IHandlerSpecifier;
+    void Register<T> (IHandlerOne<T> handlerOne) where T : IHandlerSpecifier;
+    void Register<T> (IHandlerTwo<T> handlerOne) where T : IHandlerSpecifier;
 }
