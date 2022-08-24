@@ -47,9 +47,7 @@ public class LexerTest
         Assert.Equal(new Token(TokenType.NamedParam, 2, 3), tokens[4]);
         Assert.Equal(new Token(TokenType.CommandBody, 0, 5), tokens[5]);
     }
-
-    [Theory, MemberData(nameof(LexerTestData.EmptyLines), MemberType = typeof(LexerTestData))]
-    public void EmptyLineTokenized (string text) => LineTokenized(text, LineType.Empty);
+    
 
     [Theory, MemberData(nameof(LexerTestData.CommentLines), MemberType = typeof(LexerTestData))]
     public void CommentLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Comment, tokens);
@@ -60,8 +58,8 @@ public class LexerTest
     [Theory, MemberData(nameof(LexerTestData.CommandLines), MemberType = typeof(LexerTestData))]
     public void CommandLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Command, tokens);
 
-    [Theory, MemberData(nameof(LexerTestData.GenericTextLines), MemberType = typeof(LexerTestData))]
-    public void GenericTextLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.GenericText, tokens);
+    [Theory, MemberData(nameof(LexerTestData.GenericLines), MemberType = typeof(LexerTestData))]
+    public void GenericLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Generic, tokens);
 
     [ExcludeFromCodeCoverage]
     private void LineTokenized (string text, LineType expectedLineType, params Token[] expectedTokens)

@@ -9,7 +9,7 @@ public class TokenTypeTest
     public void HasFlagEvaluatedCorrectly ()
     {
         Assert.True(TokenTypeExtensions.HasFlag(TokenType.Expression, TokenType.Expression));
-        Assert.False(TokenTypeExtensions.HasFlag(LineId, TokenType.GenericText));
+        Assert.False(TokenTypeExtensions.HasFlag(LineId, GenericText));
         Assert.True(TokenTypeExtensions.HasFlag(LineId | TokenType.Expression | CommentText, TokenType.Expression));
         Assert.False(TokenTypeExtensions.HasFlag(CommandBody | AuthorAssign, LineId));
     }

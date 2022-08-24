@@ -6,7 +6,7 @@ public class Lexer
 {
     private readonly LexState state;
     private readonly CommandBodyLexer commandLexer;
-    private readonly GenericTextLineLexer genericLineLexer;
+    private readonly GenericLineLexer genericLineLexer;
 
     public Lexer ()
     {
@@ -14,7 +14,7 @@ public class Lexer
         var expressionLexer = new ExpressionLexer();
         var parameterLexer = new CommandParameterLexer(expressionLexer);
         commandLexer = new CommandBodyLexer(parameterLexer);
-        genericLineLexer = new GenericTextLineLexer(expressionLexer, commandLexer);
+        genericLineLexer = new GenericLineLexer(expressionLexer, commandLexer);
     }
 
     public LineType TokenizeLine (string text, ICollection<Token> tokens)
@@ -24,7 +24,7 @@ public class Lexer
                TryCommentLine() ??
                TryLabelLine() ??
                TryCommandLine() ??
-               genericLineLexer.AddGenericTextLine(state);
+               genericLineLexer.AddGenericLine(state);
     }
 
     public void TokenizeCommandBody (string text, ICollection<Token> tokens)
@@ -36,7 +36,7 @@ public class Lexer
     private LineType? TryEmptyLine ()
     {
         state.SkipSpace();
-        if (state.EndReached) return LineType.Empty;
+        if (state.EndReached) return LineType.Generic;
         return null;
     }
 

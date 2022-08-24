@@ -4,13 +4,6 @@ namespace Naninovel.Parsing.Test;
 
 public static class LexerTestData
 {
-    public static IEnumerable<object[]> EmptyLines { get; } = new[] {
-        T(string.Empty),
-        T("    "),
-        T("\t\t"),
-        T(" \t  \t ")
-    };
-
     public static IEnumerable<object[]> CommentLines { get; } = new[] {
         T(
             "; Comment",
@@ -196,7 +189,19 @@ public static class LexerTestData
         )
     };
 
-    public static IEnumerable<object[]> GenericTextLines { get; } = new[] {
+    public static IEnumerable<object[]> GenericLines { get; } = new[] {
+        T(
+            ""
+        ),
+        T(
+            "    "
+        ),
+        T(
+            "\t\t"
+        ),
+        T(
+            " \t  \t "
+        ),
         T(
             "Generic text line.",
             GenericText(0, 18)

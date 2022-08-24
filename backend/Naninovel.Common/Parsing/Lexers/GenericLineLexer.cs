@@ -2,7 +2,7 @@ using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;
 
-internal class GenericTextLineLexer
+internal class GenericLineLexer
 {
     private bool hasAppearance => firstAppearance > -1;
 
@@ -17,20 +17,20 @@ internal class GenericTextLineLexer
     private int lastNotSpace;
     private int firstAppearance;
 
-    public GenericTextLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer)
+    public GenericLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer)
     {
         this.expressionLexer = expressionLexer;
         this.commandLexer = commandLexer;
     }
 
-    public LineType AddGenericTextLine (LexState state)
+    public LineType AddGenericLine (LexState state)
     {
         Reset(state);
         while (!state.EndReached)
             if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression())
                 Move();
         AddPrecedingText();
-        return LineType.GenericText;
+        return LineType.Generic;
     }
 
     private void Reset (LexState state)
