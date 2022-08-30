@@ -13,7 +13,7 @@ public class NamedValueParser
     /// </summary>
     /// <param name="value">The decoded named value to split.</param>
     /// <returns>Name and value pair; each could be null when not assigned (skipped).</returns>
-    public (string? name, string? value) Parse (string value)
+    public (string? Name, string? Value) Parse (string value)
     {
         if (string.IsNullOrEmpty(value)) return (null, null);
         var delimiterIndex = FindDelimiterIndex(value);
