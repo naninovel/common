@@ -13,6 +13,7 @@ public static class ConstantEvaluator
     private const char paramIdSymbol = ':';
     private const char paramIndexStartSymbol = '[';
     private const char paramIndexEndSymbol = ']';
+    private static readonly string[] nullSeparator = { nullCoalescingSymbol };
 
     public static string EvaluateName (string value, string script, GetParamValue getParamValue)
     {
@@ -35,7 +36,7 @@ public static class ConstantEvaluator
 
     private static string EvaluateExpression (string expression, string script, GetParamValue getParamValue)
     {
-        var atoms = expression.Split(new[] { nullCoalescingSymbol }, StringSplitOptions.RemoveEmptyEntries);
+        var atoms = expression.Split(nullSeparator, StringSplitOptions.RemoveEmptyEntries);
         foreach (var atom in atoms)
             if (EvaluateAtom(atom, script, getParamValue) is { } value)
                 return value;
