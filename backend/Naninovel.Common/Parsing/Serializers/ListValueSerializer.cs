@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using static Naninovel.Parsing.Utilities;
 using static Naninovel.Parsing.Identifiers;
 
@@ -12,7 +13,7 @@ public class ListValueSerializer
 {
     private readonly StringBuilder builder = new();
 
-    public string Serialize (string?[] value)
+    public string Serialize (IReadOnlyList<string?> value)
     {
         var lastNonNullIndex = FindLastNonNullElementIndex(value);
         if (lastNonNullIndex < 0) return "";
@@ -22,16 +23,16 @@ public class ListValueSerializer
         return builder.ToString();
     }
 
-    private int FindLastNonNullElementIndex (string?[] value)
+    private int FindLastNonNullElementIndex (IReadOnlyList<string?> value)
     {
         var lastNonNullIndex = -1;
-        for (int i = 0; i < value.Length; i++)
+        for (int i = 0; i < value.Count; i++)
             if (value[i] != null)
                 lastNonNullIndex = i;
         return lastNonNullIndex;
     }
 
-    private void AppendElement (string?[] value, int index)
+    private void AppendElement (IReadOnlyList<string?> value, int index)
     {
         var element = value[index];
         if (index > 0) builder.Append(ListDelimiter[0]);
