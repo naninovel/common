@@ -17,11 +17,11 @@ public class NamedValueParser
     {
         if (string.IsNullOrEmpty(value)) return (null, null);
         var delimiterIndex = FindDelimiterIndex(value);
-        if (delimiterIndex < 0) return (Unescape(value), null);
+        if (delimiterIndex < 0) return (value, null);
         var name = delimiterIndex == 0 ? null : value.Substring(0, delimiterIndex);
         var namedValue = delimiterIndex == value.Length - 1 ? null
             : value.Substring(delimiterIndex + 1, value.Length - (delimiterIndex + 1));
-        return (name is null ? null : Unescape(name), namedValue is null ? null : Unescape(namedValue));
+        return (name is null ? null : Unescape(name), namedValue);
     }
 
     private static string Unescape (string value) => UnescapeCharacter(value, NamedDelimiter);

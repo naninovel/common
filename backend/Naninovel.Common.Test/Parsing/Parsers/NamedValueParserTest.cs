@@ -22,7 +22,7 @@ public class NamedValueParserTest
     }
 
     [Fact]
-    public void SkippedNameIsNullInSplitNamed ()
+    public void SkippedNameIsNull ()
     {
         var (name, value) = parser.Parse(".bar");
         Assert.Null(name);
@@ -30,7 +30,7 @@ public class NamedValueParserTest
     }
 
     [Fact]
-    public void SkippedValueWithDelimiterIsNullInSplitNamed ()
+    public void SkippedValueWithDelimiterIsNull ()
     {
         var (name, value) = parser.Parse("foo.");
         Assert.Equal("foo", name);
@@ -38,7 +38,7 @@ public class NamedValueParserTest
     }
 
     [Fact]
-    public void SkippedValueWithoutDelimiterIsNullInSplitNamed ()
+    public void SkippedValueWithoutDelimiterIsNull ()
     {
         var (name, value) = parser.Parse("foo");
         Assert.Equal("foo", name);
@@ -46,13 +46,19 @@ public class NamedValueParserTest
     }
 
     [Fact]
-    public void WhenOnlyDelimiterBothAreNullInSplitNamed ()
+    public void WhenEmptyBothAreNull ()
+    {
+        Assert.Equal((null, null), parser.Parse(""));
+    }
+
+    [Fact]
+    public void WhenOnlyDelimiterBothAreNull ()
     {
         Assert.Equal((null, null), parser.Parse("."));
     }
 
     [Fact]
-    public void WhenMultipleUnescapedDelimitersFirstIsUsedInSplitNamed ()
+    public void WhenMultipleUnescapedDelimitersFirstIsUsed ()
     {
         var (name, value) = parser.Parse("foo.12.5");
         Assert.Equal("foo", name);
@@ -60,10 +66,26 @@ public class NamedValueParserTest
     }
 
     [Fact]
-    public void EscapedDelimiterIsUnescapedAndIncludedInSplitNamed ()
+    public void EscapedDelimiterIsUnescapedAndIncluded ()
     {
         var (name, value) = parser.Parse("foo\\.12.5");
         Assert.Equal("foo.12", name);
         Assert.Equal("5", value);
+    }
+
+    [Fact]
+    public void EscapedDelimitersArePreserved ()
+    {
+        var (name, value) = parser.Parse("foo\\.12\\.5");
+        Assert.Equal("foo\\.12\\.5", name);
+        Assert.Null(value);
+    }
+
+    [Fact]
+    public void EscapedDelimitersAfterActualDelimiterArePreserved ()
+    {
+        var (name, value) = parser.Parse("foo.12\\.5");
+        Assert.Equal("foo", name);
+        Assert.Equal("12\\.5", value);
     }
 }
