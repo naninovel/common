@@ -14,12 +14,6 @@ public class ListValueSerializerTest
     }
 
     [Fact]
-    public void WhenAllElementsAreNullReturnsEmpty ()
-    {
-        Assert.Equal("", serializer.Serialize(new string[] { null, null }));
-    }
-
-    [Fact]
     public void CanSerializeListValue ()
     {
         Assert.Equal("foo,bar.nya", serializer.Serialize(new[] { "foo", "bar.nya" }));
@@ -33,9 +27,15 @@ public class ListValueSerializerTest
     }
 
     [Fact]
-    public void TrailingNullElementsAreIgnored ()
+    public void WhenAllElementsAreNullPreservesThem ()
     {
-        Assert.Equal("foo", serializer.Serialize(new[] { "foo", null, null }));
+        Assert.Equal(",", serializer.Serialize(new string[] { null, null }));
+    }
+
+    [Fact]
+    public void TrailingNullElementsArePreserved ()
+    {
+        Assert.Equal("foo,,", serializer.Serialize(new[] { "foo", null, null }));
     }
 
     [Fact]

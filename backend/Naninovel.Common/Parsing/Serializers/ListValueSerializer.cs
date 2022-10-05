@@ -15,21 +15,10 @@ public class ListValueSerializer
 
     public string Serialize (IReadOnlyList<string?> value)
     {
-        var lastNonNullIndex = FindLastNonNullElementIndex(value);
-        if (lastNonNullIndex < 0) return "";
         builder.Clear();
-        for (int i = 0; i <= lastNonNullIndex; i++)
+        for (int i = 0; i < value.Count; i++)
             AppendElement(value, i);
         return builder.ToString();
-    }
-
-    private int FindLastNonNullElementIndex (IReadOnlyList<string?> value)
-    {
-        var lastNonNullIndex = -1;
-        for (int i = 0; i < value.Count; i++)
-            if (value[i] != null)
-                lastNonNullIndex = i;
-        return lastNonNullIndex;
     }
 
     private void AppendElement (IReadOnlyList<string?> value, int index)
