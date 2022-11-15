@@ -14,15 +14,17 @@ public class ObserverNotifier<TObserver> : IObserverNotifier<TObserver>
         this.observers = observers;
     }
 
-    public void Notify (Action<TObserver> notification)
+    public void Notify (Action<TObserver> notification,
+        Func<IEnumerable<TObserver>, IEnumerable<TObserver>>? order = null)
     {
-        foreach (var observer in observers)
+        foreach (var observer in order?.Invoke(observers) ?? observers)
             notification(observer);
     }
 
-    public async Task NotifyAsync (Func<TObserver, Task> notification)
+    public async Task NotifyAsync (Func<TObserver, Task> notification,
+        Func<IEnumerable<TObserver>, IEnumerable<TObserver>>? order = null)
     {
-        foreach (var observer in observers)
+        foreach (var observer in order?.Invoke(observers) ?? observers)
             await notification(observer);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Naninovel;
@@ -11,9 +12,12 @@ public interface IObserverNotifier<TObserver>
     /// <summary>
     /// Invokes the notification action on the registered observes.
     /// </summary>
-    void Notify (Action<TObserver> notification);
+    /// <param name="notification">The action to invoke on each observer.</param>
+    /// <param name="order">Allows changing notification order; by default observers are notified in the register order.</param>
+    void Notify (Action<TObserver> notification, Func<IEnumerable<TObserver>, IEnumerable<TObserver>>? order = null);
     /// <summary>
     /// Invokes the notification task on the registered observes.
     /// </summary>
-    Task NotifyAsync (Func<TObserver, Task> notification);
+    /// <inheritdoc cref="Notify"/>
+    Task NotifyAsync (Func<TObserver, Task> notification, Func<IEnumerable<TObserver>, IEnumerable<TObserver>>? order = null);
 }
