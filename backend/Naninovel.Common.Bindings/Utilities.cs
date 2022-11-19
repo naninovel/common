@@ -9,7 +9,7 @@ namespace Naninovel.Common.Bindings;
 
 public static class Utilities
 {
-    public const string NamespacePattern = @".*\.(\S+)";
+    public const string NamespacePattern = @".*\.I?(\S+)";
     public const string NamespaceReplacement = "$1";
 
     public static void ConfigureJson ()
