@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using DotNetJS;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Naninovel.Common.Bindings;
@@ -31,6 +33,19 @@ public static class Injection
         var observers = new HashSet<TObserver>();
         services.AddSingleton<IObserverRegistry<TObserver>>(new ObserverRegistry<TObserver>(observers));
         services.AddSingleton<IObserverNotifier<TObserver>>(new ObserverNotifier<TObserver>(observers));
+        return services;
+    }
+
+    [RequiresUnreferencedCode("Resolves auto-generated JS export and import types.")]
+    public static IServiceCollection AddJS (this IServiceCollection services)
+    {
+        var assembly = Assembly.GetCallingAssembly();
+        if (assembly.GetCustomAttribute<JSExportAttribute>()?.Types is { } exports)
+            foreach (var type in exports)
+                services.AddSingleton(assembly.GetType($"{type.Name[1..]}.JS{type.Name[1..]}")!);
+        if (assembly.GetCustomAttribute<JSImportAttribute>()?.Types is { } imports)
+            foreach (var type in imports)
+                services.AddSingleton(type, assembly.GetType($"{type.Name[1..]}.JS{type.Name[1..]}")!);
         return services;
     }
 
