@@ -37,11 +37,11 @@ public class Parameter
     /// <summary>
     /// Optional information about the context in which the value is used.
     /// </summary>
-    public ValueContext? ValueContext { get; set; }
-    /// <summary>
-    /// When value container is of a named type, represents context of the named part.
-    /// </summary>
-    public ValueContext? NamedValueContext { get; set; }
+    /// <remarks>
+    /// Multiple elements can be specified to map contexts to specific value indexes,
+    /// in case the parameter value is of list or named container types.
+    /// </remarks>
+    public ValueContext?[]? ValueContext { get; set; }
     /// <summary>
     /// The value the parameter has when it's not explicitly specified in script.
     /// </summary>
