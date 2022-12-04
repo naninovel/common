@@ -24,5 +24,9 @@ public enum ValueContextType
     /// <summary>
     /// Identifier of an actor appearance.
     /// </summary>
-    Appearance
+    Appearance,
+    /// <summary>
+    /// A color string in hex format.
+    /// </summary>
+    Color
 }
