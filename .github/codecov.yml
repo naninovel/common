@@ -1,2 +1,2 @@
 ignore:
-  - "**/Naninovel.Common.Bindings/**"
+  - "**/Naninovel.Common.Bindings"
