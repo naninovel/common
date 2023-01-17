@@ -21,6 +21,7 @@ jobs:
           chmod +x build-backend.sh
           ./build-backend.sh
           dotnet test backend/Naninovel.Common.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        shell: bash
       - name: upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
