@@ -24,7 +24,7 @@ public class NotifierTest
         await notifier.NotifyAsync(o => o.HandleAsync());
         observer.Verify(o => o.HandleAsync(), Times.Once);
     }
-    
+
     [Fact]
     public void ByDefaultNotifiesInOrder ()
     {
@@ -36,7 +36,7 @@ public class NotifierTest
         var notifier = new ObserverNotifier<IMockObserver>(new[] { observer1.Object, observer2.Object });
         notifier.Notify(o => o.Handle());
     }
-    
+
     [Fact]
     public void CanChangeNotifyOrder ()
     {
