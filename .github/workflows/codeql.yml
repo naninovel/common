@@ -33,7 +33,7 @@ jobs:
           languages: ${{ matrix.language }}
       - name: build
         run: |
-          dotnet build backend/Naninovel.Common.sln
+          dotnet publish -c release backend/Naninovel.Common.sln
           npm ci
           npm run build
       - name: analyze
