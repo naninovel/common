@@ -47,7 +47,6 @@ public class LexerTest
         Assert.Equal(new Token(TokenType.NamedParam, 2, 3), tokens[4]);
         Assert.Equal(new Token(TokenType.CommandBody, 0, 5), tokens[5]);
     }
-    
 
     [Theory, MemberData(nameof(LexerTestData.CommentLines), MemberType = typeof(LexerTestData))]
     public void CommentLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Comment, tokens);
