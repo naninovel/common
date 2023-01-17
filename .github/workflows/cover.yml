@@ -21,5 +21,4 @@ jobs:
       - name: upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: /home/runner/work/Common/**/*.xml
           fail_ci_if_error: true
