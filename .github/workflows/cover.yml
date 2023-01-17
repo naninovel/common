@@ -17,7 +17,7 @@ jobs:
           dotnet-version: 6.0.x
       - name: cover
         run: |
-          dotnet publish backend/Naninovel.Common.sln
+          dotnet publish backend/Naninovel.Common.sln -c release
           dotnet test backend/Naninovel.Common.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       - name: upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
