@@ -48,14 +48,6 @@ public class LexerTest
         Assert.Equal(new Token(TokenType.CommandBody, 0, 5), tokens[5]);
     }
 
-    [Fact]
-    public void PreviousIsNotSpaceWhenInvalidIndex ()
-    {
-        var state = new LexState();
-        state.Reset("", new List<Token>());
-        Assert.False(state.IsPreviousSpace);
-    }
-
     [Theory, MemberData(nameof(LexerTestData.CommentLines), MemberType = typeof(LexerTestData))]
     public void CommentLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Comment, tokens);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Naninovel.Parsing;
 
-public class LexState
+internal class LexState
 {
     public int Index { get; private set; }
     public int Length => text.Length;
