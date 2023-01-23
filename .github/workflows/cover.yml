@@ -18,6 +18,10 @@ jobs:
       - name: cover
         run: |
           dotnet test backend/Naninovel.Common.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet publish backend/Naninovel.Common.WASM/Naninovel.Common.WASM.csproj
+          npm ci
+          npm run build
+          jest --coverage --reporters="text" --reporters="cobertura"
       - name: upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
