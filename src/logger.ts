@@ -9,9 +9,9 @@ export function injectLogger(
     warn?: (message: string) => void,
     error?: (message: string) => void
 ) {
-    Bindings.LogInfo = injectedLog = log;
-    Bindings.LogWarning = injectedWarn = warn ?? log;
-    Bindings.LogError = injectedError = error ?? log;
+    Bindings.logInfo = injectedLog = log;
+    Bindings.logWarning = injectedWarn = warn ?? log;
+    Bindings.logError = injectedError = error ?? log;
 }
 
 export function log(message: string) {
