@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Moq;
 using Xunit;
 
 namespace Naninovel.Bridging.Test;
@@ -163,15 +163,15 @@ public class ServerTest
         Assert.Equal(0, cde.CurrentCount);
     }
 
-    [Fact, ExcludeFromCodeCoverage]
+    [Fact]
     public async Task UnsubscribedHandlerNotInvoked ()
     {
-        var message = default(ClientMessage);
-        server.Subscribe<ClientMessage>(m => message = m);
-        server.Unsubscribe<ClientMessage>(m => message = m);
+        var handler = new Mock<Action<ClientMessage>>();
+        server.Subscribe<ClientMessage>(handler.Object);
+        server.Unsubscribe<ClientMessage>(handler.Object);
         var transport = await ConnectAsync();
         await MockIncomingAsync<ClientMessage>(transport);
-        Assert.Null(message);
+        handler.VerifyNoOtherCalls();
     }
 
     [Fact]

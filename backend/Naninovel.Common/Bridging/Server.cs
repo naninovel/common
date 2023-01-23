@@ -38,7 +38,7 @@ public class Server : IDisposable
 
     public Task StopAsync (CancellationToken token = default)
     {
-        var tasks = connections.Select(c => c.CloseAsync(token)
+        var tasks = connections.Enumerate().Select(c => c.CloseAsync(token)
             .ContinueWith(_ => c.Dispose(), token)).ToList();
         connections.Clear();
         listener.StopListening();
@@ -48,7 +48,7 @@ public class Server : IDisposable
 
     public void Broadcast (IServerMessage message)
     {
-        foreach (var connection in connections)
+        foreach (var connection in connections.Enumerate())
             connection.Send(message);
     }
 
@@ -69,7 +69,7 @@ public class Server : IDisposable
 
     public void Dispose ()
     {
-        foreach (var connection in connections)
+        foreach (var connection in connections.Enumerate())
             connection.Dispose();
         listener.Dispose();
     }

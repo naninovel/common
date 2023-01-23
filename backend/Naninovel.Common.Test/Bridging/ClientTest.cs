@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using Moq;
 using Xunit;
 
 namespace Naninovel.Bridging.Test;
@@ -114,15 +114,15 @@ public class ClientTest
         Assert.NotNull(message);
     }
 
-    [Fact, ExcludeFromCodeCoverage]
+    [Fact]
     public async Task UnsubscribedHandlerNotInvoked ()
     {
-        var message = default(ServerMessage);
-        client.Subscribe<ServerMessage>(m => message = m);
-        client.Unsubscribe<ServerMessage>(m => message = m);
+        var handler = new Mock<Action<ServerMessage>>();
+        client.Subscribe<ServerMessage>(handler.Object);
+        client.Unsubscribe<ServerMessage>(handler.Object);
         await ConnectAsync();
         await MockIncomingAsync<ServerMessage>();
-        Assert.Null(message);
+        handler.VerifyNoOtherCalls();
     }
 
     private Task<ConnectionStatus> ConnectAsync () => ConnectAsync("");
