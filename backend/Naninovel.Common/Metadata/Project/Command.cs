@@ -19,19 +19,19 @@ public class Command
     /// <summary>
     /// Whether the command can be translated.
     /// </summary>
-    public bool Localizable { get; set; }
+    public bool Localizable { get; set; } = default;
     /// <summary>
     /// Human-readable description of the command.
     /// </summary>
-    public string? Summary { get; set; }
+    public string? Summary { get; set; } = default;
     /// <summary>
     /// Additional, less important information about the command.
     /// </summary>
-    public string? Remarks { get; set; }
+    public string? Remarks { get; set; } = default;
     /// <summary>
     /// Command usage examples in scenario script.
     /// </summary>
-    public string? Examples { get; set; }
+    public string? Examples { get; set; } = default;
     /// <summary>
     /// List of parameters the command supports.
     /// </summary>

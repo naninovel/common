@@ -21,11 +21,11 @@ public class Parameter
     /// <summary>
     /// Whether the parameter is expected to always be specified.
     /// </summary>
-    public bool Required { get; set; }
+    public bool Required { get; set; } = default;
     /// <summary>
     /// Whether the parameter can be translated.
     /// </summary>
-    public bool Localizable { get; set; }
+    public bool Localizable { get; set; } = default;
     /// <summary>
     /// Type of the data container that stores value of the parameter.
     /// </summary>
@@ -41,15 +41,15 @@ public class Parameter
     /// Multiple elements can be specified to map contexts to specific value indexes,
     /// in case the parameter value is of list or named container types.
     /// </remarks>
-    public ValueContext?[]? ValueContext { get; set; }
+    public ValueContext?[]? ValueContext { get; set; } = default;
     /// <summary>
     /// The value the parameter has when it's not explicitly specified in script.
     /// </summary>
-    public string? DefaultValue { get; set; }
+    public string? DefaultValue { get; set; } = default;
     /// <summary>
     /// Human-readable description of the parameter.
     /// </summary>
-    public string? Summary { get; set; }
+    public string? Summary { get; set; } = default;
 
     /// <summary>
     /// User-facing formatted identifier of the parameter.

@@ -22,5 +22,5 @@ public class Actor
     /// <summary>
     /// Additional human-readable information about the actor.
     /// </summary>
-    public string? Description { get; set; }
+    public string? Description { get; set; } = default;
 }

@@ -8,9 +8,9 @@ public class ValueContext
     /// <summary>
     /// Type of the context.
     /// </summary>
-    public ValueContextType Type { get; set; }
+    public ValueContextType Type { get; set; } = default;
     /// <summary>
     /// Optional, further specified type of the context.
     /// </summary>
-    public string? SubType { get; set; }
+    public string? SubType { get; set; } = default;
 }
