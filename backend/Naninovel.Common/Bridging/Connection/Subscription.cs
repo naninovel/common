@@ -14,7 +14,7 @@ internal abstract class Subscription
     }
 
     public void InvokeHandler (IMessage message) => handler.Invoke(message);
-    public override bool Equals (object o) => o is Subscription s && s.id == id;
+    public override bool Equals (object o) => ((Subscription)o).id == id;
     public override int GetHashCode () => id;
 }
 
