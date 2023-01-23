@@ -12,8 +12,8 @@ public class ErrorHandlerTest
     [Fact]
     public void WhenHandlerNotAssignedErrorIsNotHandled ()
     {
-        lexer.TokenizeLine("# ", tokens);
-        new LabelLineParser().Parse("# ", tokens);
+        lexer.TokenizeLine("foo", tokens);
+        new LabelLineParser().Parse("foo", tokens);
         tokens.Clear();
         lexer.TokenizeLine("# foo bar", tokens);
         new LabelLineParser().Parse("# foo bar", tokens);
@@ -23,8 +23,8 @@ public class ErrorHandlerTest
     public void WhenHandlerAssignedErrorIsNotHandled ()
     {
         var handler = new Mock<IErrorHandler>();
-        lexer.TokenizeLine("# ", tokens);
-        new LabelLineParser(handler.Object).Parse("# ", tokens);
+        lexer.TokenizeLine("foo", tokens);
+        new LabelLineParser(handler.Object).Parse("foo", tokens);
         tokens.Clear();
         lexer.TokenizeLine("# foo bar", tokens);
         new LabelLineParser(handler.Object).Parse("# foo bar", tokens);
