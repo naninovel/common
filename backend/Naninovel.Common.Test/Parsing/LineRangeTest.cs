@@ -20,6 +20,7 @@ public class LineRangeTest
     [Fact]
     public void EqualityWorksCorrectly ()
     {
+        Assert.False(new LineRange().Equals(null));
         Assert.False(new LineRange(0, 1).Equals(new LineRange(1, 1)));
         Assert.True(new LineRange(0, 1).Equals((object)new LineRange(0, 1)));
     }
