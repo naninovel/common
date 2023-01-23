@@ -188,6 +188,19 @@ public class ServerTest
     }
 
     [Fact]
+    public async Task WhenExceptionHandlerMissingExceptionIsIgnored ()
+    {
+        var mre = new ManualResetEventSlim();
+        server.Subscribe<ClientMessage>(_ => throw new Exception());
+        server.Start(0);
+        server.OnClientDisconnected += _ => mre.Set();
+        var transport = await ConnectAsync();
+        transport.MockIncoming(new ClientMessage());
+        await Task.Run(() => mre.Wait(TimeSpan.FromSeconds(1)));
+        Assert.True(mre.IsSet);
+    }
+
+    [Fact]
     public async Task CanSendDirectlyToConnection ()
     {
         server.OnClientConnected += c => c.Send(new ServerMessage());
