@@ -21,7 +21,7 @@ jobs:
           dotnet publish backend/Naninovel.Common.WASM/Naninovel.Common.WASM.csproj
           npm ci
           npm run build
-          npm test --coverage --reporters="text" --reporters="cobertura"
+          npm cover
       - name: upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
