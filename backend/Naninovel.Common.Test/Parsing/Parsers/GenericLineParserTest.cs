@@ -41,7 +41,7 @@ public class GenericLineParserTest
     [Fact]
     public void WhenMissingAppearanceItsNull ()
     {
-        Assert.Null(parser.Parse("x: y").Prefix.Appearance);
+        Assert.Null(parser.Parse("x: y").Prefix?.Appearance);
         Assert.Empty(parser.Errors);
     }
 
@@ -50,20 +50,20 @@ public class GenericLineParserTest
     {
         var line = parser.Parse("x.: y");
         Assert.True(parser.HasError(MissingAppearance));
-        Assert.Equal("x", line.Prefix.Author);
+        Assert.Equal("x", line.Prefix?.Author);
     }
 
     [Fact]
     public void ArbitraryGenericLineIsParsed ()
     {
-        var line = parser.Parse("k.h: x[i] {y}.");
-        Assert.Equal("k", line.Prefix.Author);
-        Assert.Equal("h", line.Prefix.Appearance);
-        Assert.Equal("x", (line.Content[0] as MixedValue)![0] as PlainText);
+        var line = parser.Parse("k.h: \"x[i] {y}.\"");
+        Assert.Equal("k", line.Prefix?.Author);
+        Assert.Equal("h", line.Prefix?.Appearance);
+        Assert.Equal("\"x", (line.Content[0] as MixedValue)![0] as PlainText);
         Assert.Equal("i", (line.Content[1] as InlinedCommand)?.Command.Identifier);
         Assert.Equal(" ", (line.Content[2] as MixedValue)![0] as PlainText);
         Assert.Equal("y", ((line.Content[2] as MixedValue)![1] as Expression)!.Body);
-        Assert.Equal(".", (line.Content[2] as MixedValue)![2] as PlainText);
+        Assert.Equal(".\"", (line.Content[2] as MixedValue)![2] as PlainText);
     }
 
     [Fact]
@@ -97,8 +97,8 @@ public class GenericLineParserTest
     {
         // Required for backward compat with v1, where prefix can contain expressions.
         var line = parser.Parse(@"{name}.{appearance}: My favourite drink is {drink}!");
-        Assert.Equal(@"{name}", line.Prefix.Author);
-        Assert.Equal(@"{appearance}", line.Prefix.Appearance);
+        Assert.Equal(@"{name}", line.Prefix?.Author);
+        Assert.Equal(@"{appearance}", line.Prefix?.Appearance);
         Assert.Equal(@"My favourite drink is ", (line.Content[0] as MixedValue)![0] as PlainText);
         Assert.Equal(@"drink", ((line.Content[0] as MixedValue)![1] as Expression)!.Body);
         Assert.Equal(@"!", (line.Content[0] as MixedValue)![2] as PlainText);
@@ -109,8 +109,8 @@ public class GenericLineParserTest
     {
         var line = parser.Parse("k.h: x{e}[i {e}]");
         Assert.Equal(new(0, 5), parser.Resolve(line.Prefix));
-        Assert.Equal(new(0, 1), parser.Resolve(line.Prefix.Author));
-        Assert.Equal(new(2, 1), parser.Resolve(line.Prefix.Appearance));
+        Assert.Equal(new(0, 1), parser.Resolve(line.Prefix?.Author));
+        Assert.Equal(new(2, 1), parser.Resolve(line.Prefix?.Appearance));
         Assert.Equal(new(5, 4), parser.Resolve(line.Content[0] as MixedValue));
         Assert.Equal(new(5, 1), parser.Resolve((line.Content[0] as MixedValue)![0] as PlainText));
         Assert.Equal(new(6, 3), parser.Resolve((line.Content[0] as MixedValue)![1] as Expression));

@@ -373,6 +373,12 @@ public static class LexerTestData
             ExpressionClose(4, 1), Expression(2, 3),
             AuthorId(0, 1), AppearanceAssign(1, 1),
             AuthorAppearance(2, 3), AuthorAssign(5, 2), GenericText(7, 1)
+        ),
+        T(
+            "x: \"x[x]\"",
+            AuthorId(0, 1), AuthorAssign(1, 2), GenericText(3, 2),
+            InlinedOpen(5, 1), CommandId(6, 1), CommandBody(6, 1),
+            InlinedClose(7, 1), Inlined(5, 3), GenericText(8, 1)
         )
     };
 
