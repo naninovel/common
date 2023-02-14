@@ -35,7 +35,7 @@ public class ScriptSerializer
             AppendLine(line);
             builder.Append('\n');
         }
-        return builder.ToString();
+        return TrimTrailingLineBreaks(builder).ToString();
     }
 
     /// <summary>
@@ -182,5 +182,17 @@ public class ScriptSerializer
                     return true;
             return false;
         }
+    }
+
+    public static StringBuilder TrimTrailingLineBreaks (StringBuilder builder)
+    {
+        var trimIndex = builder.Length - 1;
+        for (; trimIndex >= 0; trimIndex--)
+            if (builder[trimIndex] != '\n')
+                break;
+        trimIndex++;
+        if (trimIndex < builder.Length - 1)
+            builder.Length = trimIndex + 1;
+        return builder;
     }
 }

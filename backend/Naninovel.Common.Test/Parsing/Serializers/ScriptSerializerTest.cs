@@ -168,4 +168,14 @@ public class ScriptSerializerTest
             new PlainText(@"a="" \"" "";b="" \"" """)
         }, true));
     }
+
+    [Fact]
+    public void TrimsTrailingEmptyLines ()
+    {
+        Assert.Equal("foo\n", serializer.Serialize(new IScriptLine[] {
+            new GenericLine(new[] { new MixedValue(new[] { new PlainText("foo") }) }),
+            new GenericLine(Array.Empty<IGenericContent>()),
+            new GenericLine(Array.Empty<IGenericContent>())
+        }));
+    }
 }
