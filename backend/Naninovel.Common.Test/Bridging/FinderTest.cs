@@ -40,4 +40,11 @@ public class FinderTest
         Assert.Equal("MyBoy", servers[0].Name);
         Assert.Equal(2, servers[0].Port);
     }
+
+    [Fact]
+    public async Task CanConstructWithDefaultTransport ()
+    {
+        var finder = new ServerFinder();
+        Assert.Empty(await finder.FindServersAsync(0, 0, TimeSpan.Zero));
+    }
 }

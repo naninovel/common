@@ -9,9 +9,9 @@ public class ServerFinder
 {
     private readonly Func<IClientTransport> clientFactory;
 
-    public ServerFinder (Func<IClientTransport> clientFactory)
+    public ServerFinder (Func<IClientTransport>? clientFactory = null)
     {
-        this.clientFactory = clientFactory;
+        this.clientFactory = clientFactory ?? (() => new NetClientTransport());
     }
 
     public async Task<List<ServerInfo>> FindServersAsync (int startPort, int endPort, TimeSpan timeout)

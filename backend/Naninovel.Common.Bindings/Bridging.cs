@@ -15,7 +15,7 @@ public static partial class Bridging
 {
     private static readonly TimeSpan scanDelay = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
-    private static readonly ServerFinder serverFinder = new(() => new NetClientTransport());
+    private static readonly ServerFinder serverFinder = new();
 
     private static CancellationTokenSource? tcs;
     private static int preferredPort;
