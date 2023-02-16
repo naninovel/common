@@ -8,7 +8,7 @@ public class ConnectionStatus
     public Task MaintainTask { get; }
     public ServerInfo ServerInfo { get; }
 
-    internal ConnectionStatus (Task maintainTask, ServerInfo serverInfo)
+    public ConnectionStatus (Task maintainTask, ServerInfo serverInfo)
     {
         MaintainTask = maintainTask;
         ServerInfo = serverInfo;
