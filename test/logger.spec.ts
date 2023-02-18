@@ -1,4 +1,5 @@
-﻿import { injectLogger, log, warn, error } from "../src";
+﻿import { Bindings } from "backend";
+import { injectLogger, log, warn, error } from "../src";
 
 test("can log without injecting", () => {
     expect(() => log("")).not.toThrow();
@@ -26,4 +27,12 @@ test("when only info logger is injected, others re-use it", () => {
     expect(infoMsg).toEqual("bar");
     error("nya");
     expect(infoMsg).toEqual("nya");
+});
+
+test("bindings are assigned when injected", () => {
+    const log = jest.fn(), warn = jest.fn(), err = jest.fn();
+    injectLogger(log, warn, err);
+    expect(Bindings.logInfo).toEqual(log);
+    expect(Bindings.logWarning).toEqual(warn);
+    expect(Bindings.logError).toEqual(err);
 });
