@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Naninovel.Metadata;
 
@@ -8,30 +10,40 @@ public static class ConstantEvaluator
 
     private const char expressionStartSymbol = '{';
     private const char expressionEndSymbol = '}';
+    private const string concatSymbol = "+";
     private const string nullCoalescingSymbol = "??";
     private const string scriptSymbol = "$Script";
     private const char paramIdSymbol = ':';
     private const char paramIndexStartSymbol = '[';
     private const char paramIndexEndSymbol = ']';
+    private static readonly string[] concatSeparator = { concatSymbol };
     private static readonly string[] nullSeparator = { nullCoalescingSymbol };
 
-    public static string EvaluateName (string value, string script, GetParamValue getParamValue)
+    public static IReadOnlyList<string> EvaluateNames (string value, string script, GetParamValue getParamValue)
     {
-        if (string.IsNullOrEmpty(value)) return value;
+        if (string.IsNullOrEmpty(value)) return Array.Empty<string>();
+        var parts = value.Split(concatSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
+        for (int i = parts.Count - 1; i >= 0; i--)
+            if (EvaluatePart(parts[i], script, getParamValue) is { } part) parts[i] = part;
+            else parts.RemoveAt(i);
+        return parts;
+    }
 
-        var startIndex = value.IndexOf(expressionStartSymbol);
-        var endIndex = value.IndexOf(expressionEndSymbol);
+    private static string? EvaluatePart (string part, string script, GetParamValue getParamValue)
+    {
+        var startIndex = part.IndexOf(expressionStartSymbol);
+        var endIndex = part.IndexOf(expressionEndSymbol);
 
         while (endIndex - startIndex > 1 && startIndex >= 0)
         {
-            var expression = value.Substring(startIndex + 1, endIndex - startIndex - 1);
-            value = value.Remove(startIndex, endIndex - startIndex + 1);
-            value = value.Insert(startIndex, EvaluateExpression(expression, script, getParamValue));
-            startIndex = value.IndexOf(expressionStartSymbol);
-            endIndex = value.IndexOf(expressionEndSymbol);
+            var expression = part.Substring(startIndex + 1, endIndex - startIndex - 1);
+            part = part.Remove(startIndex, endIndex - startIndex + 1);
+            part = part.Insert(startIndex, EvaluateExpression(expression, script, getParamValue));
+            startIndex = part.IndexOf(expressionStartSymbol);
+            endIndex = part.IndexOf(expressionEndSymbol);
         }
 
-        return value;
+        return string.IsNullOrEmpty(part) ? null : part;
     }
 
     private static string EvaluateExpression (string expression, string script, GetParamValue getParamValue)
