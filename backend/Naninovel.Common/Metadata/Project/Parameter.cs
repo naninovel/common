@@ -43,7 +43,7 @@ public class Parameter
     /// </remarks>
     public ValueContext?[]? ValueContext { get; set; } = default;
     /// <summary>
-    /// The value the parameter has when it's not explicitly specified in script.
+    /// The value of the parameter has when it's not explicitly specified in script.
     /// </summary>
     public string? DefaultValue { get; set; } = default;
     /// <summary>
