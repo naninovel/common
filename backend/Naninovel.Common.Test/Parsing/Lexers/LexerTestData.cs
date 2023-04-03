@@ -186,6 +186,12 @@ public static class LexerTestData
             LineId(0, 1), CommandId(1, 1),
             ParamId(3, 1), ParamAssign(4, 1), MissingParamValue(3, 2),
             NamedParam(3, 2), CommandBody(1, 4)
+        ),
+        T(
+            "@c p<#x>",
+            LineId(0, 1), CommandId(1, 1),
+            TextIdOpen(4, 2), TextIdBody(6, 1), TextIdClose(7, 1), TextId(4, 4),
+            ParamValue(3, 5), NamelessParam(3, 5), CommandBody(1, 7)
         )
     };
 
@@ -395,8 +401,8 @@ public static class LexerTestData
     private static Token LabelText (int startIndex, int length) => Token(TokenType.LabelText, startIndex, length);
     private static Token CommentText (int startIndex, int length) => Token(TokenType.CommentText, startIndex, length);
     private static Token LineId (int startIndex, int length) => Token(TokenType.LineId, startIndex, length);
-    private static Token ExpressionBody (int startIndex, int length) => Token(TokenType.ExpressionBody, startIndex, length);
     private static Token Expression (int startIndex, int length) => Token(TokenType.Expression, startIndex, length);
+    private static Token ExpressionBody (int startIndex, int length) => Token(TokenType.ExpressionBody, startIndex, length);
     private static Token ExpressionOpen (int startIndex, int length) => Token(TokenType.ExpressionOpen, startIndex, length);
     private static Token ExpressionClose (int startIndex, int length) => Token(TokenType.ExpressionClose, startIndex, length);
     private static Token ParamValue (int startIndex, int length) => Token(TokenType.ParamValue, startIndex, length);
@@ -414,6 +420,10 @@ public static class LexerTestData
     private static Token AppearanceAssign (int startIndex, int length) => Token(TokenType.AppearanceAssign, startIndex, length);
     private static Token AuthorId (int startIndex, int length) => Token(TokenType.AuthorId, startIndex, length);
     private static Token GenericText (int startIndex, int length) => Token(TokenType.GenericText, startIndex, length);
+    private static Token TextId (int startIndex, int length) => Token(TokenType.TextId, startIndex, length);
+    private static Token TextIdBody (int startIndex, int length) => Token(TokenType.TextIdBody, startIndex, length);
+    private static Token TextIdOpen (int startIndex, int length) => Token(TokenType.TextIdOpen, startIndex, length);
+    private static Token TextIdClose (int startIndex, int length) => Token(TokenType.TextIdClose, startIndex, length);
 
     private static Token Error (ErrorType type, int startIndex, int length) => new(type, startIndex, length);
     private static Token MissingParamId (int startIndex, int length) => Error(ErrorType.MissingParamId, startIndex, length);
