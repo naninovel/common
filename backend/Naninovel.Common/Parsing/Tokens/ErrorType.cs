@@ -12,7 +12,8 @@ public enum ErrorType
     MissingParamValue = 1 << 4,
     MultipleNameless = 1 << 5,
     MissingAppearance = 1 << 6,
-    MissingExpressionBody = 1 << 7
+    MissingExpressionBody = 1 << 7,
+    MissingTextId = 1 << 8
 }
 
 public static class ErrorTypeExtensions
