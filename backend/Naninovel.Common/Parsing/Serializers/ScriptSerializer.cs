@@ -172,8 +172,7 @@ public class ScriptSerializer
         bool ShouldEscape (int i)
         {
             if (IsIgnored(ignoreRanges, i)) return false;
-            var nextChar = (i + 1) >= value.Length ? default : value[i + 1];
-            return IsControlChar(value[i], nextChar) || wrap && value[i] == '"';
+            return IsPlainTextControlChar(value[i]) || wrap && value[i] == '"';
         }
 
         static bool IsIgnored (IEnumerable<(int start, int length)> ignoredRanges, int i)

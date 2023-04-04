@@ -14,6 +14,5 @@ public static class Identifiers
     public const string ParameterAssign = ":";
     public const string ListDelimiter = ",";
     public const string NamedDelimiter = ".";
-    public const string TextIdOpen = "<#";
-    public const string TextIdClose = ">";
+    public const string TextIdDelimiter = "|";
 }

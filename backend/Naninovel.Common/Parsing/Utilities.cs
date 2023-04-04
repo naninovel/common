@@ -4,19 +4,19 @@ namespace Naninovel.Parsing;
 
 internal static class Utilities
 {
-    private static readonly char[] controlChars = {
+    private static readonly char[] plainTextControlChars = {
         ExpressionOpen[0],
         ExpressionClose[0],
         InlinedOpen[0],
         InlinedClose[0],
+        TextIdDelimiter[0],
         '\\'
     };
 
-    public static bool IsControlChar (char @char, char next)
+    public static bool IsPlainTextControlChar (char @char)
     {
-        if (@char == TextIdOpen[0] && next == TextIdOpen[1]) return true;
-        for (int i = 0; i < controlChars.Length; i++)
-            if (controlChars[i] == @char)
+        for (int i = 0; i < plainTextControlChars.Length; i++)
+            if (plainTextControlChars[i] == @char)
                 return true;
         return false;
     }
