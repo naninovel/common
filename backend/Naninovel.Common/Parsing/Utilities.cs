@@ -12,10 +12,11 @@ internal static class Utilities
         '\\'
     };
 
-    public static bool IsControlChar (char test)
+    public static bool IsControlChar (char @char, char next)
     {
-        foreach (var character in controlChars)
-            if (character == test)
+        if (@char == TextIdOpen[0] && next == TextIdOpen[1]) return true;
+        for (int i = 0; i < controlChars.Length; i++)
+            if (controlChars[i] == @char)
                 return true;
         return false;
     }

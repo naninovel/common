@@ -95,7 +95,8 @@ internal class MixedValueParser
         {
             if (value[i] != '\\' || IsEscaped(value, i)) return false;
             var prevChar = value[i + 1];
-            return unescapeQuotes && prevChar == '"' || IsControlChar(prevChar);
+            var nextChar = i == 0 ? default : value[i - 1];
+            return unescapeQuotes && prevChar == '"' || IsControlChar(prevChar, nextChar);
         }
     }
 }
