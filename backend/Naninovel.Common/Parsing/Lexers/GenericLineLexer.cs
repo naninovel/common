@@ -7,6 +7,7 @@ internal class GenericLineLexer
     private bool hasAppearance => firstAppearance > -1;
 
     private readonly ExpressionLexer expressionLexer;
+    private readonly TextIdentifierLexer textIdLexer;
     private readonly CommandBodyLexer commandLexer;
 
     private LexState state = null!;
@@ -17,17 +18,18 @@ internal class GenericLineLexer
     private int lastNotSpace;
     private int firstAppearance;
 
-    public GenericLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer)
+    public GenericLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer, TextIdentifierLexer textIdLexer)
     {
         this.expressionLexer = expressionLexer;
         this.commandLexer = commandLexer;
+        this.textIdLexer = textIdLexer;
     }
 
     public LineType AddGenericLine (LexState state)
     {
         Reset(state);
         while (!state.EndReached)
-            if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression())
+            if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression() && !TryAddTextId())
                 Move();
         AddPrecedingText();
         return LineType.Generic;
@@ -109,6 +111,14 @@ internal class GenericLineLexer
     {
         if (!ExpressionLexer.IsOpening(state)) return false;
         expressionLexer.AddExpression(state);
+        lastNotSpace = state.Index - 1;
+        return true;
+    }
+
+    private bool TryAddTextId ()
+    {
+        if (!TextIdentifierLexer.IsDelimiter(state)) return false;
+        textIdLexer.AddIdentifier(state);
         lastNotSpace = state.Index - 1;
         return true;
     }

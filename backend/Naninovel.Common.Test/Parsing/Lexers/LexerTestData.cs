@@ -194,9 +194,9 @@ public static class LexerTestData
             ParamValue(3, 4), NamelessParam(3, 4), CommandBody(1, 6)
         ),
         T(
-            "@c v\\|x|",
+            "@c v\\|x\\|",
             LineId(0, 1), CommandId(1, 1),
-            ParamValue(3, 5), NamelessParam(3, 5), CommandBody(1, 7)
+            ParamValue(3, 6), NamelessParam(3, 6), CommandBody(1, 8)
         ),
         T(
             "@c |x0X|",
@@ -222,15 +222,21 @@ public static class LexerTestData
         T(
             "@c ||",
             LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(3, 1), MissingTextId(3, 2), TextIdDelimiter(4, 1), TextId(3, 2),
-            ParamValue(3, 2), NamelessParam(3, 2), CommandBody(1, 3)
+            TextIdDelimiter(3, 1), TextIdDelimiter(4, 1), TextId(3, 2), MissingTextIdBody(3, 2),
+            ParamValue(3, 2), NamelessParam(3, 2), CommandBody(1, 4)
+        ),
+        T(
+            "@c | |",
+            LineId(0, 1), CommandId(1, 1),
+            TextIdDelimiter(3, 1), TextId(3, 1), MissingTextIdBody(3, 1), ParamValue(3, 1), NamelessParam(3, 1),
+            TextIdDelimiter(5, 1), TextId(5, 1), MissingTextIdBody(5, 1), MultipleNameless(5, 1), CommandBody(1, 5)
         ),
         T(
             "@c p:\"|x|\"",
             LineId(0, 1), CommandId(1, 1),
             ParamId(3, 1), ParamAssign(4, 1),
             TextIdDelimiter(6, 1), TextIdBody(7, 1), TextIdDelimiter(8, 1), TextId(6, 3),
-            ParamValue(5, 5), NamedParam(3, 7)
+            ParamValue(5, 5), NamedParam(3, 7), CommandBody(1, 9)
         )
     };
 
@@ -479,5 +485,5 @@ public static class LexerTestData
     private static Token MissingParamValue (int startIndex, int length) => Error(ErrorType.MissingParamValue, startIndex, length);
     private static Token MissingCommandId (int startIndex, int length) => Error(ErrorType.MissingCommandId, startIndex, length);
     private static Token MissingAppearance (int startIndex, int length) => Error(ErrorType.MissingAppearance, startIndex, length);
-    private static Token MissingTextId (int startIndex, int length) => Error(ErrorType.MissingTextId, startIndex, length);
+    private static Token MissingTextIdBody (int startIndex, int length) => Error(ErrorType.MissingTextIdBody, startIndex, length);
 }

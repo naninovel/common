@@ -12,9 +12,10 @@ public class Lexer
     {
         state = new LexState();
         var expressionLexer = new ExpressionLexer();
-        var parameterLexer = new CommandParameterLexer(expressionLexer);
+        var textIdLexer = new TextIdentifierLexer();
+        var parameterLexer = new CommandParameterLexer(expressionLexer, textIdLexer);
         commandLexer = new CommandBodyLexer(parameterLexer);
-        genericLineLexer = new GenericLineLexer(expressionLexer, commandLexer);
+        genericLineLexer = new GenericLineLexer(expressionLexer, commandLexer, textIdLexer);
     }
 
     public LineType TokenizeLine (string text, ICollection<Token> tokens)
