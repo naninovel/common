@@ -40,7 +40,6 @@ internal class CommandParser
     {
         paramId = null;
         paramValue = emptyValue;
-        valueParser.ClearAddedExpressions();
     }
 
     private bool TryCommandId ()
@@ -69,6 +68,12 @@ internal class CommandParser
                 return true;
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
+                return true;
+            case TextIdBody:
+                valueParser.AddTextIdBodyToken(token);
+                return true;
+            case TextId:
+                valueParser.AddTextIdToken(token);
                 return true;
             case ParamValue:
                 ParseParameterValue(token);

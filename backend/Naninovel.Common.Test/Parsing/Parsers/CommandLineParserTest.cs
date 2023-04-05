@@ -85,6 +85,13 @@ public class CommandLineParserTest
     }
 
     [Fact]
+    public void WhenMissingTextIdBodyErrorIsAdded ()
+    {
+        parser.Parse("@c ||");
+        Assert.True(parser.HasError(MissingTextIdBody));
+    }
+
+    [Fact]
     public void NamelessParameterDetected ()
     {
         var line = parser.Parse("@c x p:x");
@@ -134,6 +141,16 @@ public class CommandLineParserTest
         var line = parser.Parse("@c |");
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
+    }
+
+    [Fact]
+    public void EmptyAndUnclosedIdentifiedTextsParsedCorrectly ()
+    {
+        var line = parser.Parse("@c 1||2|id2");
+        Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
+        Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
+        Assert.Equal("2", ((IdentifiedText)line.Command.Parameters[0].Value[1]).Text);
+        Assert.Equal("id2", ((IdentifiedText)line.Command.Parameters[0].Value[1]).Id.Body);
     }
 
     [Fact]

@@ -54,6 +54,12 @@ public class GenericLineParser
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
                 return true;
+            case TextIdBody:
+                valueParser.AddTextIdBodyToken(token);
+                return true;
+            case TextId:
+                valueParser.AddTextIdToken(token);
+                return true;
             case InlinedOpen:
                 ParseInlined();
                 return true;
@@ -92,7 +98,6 @@ public class GenericLineParser
         var text = new MixedValue(value);
         content.Add(text);
         walker.Associate(text, textToken);
-        valueParser.ClearAddedExpressions();
     }
 
     private void ParseInlined ()
