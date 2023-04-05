@@ -101,7 +101,51 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void ArbitraryCommandIsParsedCorrectly ()
+    public void IdentifiedTextParsedCorrectly ()
+    {
+        var line = parser.Parse("@c 1|id1|2|id2| p:3|id3|");
+        Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
+        Assert.Equal("id1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
+        Assert.Equal("2", ((IdentifiedText)line.Command.Parameters[0].Value[1]).Text);
+        Assert.Equal("id2", ((IdentifiedText)line.Command.Parameters[0].Value[1]).Id.Body);
+        Assert.Equal("3", ((IdentifiedText)line.Command.Parameters[1].Value[0]).Text);
+        Assert.Equal("id3", ((IdentifiedText)line.Command.Parameters[1].Value[0]).Id.Body);
+    }
+
+    [Fact]
+    public void UnclosedIdentifiedTextParsedCorrectly ()
+    {
+        var line = parser.Parse("@c 1|id1");
+        Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
+        Assert.Equal("id1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
+    }
+
+    [Fact]
+    public void EmptyIdentifiedTextParsedCorrectly ()
+    {
+        var line = parser.Parse("@c ||");
+        Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
+        Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
+    }
+
+    [Fact]
+    public void UnclosedEmptyIdentifiedTextParsedCorrectly ()
+    {
+        var line = parser.Parse("@c |");
+        Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
+        Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
+    }
+
+    [Fact]
+    public void EscapedTextIdentifierParsedCorrectly ()
+    {
+        var line = parser.Parse("@c 1\\|id1\\|");
+        Assert.Single(line.Command.Parameters[0].Value);
+        Assert.Equal("1|id1|", line.Command.Parameters[0].Value[0] as PlainText);
+    }
+
+    [Fact]
+    public void CommandIsParsedCorrectly ()
     {
         var line = parser.Parse("@char k.Happy pos:{x},10 wait:false");
         Assert.Equal("char", line.Command.Identifier);
@@ -116,7 +160,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void ArbitraryCommandWithExpressionsIsParsedCorrectly ()
+    public void CommandWithExpressionsIsParsedCorrectly ()
     {
         var line = parser.Parse("@c {x} x:x{y}x{z}");
         Assert.True(line.Command.Parameters[0].Value.Dynamic);

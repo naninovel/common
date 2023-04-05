@@ -54,7 +54,7 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void ArbitraryGenericLineIsParsed ()
+    public void GenericLineIsParsed ()
     {
         var line = parser.Parse("k.h: \"x[i] {y}.\"");
         Assert.Equal("k", line.Prefix?.Author);
@@ -67,7 +67,7 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void ArbitraryGenericLineWithExpressionsIsParsed ()
+    public void GenericLineWithExpressionsIsParsed ()
     {
         var line = parser.Parse("x{y}[z {w}]");
         Assert.Equal("x", (line.Content[0] as MixedValue)![0] as PlainText);
@@ -77,10 +77,36 @@ public class GenericLineParserTest
     }
 
     [Fact]
+    public void GenericLineWithIdentifiedTextIsParsed ()
+    {
+        var line = parser.Parse("x|id1|{y}w|id2|");
+        Assert.Equal("x", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Text);
+        Assert.Equal("id1", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Id.Body);
+        Assert.Equal("y", ((Expression)(line.Content[0] as MixedValue)![1])!.Body);
+        Assert.Equal("w", ((IdentifiedText)(line.Content[0] as MixedValue)![2]).Text);
+        Assert.Equal("id2", ((IdentifiedText)(line.Content[0] as MixedValue)![2]).Id.Body);
+    }
+
+    [Fact]
+    public void GenericLineWithUnclosedIdentifiedTextIsParsed ()
+    {
+        var line = parser.Parse("x|id1");
+        Assert.Equal("x", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Text);
+        Assert.Equal("id1", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Id.Body);
+    }
+
+    [Fact]
+    public void GenericLineWithEscapedIdentifiedTextIsParsed ()
+    {
+        var line = parser.Parse("x\\|id1");
+        Assert.Equal("x|id1", (line.Content[0] as MixedValue)![0] as PlainText);
+    }
+
+    [Fact]
     public void PlainTextIdDecoded ()
     {
-        var line = parser.Parse(@""" \{ \} "" \[ \] \\""");
-        Assert.Equal(@""" { } "" [ ] \""", (line.Content[0] as MixedValue)![0] as PlainText);
+        var line = parser.Parse(@""" \{ \} "" \[ \] \|\| \\""");
+        Assert.Equal(@""" { } "" [ ] || \""", (line.Content[0] as MixedValue)![0] as PlainText);
     }
 
     [Fact]

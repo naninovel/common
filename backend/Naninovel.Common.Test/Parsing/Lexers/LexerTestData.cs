@@ -232,6 +232,12 @@ public static class LexerTestData
             TextIdDelimiter(5, 1), TextId(5, 1), MissingTextIdBody(5, 1), MultipleNameless(5, 1), CommandBody(1, 5)
         ),
         T(
+            "@c v|x",
+            LineId(0, 1), CommandId(1, 1),
+            TextIdDelimiter(4, 1), TextIdBody(5, 1), TextId(4, 2),
+            ParamValue(3, 3), NamelessParam(3, 3), CommandBody(1, 5)
+        ),
+        T(
             "@c p:\"|x|\"",
             LineId(0, 1), CommandId(1, 1),
             ParamId(3, 1), ParamAssign(4, 1),
