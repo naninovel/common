@@ -217,18 +217,21 @@ public class CommandLineParserTest
     [Fact]
     public void RangesAreAssociatedCorrectly ()
     {
-        var line = parser.Parse("@c v p:v{x}");
-        Assert.Equal(new(1, 10), parser.Resolve(line.Command));
+        var line = parser.Parse("@c v|i| p:v{x}");
+        Assert.Equal(new(1, 13), parser.Resolve(line.Command));
         Assert.Equal(new(1, 1), parser.Resolve(line.Command.Identifier));
-        Assert.Equal(new(3, 1), parser.Resolve(line.Command.Parameters[0]));
-        Assert.Equal(new(3, 1), parser.Resolve(line.Command.Parameters[0].Value));
-        Assert.Equal(new(3, 1), parser.Resolve(line.Command.Parameters[0].Value[0] as PlainText));
-        Assert.Equal(new(5, 6), parser.Resolve(line.Command.Parameters[1]));
-        Assert.Equal(new(5, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
-        Assert.Equal(new(7, 4), parser.Resolve(line.Command.Parameters[1].Value));
-        Assert.Equal(new(7, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
-        Assert.Equal(new(8, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
-        Assert.Equal(new(9, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
+        Assert.Equal(new(3, 4), parser.Resolve(line.Command.Parameters[0]));
+        Assert.Equal(new(3, 4), parser.Resolve(line.Command.Parameters[0].Value));
+        Assert.Equal(new(3, 4), parser.Resolve(line.Command.Parameters[0].Value[0] as IdentifiedText));
+        Assert.Equal(new(3, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Text));
+        Assert.Equal(new(4, 3), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id));
+        Assert.Equal(new(5, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id.Body));
+        Assert.Equal(new(8, 6), parser.Resolve(line.Command.Parameters[1]));
+        Assert.Equal(new(8, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
+        Assert.Equal(new(10, 4), parser.Resolve(line.Command.Parameters[1].Value));
+        Assert.Equal(new(10, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
+        Assert.Equal(new(11, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
+        Assert.Equal(new(12, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
     }
 
     [Fact]
