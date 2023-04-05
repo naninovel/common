@@ -140,14 +140,27 @@ public class ScriptSerializer
     private void AppendComponent (IValueComponent component)
     {
         if (component is PlainText text) mixedBuilder.Append(text);
-        else if (component is Expression expression)
-        {
-            var startIndex = mixedBuilder.Length;
-            mixedBuilder.Append(Identifiers.ExpressionOpen);
-            mixedBuilder.Append(expression.Body);
-            mixedBuilder.Append(Identifiers.ExpressionClose);
-            ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
-        }
+        else if (component is Expression expression) AppendExpression(expression);
+        else if (component is IdentifiedText identifiedText) AppendIdentifiedText(identifiedText);
+    }
+
+    private void AppendExpression (Expression expression)
+    {
+        var startIndex = mixedBuilder.Length;
+        mixedBuilder.Append(Identifiers.ExpressionOpen);
+        mixedBuilder.Append(expression.Body);
+        mixedBuilder.Append(Identifiers.ExpressionClose);
+        ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
+    }
+
+    private void AppendIdentifiedText (IdentifiedText identifiedText)
+    {
+        mixedBuilder.Append(identifiedText.Text);
+        var startIndex = mixedBuilder.Length;
+        mixedBuilder.Append(Identifiers.TextIdDelimiter);
+        mixedBuilder.Append(identifiedText.Id.Body);
+        mixedBuilder.Append(Identifiers.TextIdDelimiter);
+        ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
     }
 
     private string Encode (string value, bool wrap = true)
