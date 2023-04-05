@@ -65,9 +65,10 @@ public class SemanticsTest
     [Fact]
     public void MixedValueToStringIsCorrect ()
     {
-        Assert.Equal("foo{bar}", new MixedValue(new IValueComponent[] {
-            new PlainText("foo"),
-            new Expression("bar")
+        Assert.Equal("foo|id|{bar}nya", new MixedValue(new IValueComponent[] {
+            new IdentifiedText(new("foo"), new(new("id"))),
+            new Expression("bar"),
+            new PlainText("nya")
         }).ToString());
     }
 
@@ -156,5 +157,11 @@ public class SemanticsTest
     {
         PlainText plain = string.Empty;
         Assert.Equal(PlainText.Empty, plain);
+    }
+
+    [Fact]
+    public void EmptyIdentifiedTextToStringIsCorrect ()
+    {
+        Assert.Equal("||", new IdentifiedText(new(""), new("")).ToString());
     }
 }
