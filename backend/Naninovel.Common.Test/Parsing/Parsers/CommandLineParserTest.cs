@@ -8,7 +8,7 @@ namespace Naninovel.Parsing.Test;
 
 public class CommandLineParserTest
 {
-    private readonly ParseTestHelper<CommandLine> parser = new((e, a) => new CommandLineParser(e, a).Parse);
+    private readonly ParseTestHelper<CommandLine> parser = new(h => new CommandLineParser(h).Parse);
 
     [Fact]
     public void WhenLineIdIsMissingErrorIsAddedAndCommandIsEmpty ()
@@ -32,7 +32,7 @@ public class CommandLineParserTest
     public void WhenCommandTokensMissingErrorIsAdded ()
     {
         var errors = new ErrorCollector();
-        var parser = new CommandLineParser(errors);
+        var parser = new CommandLineParser(new() { ErrorHandler = errors });
         parser.Parse("@", new[] { new Token(LineId, 0, 1) });
         Assert.Contains(MissingCommandTokens, errors.Select(e => e.Message));
     }
@@ -249,6 +249,15 @@ public class CommandLineParserTest
         Assert.Equal(new(10, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
         Assert.Equal(new(11, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
         Assert.Equal(new(12, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
+    }
+
+    [Fact]
+    public void TextIsIdentifiedCorrectly ()
+    {
+        parser.Parse("@c foo|f|far{f} p:bar|b|nya|n|");
+        Assert.Equal("foo", parser.Identifications["f"]);
+        Assert.Equal("bar", parser.Identifications["b"]);
+        Assert.Equal("nya", parser.Identifications["n"]);
     }
 
     [Fact]

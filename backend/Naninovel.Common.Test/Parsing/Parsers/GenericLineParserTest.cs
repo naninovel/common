@@ -5,7 +5,7 @@ namespace Naninovel.Parsing.Test;
 
 public class GenericLineParserTest
 {
-    private readonly ParseTestHelper<GenericLine> parser = new((e, a) => new GenericLineParser(e, a).Parse);
+    private readonly ParseTestHelper<GenericLine> parser = new(h => new GenericLineParser(h).Parse);
 
     [Fact]
     public void WhenMissingInlinedCommandIdErrorIsAdded ()
@@ -151,5 +151,14 @@ public class GenericLineParserTest
         Assert.Equal(new(15, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value));
         Assert.Equal(new(15, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression));
         Assert.Equal(new(16, 1), parser.Resolve(((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression)!.Body));
+    }
+
+    [Fact]
+    public void TextIsIdentifiedCorrectly ()
+    {
+        parser.Parse("k.h: foo|f|far{f} [i bar|b| p:nya|n|]");
+        Assert.Equal("foo", parser.Identifications["f"]);
+        Assert.Equal("bar", parser.Identifications["b"]);
+        Assert.Equal("nya", parser.Identifications["n"]);
     }
 }

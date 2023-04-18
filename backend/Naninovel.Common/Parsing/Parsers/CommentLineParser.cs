@@ -9,9 +9,9 @@ public class CommentLineParser
     private readonly LineWalker walker;
     private PlainText comment = PlainText.Empty;
 
-    public CommentLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
+    public CommentLineParser (ParseHandlers handlers)
     {
-        walker = new(errorHandler, associator);
+        walker = new(handlers);
     }
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens)

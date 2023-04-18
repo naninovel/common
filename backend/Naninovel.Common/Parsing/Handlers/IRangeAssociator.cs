@@ -1,7 +1,7 @@
 ﻿namespace Naninovel.Parsing;
 
 /// <summary>
-/// Implementation is able to handle associations between parsed line semantics
+/// Handle associations between parsed line semantics
 /// and script text line ranges used to represent them.
 /// </summary>
 public interface IRangeAssociator

@@ -9,7 +9,7 @@ public class ScriptParserTest
 
     public ScriptParserTest ()
     {
-        parser = new(errors);
+        parser = new(new ParseHandlers { ErrorHandler = errors });
     }
 
     [Fact]

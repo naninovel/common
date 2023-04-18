@@ -13,9 +13,9 @@ public class GenericLineParser
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
 
-    public GenericLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
+    public GenericLineParser (ParseHandlers handlers)
     {
-        walker = new(errorHandler, associator);
+        walker = new(handlers);
     }
 
     public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens)
@@ -98,6 +98,7 @@ public class GenericLineParser
         var text = new MixedValue(value);
         content.Add(text);
         walker.Associate(text, textToken);
+        walker.Identify(text);
     }
 
     private void ParseInlined ()

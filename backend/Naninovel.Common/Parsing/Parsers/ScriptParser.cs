@@ -8,6 +8,7 @@ namespace Naninovel.Parsing;
 /// </summary>
 public class ScriptParser
 {
+    private static readonly ParseHandlers nullHandlers = new();
     private static readonly string[] lineBreakSymbols = { "\r\n", "\n", "\r" };
 
     private readonly Lexer lexer = new();
@@ -20,14 +21,14 @@ public class ScriptParser
     /// <summary>
     /// Creates a new parser instance.
     /// </summary>
-    /// <param name="errorHandler">Optional handler for parsing errors.</param>
-    /// <param name="associator">Optional handler for associating parse models with text ranges.</param>
-    public ScriptParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
+    /// <param name="handlers">Optional parse handlers (hooks).</param>
+    public ScriptParser (ParseHandlers? handlers = null)
     {
-        commandParser = new(errorHandler, associator);
-        commentParser = new(errorHandler, associator);
-        genericParser = new(errorHandler, associator);
-        labelParser = new(errorHandler, associator);
+        handlers ??= nullHandlers;
+        commandParser = new(handlers);
+        commentParser = new(handlers);
+        genericParser = new(handlers);
+        labelParser = new(handlers);
     }
 
     /// <summary>

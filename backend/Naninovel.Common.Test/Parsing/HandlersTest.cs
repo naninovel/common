@@ -64,4 +64,27 @@ public class HandlersTest
             Assert.Equal(range, kv.Value);
         }
     }
+
+    [Fact]
+    public void WhenNothingIdentifiedMapperIsEmpty ()
+    {
+        Assert.Empty(new TextMapper().Map);
+    }
+
+    [Fact]
+    public void TextMapperMapsIdentifiedText ()
+    {
+        var mapper = new TextMapper();
+        mapper.Identify("f", "foo");
+        Assert.Equal("foo", mapper.Map["f"]);
+    }
+
+    [Fact]
+    public void WhenClearedMapperIsEmpty ()
+    {
+        var mapper = new TextMapper();
+        mapper.Identify("f", "foo");
+        mapper.Clear();
+        Assert.Empty(mapper.Map);
+    }
 }

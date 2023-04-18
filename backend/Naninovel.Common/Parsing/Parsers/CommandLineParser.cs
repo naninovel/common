@@ -12,9 +12,9 @@ public class CommandLineParser
     private readonly LineWalker walker;
     private Command command = emptyBody;
 
-    public CommandLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
+    public CommandLineParser (ParseHandlers handlers)
     {
-        walker = new(errorHandler, associator);
+        walker = new(handlers);
     }
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens)
