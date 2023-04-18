@@ -160,6 +160,12 @@ public class SemanticsTest
     }
 
     [Fact]
+    public void IdentifiedTextToStringIsCorrect ()
+    {
+        Assert.Equal("text|id|", new IdentifiedText(new("text"), new("id")).ToString());
+    }
+
+    [Fact]
     public void EmptyIdentifiedTextToStringIsCorrect ()
     {
         Assert.Equal("||", new IdentifiedText(new(""), new("")).ToString());

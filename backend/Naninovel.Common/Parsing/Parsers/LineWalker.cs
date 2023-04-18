@@ -57,9 +57,10 @@ internal class LineWalker
 
     public void Identify (MixedValue mixed)
     {
+        if (handlers.TextIdentifier is null) return;
         foreach (var component in mixed)
             if (component is IdentifiedText idText)
-                handlers.TextIdentifier?.Identify(idText.Id.Body, idText.Text);
+                handlers.TextIdentifier.Identify(idText.Id.Body, idText.Text);
     }
 
     public bool Next (TokenType types, ErrorType errors, out Token token)

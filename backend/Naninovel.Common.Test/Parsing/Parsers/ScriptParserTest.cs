@@ -59,4 +59,10 @@ Generic text line
         Assert.Equal(2, errors[0].Length);
         Assert.Equal(4, errors[0].EndIndex);
     }
+
+    [Fact]
+    public void CanCreateParserWithoutHandlers ()
+    {
+        _ = new ScriptParser();
+    }
 }
