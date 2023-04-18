@@ -22,7 +22,7 @@ public class ScriptParser
     /// </summary>
     /// <param name="errorHandler">Optional handler for parsing errors.</param>
     /// <param name="associator">Optional handler for associating parse models with text ranges.</param>
-    public ScriptParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
+    public ScriptParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
     {
         commandParser = new(errorHandler, associator);
         commentParser = new(errorHandler, associator);

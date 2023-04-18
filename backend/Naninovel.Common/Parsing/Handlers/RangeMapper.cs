@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 /// <summary>
 /// Allows mapping <see cref="ILineComponent"/> to associated <see cref="LineRange"/>.
 /// </summary>
-public class RangeMapper : IAssociator, IEnumerable<KeyValuePair<ILineComponent, LineRange>>
+public class RangeMapper : IRangeAssociator, IEnumerable<KeyValuePair<ILineComponent, LineRange>>
 {
     private readonly Dictionary<ILineComponent, LineRange> map = new();
 

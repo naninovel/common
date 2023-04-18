@@ -12,7 +12,7 @@ public class CommandLineParser
     private readonly LineWalker walker;
     private Command command = emptyBody;
 
-    public CommandLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
+    public CommandLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }

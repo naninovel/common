@@ -14,11 +14,11 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
     private readonly Func<string, IReadOnlyList<Token>, TLine> parse;
     private readonly Lexer lexer = new();
 
-    public ParseTestHelper (Func<IErrorHandler, IAssociator, Func<string, IReadOnlyList<Token>, TLine>> ctor)
+    public ParseTestHelper (Func<IErrorHandler, IRangeAssociator, Func<string, IReadOnlyList<Token>, TLine>> ctor)
     {
         var errorHandler = new Mock<IErrorHandler>();
         errorHandler.Setup(h => h.HandleError(Capture.In(Errors)));
-        var associator = new Mock<IAssociator>();
+        var associator = new Mock<IRangeAssociator>();
         associator.Setup(a => a.Associate(It.IsAny<ILineComponent>(), It.IsAny<LineRange>())).Callback(Associations.Add);
         parse = ctor(errorHandler.Object, associator.Object);
     }

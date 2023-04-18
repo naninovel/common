@@ -10,7 +10,7 @@ public class LabelLineParser
     private readonly LineWalker walker;
     private PlainText label = PlainText.Empty;
 
-    public LabelLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
+    public LabelLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }

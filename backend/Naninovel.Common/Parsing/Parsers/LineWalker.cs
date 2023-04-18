@@ -6,13 +6,13 @@ namespace Naninovel.Parsing;
 internal class LineWalker
 {
     private readonly IErrorHandler? errorHandler;
-    private readonly IAssociator? associator;
+    private readonly IRangeAssociator? associator;
 
     private string lineText = "";
     private IReadOnlyList<Token> tokens = Array.Empty<Token>();
     private int index = -1;
 
-    public LineWalker (IErrorHandler? errorHandler, IAssociator? associator)
+    public LineWalker (IErrorHandler? errorHandler, IRangeAssociator? associator)
     {
         this.errorHandler = errorHandler;
         this.associator = associator;

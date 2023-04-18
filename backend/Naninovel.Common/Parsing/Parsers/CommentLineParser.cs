@@ -9,7 +9,7 @@ public class CommentLineParser
     private readonly LineWalker walker;
     private PlainText comment = PlainText.Empty;
 
-    public CommentLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
+    public CommentLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }

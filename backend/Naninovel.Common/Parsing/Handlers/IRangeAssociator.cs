@@ -4,7 +4,7 @@
 /// Implementation is able to handle associations between parsed line semantics
 /// and script text line ranges used to represent them.
 /// </summary>
-public interface IAssociator
+public interface IRangeAssociator
 {
     /// <summary>
     /// Handles association between the provided component and range.

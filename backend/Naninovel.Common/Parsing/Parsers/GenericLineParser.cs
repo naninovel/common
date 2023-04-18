@@ -13,7 +13,7 @@ public class GenericLineParser
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
 
-    public GenericLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
+    public GenericLineParser (IErrorHandler? errorHandler = null, IRangeAssociator? associator = null)
     {
         walker = new(errorHandler, associator);
     }
