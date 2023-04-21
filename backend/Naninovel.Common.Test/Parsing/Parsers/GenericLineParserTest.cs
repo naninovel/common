@@ -119,15 +119,10 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void CurlyBracketsInPrefixAreParsedAsPlainText ()
+    public void ExpressionsInPrefixAreNotSupported ()
     {
-        // Required for backward compat with v1, where prefix can contain expressions.
-        var line = parser.Parse(@"{name}.{appearance}: My favourite drink is {drink}!");
-        Assert.Equal(@"{name}", line.Prefix?.Author);
-        Assert.Equal(@"{appearance}", line.Prefix?.Appearance);
-        Assert.Equal(@"My favourite drink is ", (line.Content[0] as MixedValue)![0] as PlainText);
-        Assert.Equal(@"drink", ((line.Content[0] as MixedValue)![1] as Expression)!.Body);
-        Assert.Equal(@"!", (line.Content[0] as MixedValue)![2] as PlainText);
+        parser.Parse(@"{name}: My favourite drink is {drink}!");
+        Assert.True(parser.HasError(ExpressionInGenericPrefix));
     }
 
     [Fact]

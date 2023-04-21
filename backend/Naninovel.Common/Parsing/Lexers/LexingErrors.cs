@@ -13,7 +13,8 @@ public static class LexingErrors
         [ErrorType.MultipleNameless] = "Multiple nameless parameters are not supported.",
         [ErrorType.MissingAppearance] = "Author appearance cannot be empty.",
         [ErrorType.MissingExpressionBody] = "Script expression body is missing.",
-        [ErrorType.MissingTextIdBody] = "Text identifier body is missing."
+        [ErrorType.MissingTextIdBody] = "Text identifier body is missing.",
+        [ErrorType.ExpressionInGenericPrefix] = "Expressions in generic line prefix are not supported."
     };
 
     public static string GetFor (ErrorType type) => map[type];

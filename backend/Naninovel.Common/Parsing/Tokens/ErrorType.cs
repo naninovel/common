@@ -13,7 +13,8 @@ public enum ErrorType
     MultipleNameless = 1 << 5,
     MissingAppearance = 1 << 6,
     MissingExpressionBody = 1 << 7,
-    MissingTextIdBody = 1 << 8
+    MissingTextIdBody = 1 << 8,
+    ExpressionInGenericPrefix = 1 << 9
 }
 
 public static class ErrorTypeExtensions

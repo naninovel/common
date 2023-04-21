@@ -422,14 +422,14 @@ public static class LexerTestData
             "{x}: x",
             ExpressionOpen(0, 1), ExpressionBody(1, 1),
             ExpressionClose(2, 1), Expression(0, 3),
-            AuthorId(0, 3), AuthorAssign(3, 2), GenericText(5, 1)
+            AuthorId(0, 3), AuthorAssign(3, 2), ExpressionInGenericPrefix(0, 5), GenericText(5, 1)
         ),
         T(
             "x.{x}: x",
             ExpressionOpen(2, 1), ExpressionBody(3, 1),
             ExpressionClose(4, 1), Expression(2, 3),
             AuthorId(0, 1), AppearanceAssign(1, 1),
-            AuthorAppearance(2, 3), AuthorAssign(5, 2), GenericText(7, 1)
+            AuthorAppearance(2, 3), AuthorAssign(5, 2), ExpressionInGenericPrefix(0, 7), GenericText(7, 1)
         ),
         T(
             "x: \"x[x]\"",
@@ -492,4 +492,5 @@ public static class LexerTestData
     private static Token MissingCommandId (int startIndex, int length) => Error(ErrorType.MissingCommandId, startIndex, length);
     private static Token MissingAppearance (int startIndex, int length) => Error(ErrorType.MissingAppearance, startIndex, length);
     private static Token MissingTextIdBody (int startIndex, int length) => Error(ErrorType.MissingTextIdBody, startIndex, length);
+    private static Token ExpressionInGenericPrefix (int startIndex, int length) => Error(ErrorType.ExpressionInGenericPrefix, startIndex, length);
 }

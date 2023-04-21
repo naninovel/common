@@ -13,6 +13,7 @@ internal class GenericLineLexer
     private LexState state = null!;
     private bool authorAdded;
     private bool canAddAuthor;
+    private bool expressionAdded;
     private int startIndex;
     private int lastTextStart;
     private int lastNotSpace;
@@ -40,6 +41,7 @@ internal class GenericLineLexer
         this.state = state;
         authorAdded = false;
         canAddAuthor = true;
+        expressionAdded = false;
         startIndex = state.Index;
         lastTextStart = startIndex;
         lastNotSpace = -1;
@@ -56,6 +58,7 @@ internal class GenericLineLexer
         state.AddToken(TokenType.AuthorAssign, state.Index - 1, 2);
         authorAdded = true;
         lastTextStart = state.Move();
+        if (expressionAdded) state.AddError(ErrorType.ExpressionInGenericPrefix, 0, state.Index);
         return true;
 
         bool ShouldTryAdd () => !authorAdded
@@ -112,6 +115,7 @@ internal class GenericLineLexer
         if (!ExpressionLexer.IsOpening(state)) return false;
         expressionLexer.AddExpression(state);
         lastNotSpace = state.Index - 1;
+        expressionAdded = true;
         return true;
     }
 
