@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Naninovel.Utilities;
 
 namespace Naninovel.Parsing;
 
@@ -9,7 +9,6 @@ namespace Naninovel.Parsing;
 public class ScriptParser
 {
     private static readonly ParseHandlers nullHandlers = new();
-    private static readonly string[] lineBreakSymbols = { "\r\n", "\n", "\r" };
 
     private readonly Lexer lexer = new();
     private readonly List<Token> tokens = new();
@@ -37,8 +36,7 @@ public class ScriptParser
     /// <param name="scriptText">The script text to split.</param>
     public static string[] SplitText (string? scriptText)
     {
-        return scriptText?.Trim('\uFEFF', '\u200B') // Remove BOM and zero-width space.
-            .Split(lineBreakSymbols, StringSplitOptions.None) ?? new[] { string.Empty };
+        return scriptText?.TrimJunk().SplitLines() ?? new[] { string.Empty };
     }
 
     /// <summary>
