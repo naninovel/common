@@ -13,7 +13,7 @@ namespace Naninovel.ManagedText;
 /// <code>
 /// # key (space around key is ignored)
 /// ; comment (optional, space around comment is ignored)
-/// value (all lines until next key are joined with br tag, space is preserved)
+/// value (all lines until next key are joined, space is preserved)
 /// </code>
 /// </remarks>
 public class MultilineManagedTextParser
@@ -54,8 +54,6 @@ public class MultilineManagedTextParser
 
     private void ParseValueLine (string line)
     {
-        if (valueBuilder.Length > 0)
-            valueBuilder.Append(MultilineValueLineBreak);
         valueBuilder.Append(line);
     }
 

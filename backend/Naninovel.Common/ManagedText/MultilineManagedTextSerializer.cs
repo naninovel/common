@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using static Naninovel.ManagedText.ManagedTextConstants;
 
 namespace Naninovel.ManagedText;
@@ -9,7 +8,6 @@ namespace Naninovel.ManagedText;
 /// </summary>
 public class MultilineManagedTextSerializer
 {
-    private static readonly string[] breaks = { MultilineValueLineBreak };
     private readonly StringBuilder builder = new();
     private readonly int spacing;
 
@@ -56,7 +54,6 @@ public class MultilineManagedTextSerializer
                 .Append(record.Comment)
                 .Append('\n');
 
-        foreach (var value in record.Value.Split(breaks, StringSplitOptions.None))
-            builder.Append(value).Append('\n');
+        builder.Append(record.Value).Append('\n');
     }
 }
