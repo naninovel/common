@@ -21,6 +21,7 @@ public class InlineManagedTextParserTest
         Fact(" ke \t y : value", new ManagedTextRecord(" ke \t y ", "value")),
         Fact("key:  \tvalue \t<br>\t", new ManagedTextRecord("key", " \tvalue \t<br>\t")),
         Fact("; comment\nkey: value", new ManagedTextRecord("key", "value", "comment")),
+        Fact(";foo\n;bar\nkey: value", new ManagedTextRecord("key", "value", "bar")),
         Fact("; comment\tkey: value", Array.Empty<ManagedTextRecord>()),
         Fact(";\nkey: value", new ManagedTextRecord("key", "value", "")),
         Fact(";  \t comment\t \t\nkey: \tvalue\t", new ManagedTextRecord("key", "\tvalue\t", "comment")),
@@ -30,10 +31,11 @@ public class InlineManagedTextParserTest
         Fact("text1\nkey1: value1\ntext2\nkey2: value2", new("key1", "value1", ""), new("key2", "value2", "")),
     };
 
+    private readonly InlineManagedTextParser parser = new();
+
     [Theory, MemberData(nameof(Facts))]
     public void ParseTheory (string text, params ManagedTextRecord[] expected)
     {
-        var parser = new InlineManagedTextParser();
         var records = parser.Parse(text).Records.ToArray();
         Assert.Equal(expected.Length, records.Length);
         for (int i = 0; i < expected.Length; i++)
@@ -42,6 +44,30 @@ public class InlineManagedTextParserTest
             Assert.Equal(expected[i].Value, records[i].Value);
             Assert.Equal(expected[i].Comment, records[i].Comment);
         }
+    }
+
+    [Fact]
+    public void CommentOnFirstLineIsParsedAsHeader ()
+    {
+        Assert.Equal("foo", parser.Parse(";foo").Header);
+    }
+
+    [Fact]
+    public void HeaderIsTrimmed ()
+    {
+        Assert.Equal("foo", parser.Parse("; \tfoo \t").Header);
+    }
+
+    [Fact]
+    public void WhenCommentOnFirstLineIsWhitespaceHeaderIsEmpty ()
+    {
+        Assert.Empty(parser.Parse("; \t \t\n").Header);
+    }
+
+    [Fact]
+    public void CommentOnSecondLineIsNotParsedAsHeader ()
+    {
+        Assert.Empty(parser.Parse("\n;foo").Header);
     }
 
     private static object[] Fact (string text, params ManagedTextRecord[] records)

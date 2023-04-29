@@ -18,10 +18,9 @@ namespace Naninovel.ManagedText;
 /// </remarks>
 public class MultilineManagedTextParser
 {
-    private const string lineBreak = "<br>";
     private readonly HashSet<ManagedTextRecord> records = new();
     private readonly StringBuilder valueBuilder = new();
-    private string lastKey = "", lastComment = "";
+    private string header = "", lastKey = "", lastComment = "";
 
     /// <summary>
     /// Creates document from specified serialized text string.
@@ -29,14 +28,14 @@ public class MultilineManagedTextParser
     public ManagedTextDocument Parse (string text)
     {
         Reset();
-        foreach (var line in text.TrimJunk().IterateLines())
+        foreach (var (line, index) in text.TrimJunk().IterateLinesIndexed())
             if (line.StartsWithOrdinal(RecordMultilineKeyLiteral))
                 ParseKeyLine(line);
             else if (line.StartsWithOrdinal(RecordCommentLiteral))
-                ParseCommentLine(line);
+                ParseCommentLine(line, index);
             else ParseValueLine(line);
         if (!string.IsNullOrEmpty(lastKey)) AddLastRecord();
-        return new ManagedTextDocument(records);
+        return new ManagedTextDocument(records, header);
     }
 
     private void ParseKeyLine (string line)
@@ -47,15 +46,16 @@ public class MultilineManagedTextParser
         lastComment = "";
     }
 
-    private void ParseCommentLine (string line)
+    private void ParseCommentLine (string line, int index)
     {
         lastComment = line.GetAfterFirst(RecordCommentLiteral).Trim();
+        if (index == 0) header = lastComment;
     }
 
     private void ParseValueLine (string line)
     {
         if (valueBuilder.Length > 0)
-            valueBuilder.Append(lineBreak);
+            valueBuilder.Append(MultilineValueLineBreak);
         valueBuilder.Append(line);
     }
 
@@ -70,6 +70,6 @@ public class MultilineManagedTextParser
     {
         records.Clear();
         valueBuilder.Clear();
-        lastKey = lastComment = "";
+        header = lastKey = lastComment = "";
     }
 }

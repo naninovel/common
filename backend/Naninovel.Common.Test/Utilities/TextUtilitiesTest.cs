@@ -59,6 +59,19 @@ public class TextUtilitiesTest
     }
 
     [Fact]
+    public void IterateLinesIndexedDetectsAllTypesOfLineBreak ()
+    {
+        foreach (var (line, index) in "0\n1\r2\r\n3".IterateLinesIndexed())
+            Assert.Equal((index).ToString(), line);
+    }
+
+    [Fact]
+    public void IterateLinesIndexedIterateOnceWhenStringDoesntContainBreaks ()
+    {
+        Assert.Empty("".IterateLinesIndexed());
+    }
+
+    [Fact]
     public void TrimJunkRemovesBomAndZeroWidthSpaceFromStartAndEnd ()
     {
         Assert.Equal("x", "\uFEFF\u200Bx\u200B\u200B".TrimJunk());

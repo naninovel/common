@@ -17,7 +17,7 @@ namespace Naninovel.ManagedText;
 public class InlineManagedTextParser
 {
     private readonly HashSet<ManagedTextRecord> records = new();
-    private string lastComment = "";
+    private string header = "", lastComment = "";
 
     /// <summary>
     /// Creates document from specified serialized text string.
@@ -25,22 +25,23 @@ public class InlineManagedTextParser
     public ManagedTextDocument Parse (string text)
     {
         Reset();
-        foreach (var line in text.TrimJunk().IterateLines())
+        foreach (var (line, index) in text.TrimJunk().IterateLinesIndexed())
             if (line.StartsWithOrdinal(RecordCommentLiteral))
-                ParseCommentLine(line);
+                ParseCommentLine(line, index);
             else ParseRecordLine(line);
-        return new ManagedTextDocument(records);
+        return new ManagedTextDocument(records, header);
     }
 
     private void Reset ()
     {
         records.Clear();
-        lastComment = "";
+        header = lastComment = "";
     }
 
-    private void ParseCommentLine (string line)
+    private void ParseCommentLine (string line, int index)
     {
         lastComment = line.GetAfterFirst(RecordCommentLiteral).Trim();
+        if (index == 0) header = lastComment;
     }
 
     private void ParseRecordLine (string line)

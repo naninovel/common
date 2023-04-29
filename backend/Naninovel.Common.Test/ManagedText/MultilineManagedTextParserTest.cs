@@ -28,10 +28,11 @@ public class MultilineManagedTextParserTest
         Fact("# key\nfoo\n\nbar", new ManagedTextRecord("key", "foo<br><br>bar"))
     };
 
+    private readonly MultilineManagedTextParser parser = new();
+
     [Theory, MemberData(nameof(Facts))]
     public void ParseTheory (string text, params ManagedTextRecord[] expected)
     {
-        var parser = new MultilineManagedTextParser();
         var records = parser.Parse(text).Records.ToArray();
         Assert.Equal(expected.Length, records.Length);
         for (int i = 0; i < expected.Length; i++)
@@ -40,6 +41,30 @@ public class MultilineManagedTextParserTest
             Assert.Equal(expected[i].Value, records[i].Value);
             Assert.Equal(expected[i].Comment, records[i].Comment);
         }
+    }
+
+    [Fact]
+    public void CommentOnFirstLineIsParsedAsHeader ()
+    {
+        Assert.Equal("foo", parser.Parse(";foo").Header);
+    }
+
+    [Fact]
+    public void HeaderIsTrimmed ()
+    {
+        Assert.Equal("foo", parser.Parse("; \tfoo \t").Header);
+    }
+
+    [Fact]
+    public void WhenCommentOnFirstLineIsWhitespaceHeaderIsEmpty ()
+    {
+        Assert.Empty(parser.Parse("; \t \t\n").Header);
+    }
+
+    [Fact]
+    public void CommentOnSecondLineIsNotParsedAsHeader ()
+    {
+        Assert.Empty(parser.Parse("\n;foo").Header);
     }
 
     private static object[] Fact (string text, params ManagedTextRecord[] records)

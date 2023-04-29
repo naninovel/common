@@ -7,12 +7,20 @@ namespace Naninovel.ManagedText;
 /// </summary>
 public class ManagedTextDocument
 {
+    /// <summary>
+    /// Optional remarks/description associated with the document or empty.
+    /// </summary>
+    public string Header { get; }
+    /// <summary>
+    /// Records contained by the document or empty.
+    /// </summary>
     public IReadOnlyCollection<ManagedTextRecord> Records => map.Values;
 
     private readonly Dictionary<string, ManagedTextRecord> map = new();
 
-    public ManagedTextDocument (IEnumerable<ManagedTextRecord> records)
+    public ManagedTextDocument (IEnumerable<ManagedTextRecord> records, string? header = null)
     {
+        Header = header ?? "";
         foreach (var record in records)
             map[record.Key] = record;
     }

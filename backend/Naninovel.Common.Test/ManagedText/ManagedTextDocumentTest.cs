@@ -14,6 +14,18 @@ public class ManagedTextDocumentTest
     }
 
     [Fact]
+    public void HeaderIsEmptyByDefault ()
+    {
+        Assert.Empty(new ManagedTextDocument(Array.Empty<ManagedTextRecord>()).Header);
+    }
+
+    [Fact]
+    public void HeaderIsAssigned ()
+    {
+        Assert.Equal("foo", new ManagedTextDocument(Array.Empty<ManagedTextRecord>(), "foo").Header);
+    }
+
+    [Fact]
     public void CanCheckIfContainsRecordByKey ()
     {
         var doc = new ManagedTextDocument(new ManagedTextRecord[] { new("foo") });

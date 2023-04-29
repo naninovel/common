@@ -33,6 +33,18 @@ public static class TextUtilities
     }
 
     /// <summary>
+    /// Returns indexed iterator over the lines in the string.
+    /// Will detect any type of line breaks, independent of OS.
+    /// </summary>
+    public static IEnumerable<(string line, int index)> IterateLinesIndexed (this string str)
+    {
+        using var reader = new StringReader(str);
+        var index = -1;
+        while (reader.ReadLine() is { } line)
+            yield return (line, ++index);
+    }
+
+    /// <summary>
     /// Trims BOM, zero-width and other junk not removed with normal <see cref="string.Trim()"/>.
     /// </summary>
     public static string TrimJunk (this string str)
