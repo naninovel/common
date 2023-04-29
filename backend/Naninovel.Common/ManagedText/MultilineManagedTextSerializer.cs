@@ -11,12 +11,12 @@ public class MultilineManagedTextSerializer
 {
     private static readonly string[] breaks = { MultilineValueLineBreak };
     private readonly StringBuilder builder = new();
-    private readonly int indent;
+    private readonly int spacing;
 
-    /// <param name="indent">Line breaks between records.</param>
-    public MultilineManagedTextSerializer (int indent = 1)
+    /// <param name="spacing">Line breaks between records.</param>
+    public MultilineManagedTextSerializer (int spacing = 1)
     {
-        this.indent = indent;
+        this.spacing = spacing;
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class MultilineManagedTextSerializer
 
     private void AppendRecord (ManagedTextRecord record)
     {
-        for (int i = 0; i < indent; i++)
+        for (int i = 0; i < spacing; i++)
             builder.Append('\n');
 
         builder.Append(RecordMultilineKeyLiteral)

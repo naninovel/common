@@ -9,12 +9,12 @@ namespace Naninovel.ManagedText;
 public class InlineManagedTextSerializer
 {
     private readonly StringBuilder builder = new();
-    private readonly int indent;
+    private readonly int spacing;
 
-    /// <param name="indent">Line breaks between records.</param>
-    public InlineManagedTextSerializer (int indent = 1)
+    /// <param name="spacing">Line breaks between records.</param>
+    public InlineManagedTextSerializer (int spacing = 1)
     {
-        this.indent = indent;
+        this.spacing = spacing;
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class InlineManagedTextSerializer
 
     private void AppendRecord (ManagedTextRecord record)
     {
-        for (int i = 0; i < indent; i++)
+        for (int i = 0; i < spacing; i++)
             builder.Append('\n');
 
         if (!string.IsNullOrWhiteSpace(record.Comment))
