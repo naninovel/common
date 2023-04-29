@@ -54,6 +54,12 @@ public class MultilineManagedTextSerializer
                 .Append(record.Comment)
                 .Append('\n');
 
-        builder.Append(record.Value).Append('\n');
+        var value = InsertLineBreaksAfterBrTags(record.Value);
+        builder.Append(value).Append('\n');
+    }
+
+    private string InsertLineBreaksAfterBrTags (string value)
+    {
+        return value.Replace(LineBreakTag, LineBreakTag + '\n');
     }
 }
