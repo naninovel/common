@@ -48,7 +48,9 @@ public class MultilineManagedTextParser
 
     private void ParseCommentLine (string line, int index)
     {
-        lastComment = line.GetAfterFirst(RecordCommentLiteral).Trim();
+        lastComment = line.GetAfterFirst(RecordCommentLiteral);
+        if (lastComment.Length > 0 && lastComment[0] == ' ')
+            lastComment = lastComment.Substring(1);
         if (index == 0) header = lastComment;
     }
 

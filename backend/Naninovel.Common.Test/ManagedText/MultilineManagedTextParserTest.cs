@@ -20,6 +20,7 @@ public class MultilineManagedTextParserTest
         Fact("# k \t ey \t\n", new ManagedTextRecord("k \t ey")),
         Fact("#key1\n#key2\n", new("key1", ""), new("key2", "")),
         Fact("# key\n; comment\n", new ManagedTextRecord("key", "", "comment")),
+        Fact("# key\n;  comment \t\n", new ManagedTextRecord("key", "", " comment \t")),
         Fact("# key\n; comment\nvalue\n", new ManagedTextRecord("key", "value", "comment")),
         Fact("# key\nvalue\n; comment\n", new ManagedTextRecord("key", "value", "comment")),
         Fact("# key1\nvalue\n; comment\n# key2\n", new("key1", "value", "comment"), new("key2", "", "")),
@@ -52,13 +53,13 @@ public class MultilineManagedTextParserTest
     [Fact]
     public void HeaderIsTrimmed ()
     {
-        Assert.Equal("foo", parser.Parse("; \tfoo \t").Header);
+        Assert.Equal("\tfoo \t", parser.Parse("; \tfoo \t").Header);
     }
 
     [Fact]
-    public void WhenCommentOnFirstLineIsWhitespaceHeaderIsEmpty ()
+    public void WhenCommentOnFirstLineIsWhitespaceHeaderIsNotEmpty ()
     {
-        Assert.Empty(parser.Parse("; \t \t\n").Header);
+        Assert.Equal("\t \t", parser.Parse("; \t \t\n").Header);
     }
 
     [Fact]

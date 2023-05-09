@@ -24,7 +24,7 @@ public class InlineManagedTextParserTest
         Fact(";foo\n;bar\nkey: value", new ManagedTextRecord("key", "value", "bar")),
         Fact("; comment\tkey: value", Array.Empty<ManagedTextRecord>()),
         Fact(";\nkey: value", new ManagedTextRecord("key", "value", "")),
-        Fact(";  \t comment\t \t\nkey: \tvalue\t", new ManagedTextRecord("key", "\tvalue\t", "comment")),
+        Fact(";  \t comment\t \t\nkey: \tvalue\t", new ManagedTextRecord("key", "\tvalue\t", " \t comment\t \t")),
         Fact("; comment 1\nkey1: value1\n; comment 2\nkey2: value2", new("key1", "value1", "comment 1"), new("key2", "value2", "comment 2")),
         Fact("; foo\n; bar\nkey: value", new ManagedTextRecord("key", "value", "bar")),
         Fact("; comment1\nkey1: value1\nkey2: value2\n; comment2", new("key1", "value1", "comment1"), new("key2", "value2", "")),
@@ -55,13 +55,13 @@ public class InlineManagedTextParserTest
     [Fact]
     public void HeaderIsTrimmed ()
     {
-        Assert.Equal("foo", parser.Parse("; \tfoo \t").Header);
+        Assert.Equal("\tfoo \t", parser.Parse("; \tfoo \t").Header);
     }
 
     [Fact]
-    public void WhenCommentOnFirstLineIsWhitespaceHeaderIsEmpty ()
+    public void WhenCommentOnFirstLineIsWhitespaceHeaderIsNotEmpty ()
     {
-        Assert.Empty(parser.Parse("; \t \t\n").Header);
+        Assert.Equal("\t \t", parser.Parse("; \t \t\n").Header);
     }
 
     [Fact]
