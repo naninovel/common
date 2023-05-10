@@ -30,7 +30,8 @@ public enum TokenType
     AppearanceAssign = 1 << 22,
     TextId = 1 << 23,
     TextIdBody = 1 << 24,
-    TextIdDelimiter = 1 << 25
+    TextIdOpen = 1 << 25,
+    TextIdClose = 1 << 26
 }
 
 public static class TokenTypeExtensions

@@ -131,7 +131,7 @@ public static class LexerTestData
             ParamValue(5, 13), NamedParam(3, 15), CommandBody(1, 17)
         ),
         T(
-            "@c v{ d ? v : n }v p:\" { a(1,2) ? \\\"test \\\" : b }\"",
+            "@c v{ d | v & n }v p:\" { a(1,2) ? \\\"test \\\" : b }\"",
             LineId(0, 1), CommandId(1, 1),
             ExpressionOpen(4, 1), ExpressionBody(5, 11),
             ExpressionClose(16, 1), Expression(4, 13),
@@ -188,61 +188,61 @@ public static class LexerTestData
             NamedParam(3, 2), CommandBody(1, 4)
         ),
         T(
-            "@c v|x|",
+            "@c v|#x|",
             LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(4, 1), TextIdBody(5, 1), TextIdDelimiter(6, 1), TextId(4, 3),
-            ParamValue(3, 4), NamelessParam(3, 4), CommandBody(1, 6)
-        ),
-        T(
-            "@c v\\|x\\|",
-            LineId(0, 1), CommandId(1, 1),
-            ParamValue(3, 6), NamelessParam(3, 6), CommandBody(1, 8)
-        ),
-        T(
-            "@c |x0X|",
-            LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(3, 1), TextIdBody(4, 3), TextIdDelimiter(7, 1), TextId(3, 5),
+            TextIdOpen(4, 2), TextIdBody(6, 1), TextIdClose(7, 1), TextId(4, 4),
             ParamValue(3, 5), NamelessParam(3, 5), CommandBody(1, 7)
         ),
         T(
-            "@c v|x|{e}|x|",
+            "@c v\\|#x|",
             LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(4, 1), TextIdBody(5, 1), TextIdDelimiter(6, 1), TextId(4, 3),
-            ExpressionOpen(7, 1), ExpressionBody(8, 1), ExpressionClose(9, 1), Expression(7, 3),
-            TextIdDelimiter(10, 1), TextIdBody(11, 1), TextIdDelimiter(12, 1), TextId(10, 3),
-            ParamValue(3, 10), NamelessParam(3, 10), CommandBody(1, 12)
-        ),
-        T(
-            "@c |x||x|",
-            LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(3, 1), TextIdBody(4, 1), TextIdDelimiter(5, 1), TextId(3, 3),
-            TextIdDelimiter(6, 1), TextIdBody(7, 1), TextIdDelimiter(8, 1), TextId(6, 3),
             ParamValue(3, 6), NamelessParam(3, 6), CommandBody(1, 8)
         ),
         T(
-            "@c ||",
+            "@c |#x0X|",
             LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(3, 1), TextIdDelimiter(4, 1), TextId(3, 2), MissingTextIdBody(3, 2),
-            ParamValue(3, 2), NamelessParam(3, 2), CommandBody(1, 4)
+            TextIdOpen(3, 2), TextIdBody(5, 3), TextIdClose(8, 1), TextId(3, 6),
+            ParamValue(3, 6), NamelessParam(3, 6), CommandBody(1, 8)
         ),
         T(
-            "@c | |",
+            "@c v|#x|{e}|#x|",
             LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(3, 1), TextId(3, 1), MissingTextIdBody(3, 1), ParamValue(3, 1), NamelessParam(3, 1),
-            TextIdDelimiter(5, 1), TextId(5, 1), MissingTextIdBody(5, 1), MultipleNameless(5, 1), CommandBody(1, 5)
+            TextIdOpen(4, 2), TextIdBody(6, 1), TextIdClose(7, 1), TextId(4, 4),
+            ExpressionOpen(8, 1), ExpressionBody(9, 1), ExpressionClose(10, 1), Expression(8, 3),
+            TextIdOpen(11, 2), TextIdBody(13, 1), TextIdClose(14, 1), TextId(11, 4),
+            ParamValue(3, 12), NamelessParam(3, 12), CommandBody(1, 14)
         ),
         T(
-            "@c v|x",
+            "@c |#x||#x|",
             LineId(0, 1), CommandId(1, 1),
-            TextIdDelimiter(4, 1), TextIdBody(5, 1), TextId(4, 2),
+            TextIdOpen(3, 2), TextIdBody(5, 1), TextIdClose(6, 1), TextId(3, 4),
+            TextIdOpen(7, 2), TextIdBody(9, 1), TextIdClose(10, 1), TextId(7, 4),
+            ParamValue(3, 8), NamelessParam(3, 8), CommandBody(1, 10)
+        ),
+        T(
+            "@c |#|",
+            LineId(0, 1), CommandId(1, 1),
+            TextIdOpen(3, 2), TextIdClose(5, 1), TextId(3, 3), MissingTextIdBody(3, 3),
             ParamValue(3, 3), NamelessParam(3, 3), CommandBody(1, 5)
         ),
         T(
-            "@c p:\"|x|\"",
+            "@c |# |#",
+            LineId(0, 1), CommandId(1, 1),
+            TextIdOpen(3, 2), TextId(3, 2), MissingTextIdBody(3, 2), ParamValue(3, 2), NamelessParam(3, 2),
+            TextIdOpen(6, 2), TextId(6, 2), MissingTextIdBody(6, 2), MultipleNameless(6, 2), CommandBody(1, 7)
+        ),
+        T(
+            "@c v|#x",
+            LineId(0, 1), CommandId(1, 1),
+            TextIdOpen(4, 2), TextIdBody(6, 1), TextId(4, 3),
+            ParamValue(3, 4), NamelessParam(3, 4), CommandBody(1, 6)
+        ),
+        T(
+            "@c p:\"|#x|\"",
             LineId(0, 1), CommandId(1, 1),
             ParamId(3, 1), ParamAssign(4, 1),
-            TextIdDelimiter(6, 1), TextIdBody(7, 1), TextIdDelimiter(8, 1), TextId(6, 3),
-            ParamValue(5, 5), NamedParam(3, 7), CommandBody(1, 9)
+            TextIdOpen(6, 2), TextIdBody(8, 1), TextIdClose(9, 1), TextId(6, 4),
+            ParamValue(5, 6), NamedParam(3, 8), CommandBody(1, 10)
         )
     };
 
@@ -438,11 +438,11 @@ public static class LexerTestData
             InlinedClose(7, 1), Inlined(5, 3), GenericText(8, 1)
         ),
         T(
-            "t|x|[i v|x|] |x|",
-            TextIdDelimiter(1, 1), TextIdBody(2, 1), TextIdDelimiter(3, 1), TextId(1, 3), GenericText(0, 4),
-            InlinedOpen(4, 1), CommandId(5, 1), TextIdDelimiter(8, 1), TextIdBody(9, 1), TextIdDelimiter(10, 1), TextId(8, 3),
-            ParamValue(7, 4), NamelessParam(7, 4), CommandBody(5, 6), InlinedClose(11, 1), Inlined(4, 8),
-            TextIdDelimiter(13, 1), TextIdBody(14, 1), TextIdDelimiter(15, 1), TextId(13, 3), GenericText(12, 4)
+            "t|#x|[i v|#x|] |#x|",
+            TextIdOpen(1, 2), TextIdBody(3, 1), TextIdClose(4, 1), TextId(1, 4), GenericText(0, 5),
+            InlinedOpen(5, 1), CommandId(6, 1), TextIdOpen(9, 2), TextIdBody(11, 1), TextIdClose(12, 1), TextId(9, 4),
+            ParamValue(8, 5), NamelessParam(8, 5), CommandBody(6, 7), InlinedClose(13, 1), Inlined(5, 9),
+            TextIdOpen(15, 2), TextIdBody(17, 1), TextIdClose(18, 1), TextId(15, 4), GenericText(14, 5)
         )
     };
 
@@ -480,7 +480,8 @@ public static class LexerTestData
     private static Token GenericText (int startIndex, int length) => Token(TokenType.GenericText, startIndex, length);
     private static Token TextId (int startIndex, int length) => Token(TokenType.TextId, startIndex, length);
     private static Token TextIdBody (int startIndex, int length) => Token(TokenType.TextIdBody, startIndex, length);
-    private static Token TextIdDelimiter (int startIndex, int length) => Token(TokenType.TextIdDelimiter, startIndex, length);
+    private static Token TextIdOpen (int startIndex, int length) => Token(TokenType.TextIdOpen, startIndex, length);
+    private static Token TextIdClose (int startIndex, int length) => Token(TokenType.TextIdClose, startIndex, length);
 
     private static Token Error (ErrorType type, int startIndex, int length) => new(type, startIndex, length);
     private static Token MissingParamId (int startIndex, int length) => Error(ErrorType.MissingParamId, startIndex, length);

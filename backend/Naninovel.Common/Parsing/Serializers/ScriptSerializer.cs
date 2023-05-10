@@ -157,9 +157,9 @@ public class ScriptSerializer
     {
         mixedBuilder.Append(identifiedText.Text);
         var startIndex = mixedBuilder.Length;
-        mixedBuilder.Append(Identifiers.TextIdDelimiter);
+        mixedBuilder.Append(Identifiers.TextIdOpen);
         mixedBuilder.Append(identifiedText.Id.Body);
-        mixedBuilder.Append(Identifiers.TextIdDelimiter);
+        mixedBuilder.Append(Identifiers.TextIdClose);
         ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
     }
 
@@ -185,7 +185,7 @@ public class ScriptSerializer
         bool ShouldEscape (int i)
         {
             if (IsIgnored(ignoreRanges, i)) return false;
-            return IsPlainTextControlChar(value[i]) || wrap && value[i] == '"';
+            return IsPlainTextControlChar(value[i], value.ElementAtOrDefault(i + 1)) || wrap && value[i] == '"';
         }
 
         static bool IsIgnored (IEnumerable<(int start, int length)> ignoredRanges, int i)

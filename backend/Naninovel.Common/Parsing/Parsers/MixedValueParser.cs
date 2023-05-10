@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using static Naninovel.Parsing.Utilities;
 
 namespace Naninovel.Parsing;
@@ -142,8 +143,8 @@ internal class MixedValueParser
         bool ShouldRemove (int i)
         {
             if (value[i] != '\\' || IsEscaped(value, i)) return false;
-            var prevChar = value[i + 1];
-            return unescapeQuotes && prevChar == '"' || IsPlainTextControlChar(prevChar);
+            var prev = value[i + 1];
+            return unescapeQuotes && prev == '"' || IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
         }
     }
 }

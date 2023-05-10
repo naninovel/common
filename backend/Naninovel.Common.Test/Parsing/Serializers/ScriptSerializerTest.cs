@@ -125,10 +125,10 @@ public class ScriptSerializerTest
     [Fact]
     public void CanSerializeMixedValue ()
     {
-        Assert.Equal(@"""\{\}{x < y}\||id|||\[\]\\ ", serializer.Serialize(new IValueComponent[] {
+        Assert.Equal(@"""\{\}{x < y}\|#|#id||#|\[\]\\ ", serializer.Serialize(new IValueComponent[] {
             new PlainText(@"""{}"),
             new Expression("x < y"),
-            new IdentifiedText("|", new("id")),
+            new IdentifiedText("|#", new("id")),
             new IdentifiedText("", new("")),
             new PlainText(@"[]\ ")
         }, false));

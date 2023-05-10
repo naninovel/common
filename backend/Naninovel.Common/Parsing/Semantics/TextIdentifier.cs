@@ -19,9 +19,9 @@ public class TextIdentifier : ILineComponent
 
     public override string ToString ()
     {
-        var builder = new StringBuilder(Identifiers.TextIdDelimiter);
+        var builder = new StringBuilder(Identifiers.TextIdOpen);
         builder.Append(Body);
-        builder.Append(Identifiers.TextIdDelimiter);
+        builder.Append(Identifiers.TextIdClose);
         return builder.ToString();
     }
 }

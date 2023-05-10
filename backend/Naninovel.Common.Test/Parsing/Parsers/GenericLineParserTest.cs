@@ -79,7 +79,7 @@ public class GenericLineParserTest
     [Fact]
     public void GenericLineWithIdentifiedTextIsParsed ()
     {
-        var line = parser.Parse("x|id1|{y}w|id2|");
+        var line = parser.Parse("x|#id1|{y}w|#id2|");
         Assert.Equal("x", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Text);
         Assert.Equal("id1", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Id.Body);
         Assert.Equal("y", ((Expression)(line.Content[0] as MixedValue)![1])!.Body);
@@ -90,7 +90,7 @@ public class GenericLineParserTest
     [Fact]
     public void GenericLineWithUnclosedIdentifiedTextIsParsed ()
     {
-        var line = parser.Parse("x|id1");
+        var line = parser.Parse("x|#id1");
         Assert.Equal("x", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Text);
         Assert.Equal("id1", ((IdentifiedText)(line.Content[0] as MixedValue)![0]).Id.Body);
     }
@@ -98,15 +98,15 @@ public class GenericLineParserTest
     [Fact]
     public void GenericLineWithEscapedIdentifiedTextIsParsed ()
     {
-        var line = parser.Parse("x\\|id1");
-        Assert.Equal("x|id1", (line.Content[0] as MixedValue)![0] as PlainText);
+        var line = parser.Parse("x\\|#id1");
+        Assert.Equal("x|#id1", (line.Content[0] as MixedValue)![0] as PlainText);
     }
 
     [Fact]
     public void PlainTextIdDecoded ()
     {
-        var line = parser.Parse(@""" \{ \} "" \[ \] \|\| \\""");
-        Assert.Equal(@""" { } "" [ ] || \""", (line.Content[0] as MixedValue)![0] as PlainText);
+        var line = parser.Parse(@""" \{ \} "" \[ \] \|#| \\""");
+        Assert.Equal(@""" { } "" [ ] |#| \""", (line.Content[0] as MixedValue)![0] as PlainText);
     }
 
     [Fact]
@@ -128,30 +128,30 @@ public class GenericLineParserTest
     [Fact]
     public void RangesAreAssociatedCorrectly ()
     {
-        var line = parser.Parse("k.h: x|i|{e}[i {e}]");
+        var line = parser.Parse("k.h: x|#i|{e}[i {e}]");
         Assert.Equal(new(0, 5), parser.Resolve(line.Prefix));
         Assert.Equal(new(0, 1), parser.Resolve(line.Prefix?.Author));
         Assert.Equal(new(2, 1), parser.Resolve(line.Prefix?.Appearance));
-        Assert.Equal(new(5, 7), parser.Resolve(line.Content[0] as MixedValue));
-        Assert.Equal(new(5, 4), parser.Resolve((line.Content[0] as MixedValue)![0] as IdentifiedText));
+        Assert.Equal(new(5, 8), parser.Resolve(line.Content[0] as MixedValue));
+        Assert.Equal(new(5, 5), parser.Resolve((line.Content[0] as MixedValue)![0] as IdentifiedText));
         Assert.Equal(new(5, 1), parser.Resolve(((line.Content[0] as MixedValue)![0] as IdentifiedText)!.Text));
-        Assert.Equal(new(6, 3), parser.Resolve(((line.Content[0] as MixedValue)![0] as IdentifiedText)!.Id));
-        Assert.Equal(new(7, 1), parser.Resolve(((line.Content[0] as MixedValue)![0] as IdentifiedText)!.Id.Body));
-        Assert.Equal(new(9, 3), parser.Resolve((line.Content[0] as MixedValue)![1] as Expression));
-        Assert.Equal(new(10, 1), parser.Resolve(((line.Content[0] as MixedValue)![1] as Expression)!.Body));
-        Assert.Equal(new(12, 7), parser.Resolve(line.Content[1] as InlinedCommand));
-        Assert.Equal(new(13, 5), parser.Resolve((line.Content[1] as InlinedCommand)!.Command));
-        Assert.Equal(new(13, 1), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Identifier));
-        Assert.Equal(new(15, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0]));
-        Assert.Equal(new(15, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value));
-        Assert.Equal(new(15, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression));
-        Assert.Equal(new(16, 1), parser.Resolve(((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression)!.Body));
+        Assert.Equal(new(6, 4), parser.Resolve(((line.Content[0] as MixedValue)![0] as IdentifiedText)!.Id));
+        Assert.Equal(new(8, 1), parser.Resolve(((line.Content[0] as MixedValue)![0] as IdentifiedText)!.Id.Body));
+        Assert.Equal(new(10, 3), parser.Resolve((line.Content[0] as MixedValue)![1] as Expression));
+        Assert.Equal(new(11, 1), parser.Resolve(((line.Content[0] as MixedValue)![1] as Expression)!.Body));
+        Assert.Equal(new(13, 7), parser.Resolve(line.Content[1] as InlinedCommand));
+        Assert.Equal(new(14, 5), parser.Resolve((line.Content[1] as InlinedCommand)!.Command));
+        Assert.Equal(new(14, 1), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Identifier));
+        Assert.Equal(new(16, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0]));
+        Assert.Equal(new(16, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value));
+        Assert.Equal(new(16, 3), parser.Resolve((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression));
+        Assert.Equal(new(17, 1), parser.Resolve(((line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as Expression)!.Body));
     }
 
     [Fact]
     public void TextIsIdentifiedCorrectly ()
     {
-        parser.Parse("k.h: foo|f|far{f} [i bar|b| p:nya|n|]");
+        parser.Parse("k.h: foo|#f|far{f} [i bar|#b| p:nya|#n|]");
         Assert.Equal("foo", parser.Identifications["f"]);
         Assert.Equal("bar", parser.Identifications["b"]);
         Assert.Equal("nya", parser.Identifications["n"]);

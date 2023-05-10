@@ -59,7 +59,7 @@ internal class CommandParameterLexer
 
     private bool TryAddTextId ()
     {
-        if (!TextIdentifierLexer.IsDelimiter(state)) return false;
+        if (!TextIdentifierLexer.IsOpening(state)) return false;
         textIdLexer.AddIdentifier(state);
         return true;
     }

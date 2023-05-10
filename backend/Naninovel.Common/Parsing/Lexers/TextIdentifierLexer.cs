@@ -8,17 +8,17 @@ internal class TextIdentifierLexer
     private int startIndex;
     private bool hasBody;
 
-    public static bool IsDelimiter (LexState state)
+    public static bool IsOpening (LexState state)
     {
-        return state.IsUnescaped(TextIdDelimiter[0]);
+        return state.IsUnescaped(TextIdOpen[0]) && state.IsNext(TextIdOpen[1]);
     }
 
     public void AddIdentifier (LexState state)
     {
         Reset(state);
-        AddDelimiter();
+        AddOpening();
         AddBody();
-        if (IsDelimiter(state)) AddDelimiter();
+        if (IsClosing()) AddClosing();
         AddIdentifier();
         CheckMissingBody();
     }
@@ -30,9 +30,16 @@ internal class TextIdentifierLexer
         hasBody = false;
     }
 
-    private void AddDelimiter ()
+    private void AddOpening ()
     {
-        state.AddToken(TokenType.TextIdDelimiter, state.Index, 1);
+        state.AddToken(TokenType.TextIdOpen, state.Index, 2);
+        state.Move();
+        state.Move();
+    }
+
+    private void AddClosing ()
+    {
+        state.AddToken(TokenType.TextIdClose, state.Index, 1);
         state.Move();
     }
 
@@ -44,7 +51,7 @@ internal class TextIdentifierLexer
         var bodyLength = state.Index - bodyStart;
         state.AddToken(TokenType.TextIdBody, bodyStart, bodyLength);
 
-        bool IsInside () => !state.EndReached && !IsDelimiter(state) && state.IsNotSpace;
+        bool IsInside () => !state.EndReached && !IsClosing() && state.IsNotSpace;
 
         void Move ()
         {
@@ -65,4 +72,6 @@ internal class TextIdentifierLexer
         var length = state.Index - startIndex;
         state.AddError(ErrorType.MissingTextIdBody, startIndex, length);
     }
+
+    private bool IsClosing () => state.Is(TextIdClose[0]);
 }

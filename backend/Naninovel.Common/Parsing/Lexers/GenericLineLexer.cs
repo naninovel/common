@@ -121,7 +121,7 @@ internal class GenericLineLexer
 
     private bool TryAddTextId ()
     {
-        if (!TextIdentifierLexer.IsDelimiter(state)) return false;
+        if (!TextIdentifierLexer.IsOpening(state)) return false;
         textIdLexer.AddIdentifier(state);
         lastNotSpace = state.Index - 1;
         return true;

@@ -87,7 +87,7 @@ public class CommandLineParserTest
     [Fact]
     public void WhenMissingTextIdBodyErrorIsAdded ()
     {
-        parser.Parse("@c ||");
+        parser.Parse("@c |#|");
         Assert.True(parser.HasError(MissingTextIdBody));
     }
 
@@ -110,7 +110,7 @@ public class CommandLineParserTest
     [Fact]
     public void IdentifiedTextParsedCorrectly ()
     {
-        var line = parser.Parse("@c 1|id1|2|id2| p:3|id3|");
+        var line = parser.Parse("@c 1|#id1|2|#id2| p:3|#id3|");
         Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
         Assert.Equal("id1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
         Assert.Equal("2", ((IdentifiedText)line.Command.Parameters[0].Value[1]).Text);
@@ -122,7 +122,7 @@ public class CommandLineParserTest
     [Fact]
     public void UnclosedIdentifiedTextParsedCorrectly ()
     {
-        var line = parser.Parse("@c 1|id1");
+        var line = parser.Parse("@c 1|#id1");
         Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
         Assert.Equal("id1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
     }
@@ -130,7 +130,7 @@ public class CommandLineParserTest
     [Fact]
     public void EmptyIdentifiedTextParsedCorrectly ()
     {
-        var line = parser.Parse("@c ||");
+        var line = parser.Parse("@c |#|");
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
     }
@@ -138,7 +138,7 @@ public class CommandLineParserTest
     [Fact]
     public void UnclosedEmptyIdentifiedTextParsedCorrectly ()
     {
-        var line = parser.Parse("@c |");
+        var line = parser.Parse("@c |#");
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
     }
@@ -146,7 +146,7 @@ public class CommandLineParserTest
     [Fact]
     public void EmptyAndUnclosedIdentifiedTextsParsedCorrectly ()
     {
-        var line = parser.Parse("@c 1||2|id2");
+        var line = parser.Parse("@c 1|#|2|#id2");
         Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Id.Body);
         Assert.Equal("2", ((IdentifiedText)line.Command.Parameters[0].Value[1]).Text);
@@ -156,9 +156,9 @@ public class CommandLineParserTest
     [Fact]
     public void EscapedTextIdentifierParsedCorrectly ()
     {
-        var line = parser.Parse("@c 1\\|id1\\|");
+        var line = parser.Parse("@c 1\\|#id1|");
         Assert.Single(line.Command.Parameters[0].Value);
-        Assert.Equal("1|id1|", line.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Equal("1|#id1|", line.Command.Parameters[0].Value[0] as PlainText);
     }
 
     [Fact]
@@ -234,27 +234,27 @@ public class CommandLineParserTest
     [Fact]
     public void RangesAreAssociatedCorrectly ()
     {
-        var line = parser.Parse("@c v|i| p:v{x}");
-        Assert.Equal(new(1, 13), parser.Resolve(line.Command));
+        var line = parser.Parse("@c v|#i| p:v{x}");
+        Assert.Equal(new(1, 14), parser.Resolve(line.Command));
         Assert.Equal(new(1, 1), parser.Resolve(line.Command.Identifier));
-        Assert.Equal(new(3, 4), parser.Resolve(line.Command.Parameters[0]));
-        Assert.Equal(new(3, 4), parser.Resolve(line.Command.Parameters[0].Value));
-        Assert.Equal(new(3, 4), parser.Resolve(line.Command.Parameters[0].Value[0] as IdentifiedText));
+        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0]));
+        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value));
+        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value[0] as IdentifiedText));
         Assert.Equal(new(3, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Text));
-        Assert.Equal(new(4, 3), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id));
-        Assert.Equal(new(5, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id.Body));
-        Assert.Equal(new(8, 6), parser.Resolve(line.Command.Parameters[1]));
-        Assert.Equal(new(8, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
-        Assert.Equal(new(10, 4), parser.Resolve(line.Command.Parameters[1].Value));
-        Assert.Equal(new(10, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
-        Assert.Equal(new(11, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
-        Assert.Equal(new(12, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
+        Assert.Equal(new(4, 4), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id));
+        Assert.Equal(new(6, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id.Body));
+        Assert.Equal(new(9, 6), parser.Resolve(line.Command.Parameters[1]));
+        Assert.Equal(new(9, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
+        Assert.Equal(new(11, 4), parser.Resolve(line.Command.Parameters[1].Value));
+        Assert.Equal(new(11, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
+        Assert.Equal(new(12, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
+        Assert.Equal(new(13, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
     }
 
     [Fact]
     public void TextIsIdentifiedCorrectly ()
     {
-        parser.Parse("@c foo|f|far{f} p:bar|b|nya|n|");
+        parser.Parse("@c foo|#f|far{f} p:bar|#b|nya|#n|");
         Assert.Equal("foo", parser.Identifications["f"]);
         Assert.Equal("bar", parser.Identifications["b"]);
         Assert.Equal("nya", parser.Identifications["n"]);
