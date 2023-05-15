@@ -26,6 +26,7 @@
     <ItemGroup>
         <ProjectReference Include="../Naninovel.Common.Modern/Naninovel.Common.Modern.csproj"/>
         <ProjectReference Include="../Naninovel.Common.Bindings/Naninovel.Common.Bindings.csproj"/>
+        <ProjectReference Include="../Naninovel.Common.TestUtilities/Naninovel.Common.TestUtilities.csproj"/>
     </ItemGroup>
 
 </Project>

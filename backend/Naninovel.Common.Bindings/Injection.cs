@@ -6,7 +6,7 @@ using System.Reflection;
 using DotNetJS;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Naninovel.Common.Bindings;
+namespace Naninovel.Bindings;
 
 public static class Injection
 {

@@ -32,7 +32,7 @@ public class ParseError
     public ParseError (Token token)
     {
         Message = LexingErrors.GetFor(token.Error);
-        StartIndex = token.StartIndex;
+        StartIndex = token.Start;
         Length = token.Length;
     }
 }

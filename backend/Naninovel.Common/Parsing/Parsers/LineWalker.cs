@@ -32,7 +32,7 @@ internal class LineWalker
 
     public string Extract (Token token)
     {
-        return Extract(token.StartIndex, token.Length);
+        return Extract(token.Start, token.Length);
     }
 
     public void Error (string message)
@@ -45,7 +45,7 @@ internal class LineWalker
         handlers.ErrorHandler?.HandleError(new(token));
     }
 
-    public void Associate (ILineComponent component, LineRange range)
+    public void Associate (ILineComponent component, InlineRange range)
     {
         handlers.RangeAssociator?.Associate(component, range);
     }

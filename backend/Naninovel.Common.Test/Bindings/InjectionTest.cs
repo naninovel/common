@@ -3,7 +3,6 @@ using DotNetJS;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Naninovel.Bindings.Test;
-using Naninovel.Common.Bindings;
 using Naninovel.Observing.Test;
 using Xunit;
 

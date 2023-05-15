@@ -89,7 +89,7 @@ public class GenericLineParser
     {
         valueParser.ClearAddedExpressions();
         prefix = new GenericPrefix(authorId!, authorAppearance);
-        walker.Associate(prefix, new LineRange(0, authorAssignToken.EndIndex + 1));
+        walker.Associate(prefix, new InlineRange(0, authorAssignToken.EndIndex + 1));
     }
 
     private void ParseGenericText (Token textToken)

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using DotNetJS;
-using Naninovel.Common.Bindings;
+using Naninovel.Bindings;
 
 [assembly: JSNamespace(Utilities.NamespacePattern, Utilities.NamespaceReplacement)]
 
-namespace Naninovel.Common.Bindings;
+namespace Naninovel.Bindings;
 
 public static class Utilities
 {

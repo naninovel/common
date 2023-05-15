@@ -27,7 +27,7 @@ public class HandlersTest
     public void MapperMapsRangeOnAssociation ()
     {
         var component = new Mock<ILineComponent>().Object;
-        var range = new LineRange();
+        var range = new InlineRange();
         var mapper = new RangeMapper();
         mapper.Associate(component, range);
         Assert.True(mapper.TryResolve(component, out var result));
@@ -38,7 +38,7 @@ public class HandlersTest
     public void WhenClearedMapperLosesAssociations ()
     {
         var component = new Mock<ILineComponent>().Object;
-        var range = new LineRange();
+        var range = new InlineRange();
         var mapper = new RangeMapper();
         mapper.Associate(component, range);
         mapper.Clear();
@@ -49,14 +49,14 @@ public class HandlersTest
     public void CanEnumerateOverMapper ()
     {
         var component = new Mock<ILineComponent>().Object;
-        var range = new LineRange();
+        var range = new InlineRange();
         var mapper = new RangeMapper();
         mapper.Associate(component, range);
 
         var enumerator = ((IEnumerable)mapper).GetEnumerator();
         enumerator.MoveNext();
-        Assert.Equal(component, ((KeyValuePair<ILineComponent, LineRange>)enumerator.Current!).Key);
-        Assert.Equal(range, ((KeyValuePair<ILineComponent, LineRange>)enumerator.Current!).Value);
+        Assert.Equal(component, ((KeyValuePair<ILineComponent, InlineRange>)enumerator.Current!).Key);
+        Assert.Equal(range, ((KeyValuePair<ILineComponent, InlineRange>)enumerator.Current!).Value);
 
         foreach (var kv in mapper)
         {

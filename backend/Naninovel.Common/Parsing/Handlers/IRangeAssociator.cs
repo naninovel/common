@@ -9,5 +9,5 @@ public interface IRangeAssociator
     /// <summary>
     /// Handles association between the provided component and range.
     /// </summary>
-    void Associate (ILineComponent component, LineRange range);
+    void Associate (ILineComponent component, InlineRange range);
 }

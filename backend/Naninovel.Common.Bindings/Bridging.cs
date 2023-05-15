@@ -7,9 +7,9 @@ using DotNetJS;
 using Microsoft.JSInterop;
 using Naninovel.Bridging;
 using Naninovel.Metadata;
-using static Naninovel.Common.Bindings.JSLogger;
+using static Naninovel.Bindings.JSLogger;
 
-namespace Naninovel.Common.Bindings.Bridging;
+namespace Naninovel.Bindings.Bridging;
 
 public static partial class Bridging
 {

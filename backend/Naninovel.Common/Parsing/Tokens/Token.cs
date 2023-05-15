@@ -6,19 +6,19 @@ public readonly struct Token : IEquatable<Token>
 {
     public readonly TokenType Type;
     public readonly ErrorType Error;
-    public readonly LineRange Range;
+    public readonly InlineRange Range;
 
-    public int StartIndex => Range.StartIndex;
-    public int EndIndex => Range.EndIndex;
+    public int Start => Range.Start;
+    public int EndIndex => Range.End;
     public int Length => Range.Length;
 
     public Token (TokenType type, int startIndex, int length)
-        : this(type, default, new LineRange(startIndex, length)) { }
+        : this(type, default, new InlineRange(startIndex, length)) { }
 
     public Token (ErrorType error, int startIndex, int length)
         : this(TokenType.Error, error, new(startIndex, length)) { }
 
-    private Token (TokenType type, ErrorType error, LineRange range)
+    private Token (TokenType type, ErrorType error, InlineRange range)
     {
         Type = type;
         Error = error;

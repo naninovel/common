@@ -1,10 +1,10 @@
 ﻿using System;
 using DotNetJS;
-using static Naninovel.Common.Bindings.Utilities;
+using static Naninovel.Bindings.Utilities;
 
 [assembly: JSNamespace(NamespacePattern, NamespaceReplacement)]
 
-namespace Naninovel.Common.WASM;
+namespace Naninovel.WASM;
 
 public static class Program
 {
