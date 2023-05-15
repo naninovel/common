@@ -4,7 +4,7 @@ using Naninovel.Parsing;
 namespace Naninovel.Metadata;
 
 /// <summary>
-/// Allows resolving navigation endpoint (script name and/or label) from parsed commands.
+/// Allows resolving <see cref="Endpoint"/> from parsed commands.
 /// </summary>
 public class EndpointResolver
 {
@@ -21,18 +21,14 @@ public class EndpointResolver
     /// returns true and assigns related out arguments; returns false otherwise.
     /// </summary>
     /// <param name="command">Command to extract the endpoint from.</param>
-    /// <param name="script">When found, assigns script name to the argument; null otherwise.</param>
-    /// <param name="label">When found, assigns label to the argument; null otherwise.</param>
+    /// <param name="endpoint">When found, assigns the endpoint; default otherwise.</param>
     /// <returns>Whether script name and/or label were found in one of the command parameters.</returns>
-    public bool TryResolve (Parsing.Command command, out string? script, out string? label)
+    public bool TryResolve (Parsing.Command command, out Endpoint endpoint)
     {
-        script = null;
-        label = null;
-
         foreach (var parameter in command.Parameters)
-            if (TryResolve(parameter, command.Identifier, out script, out label))
+            if (TryResolve(parameter, command.Identifier, out endpoint))
                 return true;
-
+        endpoint = default;
         return false;
     }
 
@@ -42,20 +38,17 @@ public class EndpointResolver
     /// </summary>
     /// <param name="parameter">Parameter to extract the endpoint from.</param>
     /// <param name="commandAliasOrId">Identifier or alias of the command which the parameter is associated with.</param>
-    /// <param name="script">When found, assigns script name to the argument; null otherwise.</param>
-    /// <param name="label">When found, assigns label to the argument; null otherwise.</param>
+    /// <param name="endpoint">When found, assigns the endpoint; default otherwise.</param>
     /// <returns>Whether script name and/or label were found in one of the command parameters.</returns>
-    public bool TryResolve (Parsing.Parameter parameter, string commandAliasOrId, out string? script, out string? label)
+    public bool TryResolve (Parsing.Parameter parameter, string commandAliasOrId, out Endpoint endpoint)
     {
-        script = null;
-        label = null;
-
         if (HasEndpointContext(commandAliasOrId, parameter.Identifier))
         {
-            (script, label) = namedParser.Parse(parameter.Value.ToString());
+            var (script, label) = namedParser.Parse(parameter.Value.ToString());
+            endpoint = new Endpoint(script, label);
             return true;
         }
-
+        endpoint = default;
         return false;
     }
 

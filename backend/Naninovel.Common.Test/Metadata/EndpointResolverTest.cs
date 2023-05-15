@@ -14,9 +14,22 @@ public class EndpointResolverTest
     }
 
     [Fact]
+    public void EndpointHashingIsCorrect ()
+    {
+        Assert.True(new Endpoint(null, null).Equals(new(null, null)));
+        Assert.True(new Endpoint("foo", "bar").Equals(new("foo", "bar")));
+        Assert.False(new Endpoint(null, "foo").Equals(new(null, null)));
+        Assert.False(new Endpoint("foo", null).Equals(new(null, null)));
+        Assert.False(new Endpoint("foo", "bar").Equals(new("bar", "foo")));
+        Assert.False(new Endpoint().Equals(null));
+        Assert.Equal(new Endpoint().GetHashCode(), new Endpoint().GetHashCode());
+        Assert.Equal(new Endpoint("foo", "bar").GetHashCode(), new Endpoint("foo", "bar").GetHashCode());
+    }
+
+    [Fact]
     public void WhenUnknownCommandReturnsFalse ()
     {
-        Assert.False(resolver.TryResolve(new("c"), out _, out _));
+        Assert.False(resolver.TryResolve(new("c"), out _));
     }
 
     [Fact]
@@ -25,7 +38,7 @@ public class EndpointResolverTest
         meta.Update(new() {
             Commands = new[] { new Command { Id = "c" } }
         });
-        Assert.False(resolver.TryResolve(new("c"), out _, out _));
+        Assert.False(resolver.TryResolve(new("c"), out _));
     }
 
     [Fact]
@@ -34,7 +47,7 @@ public class EndpointResolverTest
         meta.Update(new() {
             Commands = new[] { new Command { Id = "c", Parameters = new[] { new Parameter { Id = "p" } } } }
         });
-        Assert.False(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("v") }) }), out _, out _));
+        Assert.False(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("v") }) }), out _));
     }
 
     [Fact]
@@ -43,8 +56,8 @@ public class EndpointResolverTest
         meta.Update(new() {
             Commands = new[] { new Command { Id = "c", Parameters = new[] { CreateEndpointParameterMeta("p") } } }
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s") }) }), out var script, out _));
-        Assert.Equal("s", script);
+        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s") }) }), out var point));
+        Assert.Equal("s", point.Script);
     }
 
     [Fact]
@@ -53,8 +66,8 @@ public class EndpointResolverTest
         meta.Update(new() {
             Commands = new[] { new Command { Id = "c", Parameters = new[] { CreateEndpointParameterMeta("p") } } }
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText(".l") }) }), out _, out var label));
-        Assert.Equal("l", label);
+        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText(".l") }) }), out var point));
+        Assert.Equal("l", point.Label);
     }
 
     [Fact]
@@ -63,9 +76,9 @@ public class EndpointResolverTest
         meta.Update(new() {
             Commands = new[] { new Command { Id = "c", Parameters = new[] { CreateEndpointParameterMeta("p") } } }
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s.l") }) }), out var script, out var label));
-        Assert.Equal("s", script);
-        Assert.Equal("l", label);
+        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s.l") }) }), out var point));
+        Assert.Equal("s", point.Script);
+        Assert.Equal("l", point.Label);
     }
 
     private Parameter CreateEndpointParameterMeta (string id)

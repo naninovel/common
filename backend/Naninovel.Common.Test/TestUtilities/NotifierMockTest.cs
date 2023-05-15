@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
 using Xunit;
@@ -26,19 +25,17 @@ public class NotifierMockTest
     public void InvokesHandleOnNotify ()
     {
         var handle = new Mock<Action<IMockObserver>>();
-        Func<IEnumerable<IMockObserver>, IEnumerable<IMockObserver>> order = o => o;
-        notifier.Notify(handle.Object, order);
+        notifier.Notify(handle.Object);
         handle.Verify(h => h.Invoke(It.IsAny<IMockObserver>()), Times.Once);
-        notifier.Mock.Verify(n => n.Notify(handle.Object, order), Times.Once);
+        notifier.Mock.Verify(n => n.Notify(handle.Object, null), Times.Once);
     }
 
     [Fact]
     public async Task InvokesHandleAsyncOnNotify ()
     {
         var handleAsync = new Mock<Func<IMockObserver, Task>>();
-        Func<IEnumerable<IMockObserver>, IEnumerable<IMockObserver>> order = o => o;
-        await notifier.NotifyAsync(handleAsync.Object, order);
+        await notifier.NotifyAsync(handleAsync.Object);
         handleAsync.Verify(h => h.Invoke(It.IsAny<IMockObserver>()), Times.Once);
-        notifier.Mock.Verify(n => n.NotifyAsync(handleAsync.Object, order), Times.Once);
+        notifier.Mock.Verify(n => n.NotifyAsync(handleAsync.Object, null), Times.Once);
     }
 }
