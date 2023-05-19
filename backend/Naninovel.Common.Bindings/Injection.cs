@@ -30,9 +30,9 @@ public static class Injection
 
     public static IServiceCollection AddObserving<TObserver> (this IServiceCollection services)
     {
-        var observers = new HashSet<TObserver>();
-        services.AddSingleton<IObserverRegistry<TObserver>>(new ObserverRegistry<TObserver>(observers));
-        services.AddSingleton<IObserverNotifier<TObserver>>(new ObserverNotifier<TObserver>(observers));
+        var registry = new ObserverRegistry<TObserver>();
+        services.AddSingleton<IObserverRegistry<TObserver>>(registry);
+        services.AddSingleton<IObserverNotifier<TObserver>>(new ObserverNotifier<TObserver>(registry));
         return services;
     }
 
