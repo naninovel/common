@@ -142,6 +142,14 @@ public static class LexerTestData
             ParamValue(21, 29), NamedParam(19, 31), CommandBody(1, 49)
         ),
         T(
+            "@c \"x{x }x\"",
+            LineId(0, 1), CommandId(1, 1),
+            ExpressionOpen(5, 1), ExpressionBody(6, 2),
+            ExpressionClose(8, 1), Expression(5, 4),
+            ParamValue(3, 8), NamelessParam(3, 8),
+            CommandBody(1, 10)
+        ),
+        T(
             "@c p:{ d ? v : n ",
             LineId(0, 1), CommandId(1, 1),
             ParamId(3, 1), ParamAssign(4, 1),
