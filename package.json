@@ -1,6 +1,6 @@
 {
     "name": "@naninovel/common",
-    "version": "1.0.21",
+    "version": "1.0.22",
     "description": "Systems used by multiple consumers: runtime, editor, language server, etc.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -12,19 +12,21 @@
         "coverageReporters": ["text", "cobertura"]
     },
     "scripts": {
+        "update": "ncu --interactive",
         "test": "jest --silent=true",
         "cover": "npm test -- --coverage",
         "build": "webpack --mode production && tsc --outDir ./dist --declaration --emitDeclarationOnly",
         "publish-npm": "npm publish --access public"
     },
     "devDependencies": {
-        "typescript": "^5.0.4",
-        "ts-jest": "^29.1.0",
-        "ts-loader": "^9.4.3",
-        "@types/jest": "^29.5.1",
-        "@types/node": "^20.2.3",
-        "webpack": "^5.83.1",
-        "webpack-cli": "^5.1.1",
-        "backend": "file:./backend"
+        "backend": "file:./backend",
+        "typescript": "^5.1.6",
+        "ts-jest": "^29.1.1",
+        "ts-loader": "^9.4.4",
+        "@types/jest": "^29.5.3",
+        "@types/node": "^20.4.5",
+        "webpack": "^5.88.2",
+        "webpack-cli": "^5.1.4",
+        "npm-check-updates": "^16.10.17"
     }
 }

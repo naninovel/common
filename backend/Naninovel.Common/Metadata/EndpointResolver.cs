@@ -17,6 +17,20 @@ public class EndpointResolver
     }
 
     /// <summary>
+    /// Builds constant expression for label component of endpoint parameter.
+    /// </summary>
+    /// <param name="paramId">ID of the parameter the expression is built for.</param>
+    /// <remarks>
+    /// Endpoints are expected to be named parameters where name component is script
+    /// name and value is the label. The expression will first attempt to get script name
+    /// from the parameter and fallback to currently edited script when it's not specified.
+    /// </remarks>
+    public static string BuildEndpointExpression (string paramId)
+    {
+        return $"Labels/{{:{paramId}[0]??$Script}}";
+    }
+
+    /// <summary>
     /// When specified command has a parameter with navigation context (script name and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
     /// </summary>
@@ -54,7 +68,7 @@ public class EndpointResolver
 
     private bool HasEndpointContext (string commandAliasOrId, string? paramAliasOrId)
     {
-        return provider.FindParameter(commandAliasOrId, paramAliasOrId ?? "")
-            ?.ValueContext?.ElementAtOrDefault(1)?.SubType == Constants.LabelExpression;
+        var param = provider.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
+        return param != null && param.ValueContext?.ElementAtOrDefault(1)?.SubType == BuildEndpointExpression(param.Id);
     }
 }

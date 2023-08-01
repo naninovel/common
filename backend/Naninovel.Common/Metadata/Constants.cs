@@ -17,9 +17,4 @@ public static class Constants
     /// Flag representing any type.
     /// </summary>
     public const string WildcardType = "*";
-    /// <summary>
-    /// Name expression assigned to named value of constant parameter context to
-    /// identify label component of endpoint resolved via <see cref="EndpointResolver"/>.
-    /// </summary>
-    public const string LabelExpression = "Labels/{:Path[0]??$Script}";
 }
