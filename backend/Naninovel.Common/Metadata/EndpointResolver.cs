@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Naninovel.Parsing;
+﻿using Naninovel.Parsing;
 
 namespace Naninovel.Metadata;
 
@@ -69,6 +68,10 @@ public class EndpointResolver
     private bool HasEndpointContext (string commandAliasOrId, string? paramAliasOrId)
     {
         var param = provider.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
-        return param != null && param.ValueContext?.ElementAtOrDefault(1)?.SubType == BuildEndpointExpression(param.Id);
+        if (param?.ValueContext is null || param.ValueContext.Length < 2) return false;
+        return param.ValueContext[0]?.Type == ValueContextType.Resource &&
+               param.ValueContext[0]?.SubType == Constants.ScriptsType &&
+               param.ValueContext[1]?.Type == ValueContextType.Constant &&
+               param.ValueContext[1]?.SubType == BuildEndpointExpression(param.Id);
     }
 }
