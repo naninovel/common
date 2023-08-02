@@ -41,7 +41,7 @@ public class Parameter
     /// Multiple elements can be specified to map contexts to specific value indexes,
     /// in case the parameter value is of list or named container types.
     /// </remarks>
-    public ValueContext?[]? ValueContext { get; set; } = default;
+    public ValueContext?[]? ValueContext { get; set; }
     /// <summary>
     /// The value of the parameter has when it's not explicitly specified in script.
     /// </summary>

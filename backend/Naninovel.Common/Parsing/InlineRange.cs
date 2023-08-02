@@ -38,7 +38,7 @@ public readonly struct InlineRange : IEquatable<InlineRange>
         return Start == other.Start && Length == other.Length;
     }
 
-    public override bool Equals (object obj)
+    public override bool Equals (object? obj)
     {
         return obj is InlineRange other && Equals(other);
     }

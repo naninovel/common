@@ -40,7 +40,7 @@ public readonly struct ManagedTextRecord : IEquatable<ManagedTextRecord>
         return Key == other.Key;
     }
 
-    public override bool Equals (object obj)
+    public override bool Equals (object? obj)
     {
         return obj is ManagedTextRecord other && Equals(other);
     }

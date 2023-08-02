@@ -38,7 +38,7 @@ public readonly struct Token : IEquatable<Token>
         return Type == other.Type && Error == other.Error && Range.Equals(other.Range);
     }
 
-    public override bool Equals (object obj)
+    public override bool Equals (object? obj)
     {
         return obj is Token other && Equals(other);
     }
