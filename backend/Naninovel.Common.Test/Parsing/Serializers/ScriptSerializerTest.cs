@@ -180,4 +180,11 @@ public class ScriptSerializerTest
             new GenericLine(Array.Empty<IGenericContent>())
         }));
     }
+
+    [Fact]
+    public void CanSerializeCommandWithEmptyNamelessParameter ()
+    {
+        var line = new CommandLine(new("cmd", new[] { new Parameter(new[] { new PlainText("") }) }));
+        Assert.Equal("@cmd ", serializer.Serialize(line));
+    }
 }
