@@ -152,7 +152,7 @@ public class ScriptSerializer
 
     private string Encode (string value, bool wrap = true)
     {
-        wrap = wrap && (value[0] == '\"' || IsAnySpaceOrUnclosedQuotes());
+        wrap = wrap && !string.IsNullOrEmpty(value) && (value[0] == '\"' || IsAnySpaceOrUnclosedQuotes());
         for (int i = value.Length - 1; i >= 0; i--)
             if (ShouldEscape(i))
                 value = value.Insert(i, "\\");
