@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Naninovel.Bindings;
 
-#pragma warning disable IL2090, IL2060
-
 public static class Injection
 {
     private const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
