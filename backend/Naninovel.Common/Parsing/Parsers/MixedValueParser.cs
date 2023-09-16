@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using static Naninovel.Parsing.Utilities;
 
@@ -37,7 +38,7 @@ internal class MixedValueParser
         expressions.Clear();
     }
 
-    public MixedValue Parse (Token valueToken, LineWalker walker)
+    public MixedValue Parse (Token valueToken, LineWalker walker, bool unescapeAuthor)
     {
         value.Clear();
 
@@ -111,6 +112,7 @@ internal class MixedValueParser
         PlainText ParseText (int length)
         {
             var text = walker.Extract(textStartIndex, length);
+            if (unescapeAuthor) text = UnescapeAuthor(text);
             var plain = new PlainText(UnescapePlain(text, unescapeQuotes));
             walker.Associate(plain, new InlineRange(textStartIndex, length));
             textStartIndex = -1;
@@ -146,5 +148,16 @@ internal class MixedValueParser
             var prev = value[i + 1];
             return unescapeQuotes && prev == '"' || IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
         }
+    }
+
+    private static string UnescapeAuthor (string value)
+    {
+        const string target = $"\\{Identifiers.AuthorAssign}";
+        var targetIndex = value.IndexOf(target, StringComparison.Ordinal);
+        if (targetIndex < 1) return value;
+        for (int i = 0; i < targetIndex; i++)
+            if (char.IsWhiteSpace(value[i]))
+                return value;
+        return value.Remove(targetIndex, 1);
     }
 }

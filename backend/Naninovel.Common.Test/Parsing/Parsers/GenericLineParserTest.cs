@@ -158,17 +158,23 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void CanEscapeAuthorAssign ()
+    public void UnescapesAuthorAssign ()
     {
-        var line = parser.Parse(@"x\: x");
+        var line = parser.Parse(@"x\: x\:\x");
         Assert.Null(line.Prefix);
         Assert.Single(line.Content);
-        Assert.Equal("x: x", (line.Content[0] as MixedValue)![0] as PlainText);
+        Assert.Equal(@"x: x\:\x", (line.Content[0] as MixedValue)![0] as PlainText);
     }
 
     [Fact]
-    public void CanEscapeSlashOverAuthorAssign ()
+    public void PreservesEscapedSlashBeforeAuthorAssign ()
     {
         Assert.Equal(@"x\: x", (parser.Parse(@"x\\: x").Content[0] as MixedValue)![0] as PlainText);
+    }
+
+    [Fact]
+    public void DoesntUnescapeWhenNotAuthorAssign ()
+    {
+        Assert.Equal(@"x \: x\:\x", (parser.Parse(@"x \: x\:\x").Content[0] as MixedValue)![0] as PlainText);
     }
 }

@@ -131,24 +131,28 @@ public class ScriptSerializerTest
             new IdentifiedText("|#", new("id")),
             new IdentifiedText("", new("")),
             new PlainText(@"[]\ ")
-        }, false));
+        }, new() { ParameterValue = false, FirstGenericContent = false }));
         Assert.Equal(@"""\""\{\}{x < y}\[\]\\ """, serializer.Serialize(new IValueComponent[] {
             new PlainText(@"""{}"),
             new Expression("x < y"),
             new PlainText(@"[]\ ")
-        }, true));
+        }, new() { ParameterValue = true, FirstGenericContent = false }));
     }
 
     [Fact]
     public void WhenStartingWithQuotesWithWrapEnabledValueIsWrapped ()
     {
-        Assert.Equal(@"""\""x\""""", serializer.Serialize(new[] { new PlainText(@"""x""") }, true));
+        Assert.Equal(@"""\""x\""""", serializer.Serialize(new[] {
+            new PlainText(@"""x""")
+        }, new() { ParameterValue = true, FirstGenericContent = false }));
     }
 
     [Fact]
     public void WhenStartingWithQuotesWithWrapDisabledValueIsNotWrapped ()
     {
-        Assert.Equal(@"""x""", serializer.Serialize(new[] { new PlainText(@"""x""") }, false));
+        Assert.Equal(@"""x""", serializer.Serialize(new[] {
+            new PlainText(@"""x""")
+        }, new() { ParameterValue = false, FirstGenericContent = false }));
     }
 
     [Fact]
@@ -160,7 +164,7 @@ public class ScriptSerializerTest
             new PlainText(@"\""{ "" }\"""),
             new Expression(@" "" "),
             new PlainText(@" { x } ")
-        }, true));
+        }, new() { ParameterValue = true, FirstGenericContent = false }));
     }
 
     [Fact]
@@ -168,7 +172,7 @@ public class ScriptSerializerTest
     {
         Assert.Equal(@"""a=\"" \\\"" \"";b=\"" \\\"" \""""", serializer.Serialize(new IValueComponent[] {
             new PlainText(@"a="" \"" "";b="" \"" """)
-        }, true));
+        }, new() { ParameterValue = true, FirstGenericContent = false }));
     }
 
     [Fact]
@@ -186,5 +190,16 @@ public class ScriptSerializerTest
     {
         var line = new CommandLine(new("cmd", new[] { new Parameter(new[] { new PlainText("") }) }));
         Assert.Equal("@cmd ", serializer.Serialize(line));
+    }
+
+    [Fact]
+    public void CanSerializeEscapedAuthorAssign ()
+    {
+        Assert.Equal("x\\: x:x :x\n", serializer.Serialize(new IScriptLine[] {
+            new GenericLine(new[] { new MixedValue(new[] { new PlainText("x: x:x :x") }) }),
+        }));
+        Assert.Equal("x : x\n", serializer.Serialize(new IScriptLine[] {
+            new GenericLine(new[] { new MixedValue(new[] { new PlainText("x : x") }) })
+        }));
     }
 }

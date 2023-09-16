@@ -10,7 +10,6 @@ internal static class Utilities
         if (ch == ExpressionOpen[0] || ch == ExpressionClose[0]) return true;
         if (ch == InlinedOpen[0] || ch == InlinedClose[0]) return true;
         if (ch == TextIdOpen[0] && next == TextIdOpen[1]) return true;
-        if (ch == AuthorAssign[0]) return true;
         return false;
     }
 

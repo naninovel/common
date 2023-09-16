@@ -100,7 +100,7 @@ internal class CommandParser
 
     private void ParseParameterValue (Token valueToken)
     {
-        paramValue = new MixedValue(valueParser.Parse(valueToken, walker));
+        paramValue = new MixedValue(valueParser.Parse(valueToken, walker, false));
         walker.Associate(paramValue, valueToken);
         walker.Identify(paramValue);
     }

@@ -94,7 +94,7 @@ public class GenericLineParser
 
     private void ParseGenericText (Token textToken)
     {
-        var text = valueParser.Parse(textToken, walker);
+        var text = valueParser.Parse(textToken, walker, content.Count == 0);
         content.Add(text);
         walker.Associate(text, textToken);
         walker.Identify(text);
