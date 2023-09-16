@@ -276,15 +276,15 @@ public static class LexerTestData
             GenericText(1, 1)
         ),
         T(
-            "\\; x",
+            @"\; x",
             GenericText(0, 4)
         ),
         T(
-            "\\# x",
+            @"\# x",
             GenericText(0, 4)
         ),
         T(
-            "\\@ x",
+            @"\@ x",
             GenericText(0, 4)
         ),
         T(
@@ -313,7 +313,7 @@ public static class LexerTestData
             Expression(0, 4), GenericText(0, 4)
         ),
         T(
-            "\\{{a}\\}b",
+            @"\{{a}\}b",
             ExpressionOpen(2, 1), ExpressionBody(3, 1), ExpressionClose(4, 1),
             Expression(2, 3), GenericText(0, 8)
         ),
