@@ -121,7 +121,7 @@ public class GenericLineParserTest
     [Fact]
     public void ExpressionsInPrefixAreNotSupported ()
     {
-        parser.Parse(@"{name}: My favourite drink is {drink}!");
+        parser.Parse("{name}: My favourite drink is {drink}!");
         Assert.True(parser.HasError(ExpressionInGenericPrefix));
     }
 
@@ -155,5 +155,15 @@ public class GenericLineParserTest
         Assert.Equal("foo", parser.Identifications["f"]);
         Assert.Equal("bar", parser.Identifications["b"]);
         Assert.Equal("nya", parser.Identifications["n"]);
+    }
+
+    [Fact]
+    public void CanEscapeAuthorAssign ()
+    {
+        var line = parser.Parse("x\\: x");
+        Assert.Empty(parser.Errors);
+        Assert.Null(line.Prefix);
+        Assert.Single(line.Content);
+        Assert.Equal("x\\: x", (line.Content[0] as MixedValue)![0] as PlainText);
     }
 }
