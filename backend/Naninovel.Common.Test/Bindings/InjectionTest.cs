@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using DotNetJS;
+using Bootsharp;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Naninovel.Bindings.Test;

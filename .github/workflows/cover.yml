@@ -10,15 +10,18 @@ jobs:
   cover:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: setup dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
       - name: cover
         run: |
-          dotnet test backend/Naninovel.Common.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-          dotnet publish backend/Naninovel.Common.WASM/Naninovel.Common.WASM.csproj
+          dotnet test backend /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet publish backend
           npm ci
           npm run build
           npm run cover

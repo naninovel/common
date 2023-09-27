@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
-using DotNetJS;
-using Naninovel.Bindings;
-
-[assembly: JSNamespace(Utilities.NamespacePattern, Utilities.NamespaceReplacement)]
+using Bootsharp;
 
 namespace Naninovel.Bindings;
 
@@ -11,14 +7,6 @@ public static class Utilities
 {
     public const string NamespacePattern = @".*?([^\.]+?)(?:UI)?$";
     public const string NamespaceReplacement = "$1";
-
-    public static void ConfigureJson ()
-    {
-        JS.Runtime.ConfigureJson(options => {
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.Converters.Add(new JsonStringEnumConverter());
-        });
-    }
 
     public static void Try (Action action)
     {

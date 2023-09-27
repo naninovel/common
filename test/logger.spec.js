@@ -1,4 +1,5 @@
 ﻿import { Bindings } from "backend";
+import { test, expect, vi } from "vitest";
 import { injectLogger, log, warn, error } from "../src";
 
 test("can log without injecting", () => {
@@ -30,9 +31,9 @@ test("when only info logger is injected, others re-use it", () => {
 });
 
 test("bindings are assigned when injected", () => {
-    const log = jest.fn(), warn = jest.fn(), err = jest.fn();
+    const log = vi.fn(), warn = vi.fn(), err = vi.fn();
     injectLogger(log, warn, err);
-    expect(Bindings.logInfo).toEqual(log);
-    expect(Bindings.logWarning).toEqual(warn);
-    expect(Bindings.logError).toEqual(err);
+    expect(Bindings.$logInfo).toEqual(log);
+    expect(Bindings.$logWarning).toEqual(warn);
+    expect(Bindings.$logError).toEqual(err);
 });

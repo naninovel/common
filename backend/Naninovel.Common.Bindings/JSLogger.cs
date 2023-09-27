@@ -1,4 +1,4 @@
-﻿using DotNetJS;
+﻿using Bootsharp;
 
 namespace Naninovel.Bindings;
 
