@@ -1,4 +1,4 @@
-﻿import { Metadata } from "backend";
+import { Metadata } from "backend";
 
 export function getDefaultMetadata(): Metadata.Project {
     const json = require("../assets/default-metadata.json");

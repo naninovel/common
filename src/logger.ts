@@ -1,4 +1,4 @@
-﻿import { Bindings } from "backend";
+import { Bindings } from "backend";
 
 let injectedLog: (message: string) => void;
 let injectedWarn: (message: string) => void;
