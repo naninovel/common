@@ -9,10 +9,10 @@
         "backend": "dotnet publish backend",
         "update": "ncu --interactive",
         "test": "vitest run",
-        "cover": "npm test -- --coverage",
+        "cover": "npm test -- --coverage.enabled --coverage.include=**/src/**",
         "bundle": "esbuild src/index.ts --bundle --outfile=dist/index.mjs --format=esm --external:backend",
-        "types": "tsc --outDir dist --declaration --emitDeclarationOnly --resolveJsonModule false",
-        "build": "npm run bundle && npm run types",
+        "types": "tsc --outDir dist --declaration --emitDeclarationOnly",
+        "build": "rimraf dist && npm run bundle && npm run types",
         "publish-npm": "npm publish --access public"
     },
     "devDependencies": {
@@ -20,7 +20,8 @@
         "typescript": "^5.2.2",
         "vitest": "^0.34.5",
         "@vitest/coverage-v8": "^0.34.5",
-        "esbuild": "^0.19.3",
+        "esbuild": "^0.19.4",
+        "rimraf": "^5.0.5",
         "npm-check-updates": "^16.14.4"
     }
 }

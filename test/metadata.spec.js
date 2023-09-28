@@ -1,15 +1,16 @@
-﻿import { test, expect, vi } from "vitest";
+import { expect, test } from "vitest";
 import { getDefaultMetadata, mergeMetadata } from "../src";
+import { Module } from "node:module";
 
-// test("can provide default when object", async () => {
-//     vi.doMock("../assets/default-metadata.json", () => ({ variables: ["foo"] }));
-//     expect(getDefaultMetadata().variables).toContain("foo");
-// });
-//
-// test("can provide default when json", async () => {
-//     vi.doMock("../assets/default-metadata.json", () => "{ \"variables\": [\"bar\"] }");
-//     expect(getDefaultMetadata().variables).toContain("bar");
-// });
+test("can provide default when object", async () => {
+    mock("../assets/default-metadata.json", { variables: ["foo"] });
+    expect(getDefaultMetadata().variables).toContain("foo");
+});
+
+test("can provide default when json", async () => {
+    mock("../assets/default-metadata.json", "{ \"variables\": [\"bar\"] }");
+    expect(getDefaultMetadata().variables).toContain("bar");
+});
 
 test("can merge with default", () => {
     const def = { commands: [{ id: "PrintText" }] };
@@ -47,12 +48,12 @@ test("transfers docs to the overridden commands and parameters", () => {
 });
 
 test("doesn't mutate original metadata", async () => {
-    vi.doMock("../assets/default-metadata.json", () => ({
-        actors: [{}],
-        commands: [{ parameters: [{}] }]
-    }));
+    mock("../assets/default-metadata.json", {
+        actors: [{ id: "foo" }],
+        commands: [{ id: "cmd", parameters: [{ id: "bar" }] }]
+    });
     const def = getDefaultMetadata();
-    const custom = { actors: [{ id: "bar" }] };
+    const custom = { actors: [{ id: "baz" }] };
     const merged = merge(def, custom);
     expect(merged.actors).not.toBe(custom.actors);
     expect(merged.actors[0]).not.toBe(custom.actors[0]);
@@ -60,8 +61,23 @@ test("doesn't mutate original metadata", async () => {
     expect(merged.commands[0]).not.toBe(def.commands[0]);
     expect(merged.commands[0].parameters).not.toBe(def.commands[0].parameters);
     expect(merged.commands[0].parameters[0]).not.toBe(def.commands[0].parameters[0]);
+    expect(def.actors.length).toStrictEqual(1);
+    expect(def.actors[0].id).toStrictEqual("foo");
+    expect(def.commands.length).toStrictEqual(1);
+    expect(def.commands[0].id).toStrictEqual("cmd");
+    expect(def.commands[0].parameters.length).toStrictEqual(1);
+    expect(def.commands[0].parameters[0].id).toStrictEqual("bar");
 });
 
 function merge(...metas) {
     return mergeMetadata(...metas);
+}
+
+// vitest can't mock "require": https://github.com/vitest-dev/vitest/discussions/3134
+function mock(mockedUri, stub) {
+    Module._load_original = Module._load;
+    Module._load = function (uri, parent) {
+        if (uri === mockedUri) return stub;
+        return Module._load_original(uri, parent);
+    };
 }
