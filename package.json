@@ -8,7 +8,7 @@
     "scripts": {
         "backend": "dotnet publish backend",
         "update": "ncu --interactive",
-        "test": "vitest run",
+        "test": "vitest run --silent",
         "cover": "npm test -- --coverage.enabled --coverage.include=**/src/**",
         "bundle": "esbuild src/index.ts --bundle --outfile=dist/index.mjs --format=esm --external:backend",
         "types": "tsc --outDir dist --declaration --emitDeclarationOnly",
