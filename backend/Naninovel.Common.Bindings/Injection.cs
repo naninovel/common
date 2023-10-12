@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,9 @@ namespace Naninovel.Bindings;
 public static class Injection
 {
     private const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ServiceProvider))]
     private static readonly PropertyInfo callSiteProperty = typeof(ServiceProvider).GetProperty("CallSiteFactory", flags)!;
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, "Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory", "Microsoft.Extensions.DependencyInjection")]
     private static readonly FieldInfo descriptorsField = callSiteProperty.PropertyType.GetField("_descriptors", flags)!;
 
     public static IEnumerable<T> GetAll<T> (this IServiceProvider provider)
@@ -17,6 +20,7 @@ public static class Injection
         return GetAll(provider).OfType<T>();
     }
 
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ServiceDescriptor))]
     public static IEnumerable<object> GetAll (this IServiceProvider provider, Predicate<Type>? predicate = null)
     {
         var site = callSiteProperty.GetValue(provider);
@@ -34,6 +38,7 @@ public static class Injection
         return services;
     }
 
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ObserverRegistry<>))]
     public static IServiceProvider RegisterObservers (this IServiceProvider provider)
     {
         foreach (var registry in provider.GetAll(IsObserverRegistry))
@@ -62,7 +67,7 @@ public static class Injection
             m.GetParameters().Length > specifierIndex &&
             m.GetParameters()[specifierIndex].ParameterType.GetGenericTypeDefinition() == genericHandler);
         var registrar = provider.GetRequiredService<TRegistrar>();
-        foreach (var service in provider.GetAll<object>())
+        foreach (var service in provider.GetAll())
         foreach (var handler in GetHandlerTypes(service))
             RegisterHandler(service, handler);
         return provider;

@@ -9,12 +9,7 @@ public class NotifierMock<TObserver> : Mock<TObserver>, IObserverNotifier<TObser
     where TObserver : class
 {
     public override bool CallBase => true;
-    public Mock<IObserverNotifier<TObserver>> Mock { get; }
-
-    public NotifierMock ()
-    {
-        Mock = new Mock<IObserverNotifier<TObserver>>();
-    }
+    public Mock<IObserverNotifier<TObserver>> Mock { get; } = new();
 
     public void Notify (Action<TObserver> notification,
         Func<IEnumerable<TObserver>, IEnumerable<TObserver>> order = null)
