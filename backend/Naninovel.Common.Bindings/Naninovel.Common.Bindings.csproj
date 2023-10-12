@@ -12,8 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bootsharp.Common" Version="0.1.0-rc.25"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0-rc.1.23419.4"/>
+        <PackageReference Include="Bootsharp.Common" Version="0.1.0-rc.146"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0-rc.2.23479.6"/>
     </ItemGroup>
 
     <ItemGroup>

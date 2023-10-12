@@ -3,7 +3,7 @@ using Naninovel.Observing.Test;
 
 namespace Naninovel.Bindings.Test;
 
-public interface IMockGenericObserver<T> { }
+public interface IMockGenericObserver<T>;
 
 public interface IMockNotifier
 {

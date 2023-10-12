@@ -1,5 +1,8 @@
 ﻿using System;
 using Bootsharp;
+using Naninovel.Bindings;
+
+[assembly: JSNamespace(Utilities.NamespacePattern, Utilities.NamespaceReplacement)]
 
 namespace Naninovel.Bindings;
 

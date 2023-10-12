@@ -33,7 +33,7 @@ test("when only info logger is injected, others re-use it", () => {
 test("bindings are assigned when injected", () => {
     const log = vi.fn(), warn = vi.fn(), err = vi.fn();
     injectLogger(log, warn, err);
-    expect(Bindings.$logInfo).toEqual(log);
-    expect(Bindings.$logWarning).toEqual(warn);
-    expect(Bindings.$logError).toEqual(err);
+    expect(Bindings.logInfo).toEqual(log);
+    expect(Bindings.logWarning).toEqual(warn);
+    expect(Bindings.logError).toEqual(err);
 });

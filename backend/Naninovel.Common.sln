@@ -1,4 +1,4 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naninovel.Common", "Naninovel.Common/Naninovel.Common.csproj", "{56257CAA-9762-4352-B2D3-08855ACA7410}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naninovel.Common.Test", "Naninovel.Common.Test/Naninovel.Common.Test.csproj", "{F713EE0E-61E2-4D53-A6A2-313791595216}"
