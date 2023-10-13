@@ -1,4 +1,3 @@
-﻿import { Bindings } from "backend";
 import { test, expect, vi } from "vitest";
 import { injectLogger, log, warn, error } from "../src";
 
@@ -9,8 +8,9 @@ test("can log without injecting", () => {
 });
 
 test("can inject custom loggers", () => {
+    const logger = {};
     let infoMsg, warnMsg, errMsg;
-    injectLogger(msg => infoMsg = msg, wrn => warnMsg = wrn, err => errMsg = err);
+    injectLogger(logger, msg => infoMsg = msg, wrn => warnMsg = wrn, err => errMsg = err);
     log("foo");
     warn("bar");
     error("nya");
@@ -20,8 +20,9 @@ test("can inject custom loggers", () => {
 });
 
 test("when only info logger is injected, others re-use it", () => {
+    const logger = {};
     let infoMsg;
-    injectLogger(msg => infoMsg = msg);
+    injectLogger(logger, msg => infoMsg = msg);
     log("foo");
     expect(infoMsg).toEqual("foo");
     warn("bar");
@@ -31,9 +32,10 @@ test("when only info logger is injected, others re-use it", () => {
 });
 
 test("bindings are assigned when injected", () => {
+    const logger = {};
     const log = vi.fn(), warn = vi.fn(), err = vi.fn();
-    injectLogger(log, warn, err);
-    expect(Bindings.logInfo).toEqual(log);
-    expect(Bindings.logWarning).toEqual(warn);
-    expect(Bindings.logError).toEqual(err);
+    injectLogger(logger, log, warn, err);
+    expect(logger.logInfo).toEqual(log);
+    expect(logger.logWarning).toEqual(warn);
+    expect(logger.logError).toEqual(err);
 });

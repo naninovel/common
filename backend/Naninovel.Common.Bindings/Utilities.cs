@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Bootsharp;
 using Naninovel.Bindings;
 

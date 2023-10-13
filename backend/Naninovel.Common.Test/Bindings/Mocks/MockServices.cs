@@ -1,4 +1,4 @@
-﻿namespace Naninovel.Bindings.Test;
+namespace Naninovel.Bindings.Test;
 
 public interface IHandlerSpecifier;
 public interface IHandlerOne<T> where T : IHandlerSpecifier;
