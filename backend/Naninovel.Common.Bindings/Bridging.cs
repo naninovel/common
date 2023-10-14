@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
@@ -20,6 +21,10 @@ public static partial class Bridging
     private static int preferredPort;
     private static Client? client;
 
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ConnectionAccepted))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UpdateMetadata))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UpdatePlaybackStatus))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GotoRequest))]
     [JSInvokable]
     public static async void ConnectToServerInLoop (int preferredPort)
     {

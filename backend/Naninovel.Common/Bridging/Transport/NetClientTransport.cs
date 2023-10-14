@@ -57,7 +57,7 @@ public class NetClientTransport : IClientTransport
 
     public Task CloseAsync (CancellationToken token)
     {
-        return socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", token);
+        return socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", token);
     }
 
     public void Dispose () => socket.Dispose();
