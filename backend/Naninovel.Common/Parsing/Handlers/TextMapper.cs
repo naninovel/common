@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Naninovel.Parsing;
+﻿namespace Naninovel.Parsing;
 
 /// <summary>
 /// Maps <see cref="IdentifiedText.Id"/> to <see cref="IdentifiedText.Text"/>.

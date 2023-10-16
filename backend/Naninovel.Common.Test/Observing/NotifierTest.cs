@@ -1,7 +1,4 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Moq;
-using Xunit;
 
 namespace Naninovel.Observing.Test;
 

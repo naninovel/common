@@ -1,6 +1,3 @@
-using System.Linq;
-using Xunit;
-
 namespace Naninovel.Metadata.Test;
 
 public class ProviderTest

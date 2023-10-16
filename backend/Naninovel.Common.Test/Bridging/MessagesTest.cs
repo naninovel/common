@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Xunit;
 
 namespace Naninovel.Bridging.Test;
 

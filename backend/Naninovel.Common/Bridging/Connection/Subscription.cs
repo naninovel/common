@@ -1,5 +1,3 @@
-using System;
-
 namespace Naninovel.Bridging;
 
 internal abstract class Subscription

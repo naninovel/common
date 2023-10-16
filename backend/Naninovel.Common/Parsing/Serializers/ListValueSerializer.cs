@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using static Naninovel.Parsing.Utilities;
 using static Naninovel.Parsing.Identifiers;
 

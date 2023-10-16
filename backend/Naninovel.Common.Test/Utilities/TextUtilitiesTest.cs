@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using Xunit;
-
 namespace Naninovel.Utilities.Test;
 
 public class TextUtilitiesTest

@@ -1,8 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Naninovel.Bridging;
 
 public class Server : IDisposable
@@ -18,14 +13,16 @@ public class Server : IDisposable
     public Task? WaitForExit { get; private set; }
 
     private readonly IServerTransport listener;
+    private readonly ISerializer serializer;
     private readonly Connections connections = new();
     private readonly Subscriber subscriber = new();
     private readonly Waiter waiter = new();
 
-    public Server (string name, IServerTransport listener)
+    public Server (string name, IServerTransport listener, ISerializer serializer)
     {
         Name = name;
         this.listener = listener;
+        this.serializer = serializer;
     }
 
     public void Start (int port, CancellationToken token = default)
@@ -83,7 +80,7 @@ public class Server : IDisposable
 
     private void AcceptConnection (ITransport transport)
     {
-        var connection = new Connection(transport, subscriber, waiter);
+        var connection = new Connection(transport, serializer, subscriber, waiter);
         connection.Send(new ConnectionAccepted { ServerName = Name });
         connections.Add(connection);
         MaintainConnection(connection);

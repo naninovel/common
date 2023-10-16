@@ -1,5 +1,4 @@
-﻿using Xunit;
-using static Naninovel.Parsing.ErrorType;
+﻿using static Naninovel.Parsing.ErrorType;
 
 namespace Naninovel.Parsing.Test;
 

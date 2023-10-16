@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Moq;
-using Xunit;
 
 namespace Naninovel.Bridging.Test;
 
 public class ServerTest
 {
     private readonly MockServerTransport listener = new();
+    private readonly JsonSerializer serializer = new();
     private readonly Server server;
 
     public ServerTest ()
     {
-        server = new Server("", listener);
+        server = new Server("", listener, serializer);
     }
 
     [Fact]

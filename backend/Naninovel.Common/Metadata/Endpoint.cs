@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Naninovel.Metadata;
+﻿namespace Naninovel.Metadata;
 
 /// <summary>
 /// Represents navigation position inside scenario script.

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Xunit;
-
 namespace Naninovel.Metadata.Test;
 
 public class ConstantEvaluatorTest

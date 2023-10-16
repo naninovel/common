@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Naninovel;
+﻿namespace Naninovel;
 
 /// <summary>
 /// Exception thrown from Naninovel internal behaviour.

@@ -1,42 +1,38 @@
-﻿using Xunit;
-using static Naninovel.Metadata.ValueContainerType;
-using static Naninovel.Metadata.ValueType;
-
-namespace Naninovel.Metadata.Test;
+﻿namespace Naninovel.Metadata.Test;
 
 public class ValueValidatorTest
 {
     private readonly ValueValidator validator = new();
 
     [Theory]
-    [InlineData(null, Single, String, true)]
-    [InlineData(null, List, Boolean, true)]
-    [InlineData(null, Named, Decimal, true)]
-    [InlineData(null, NamedList, Integer, true)]
-    [InlineData(" ", Single, String, true)]
-    [InlineData(" ", List, Boolean, false)]
-    [InlineData(" ", Named, Decimal, false)]
-    [InlineData(" ", NamedList, Integer, false)]
-    [InlineData(",,", List, Boolean, true)]
-    [InlineData(".", Named, Decimal, true)]
-    [InlineData(".,,.", NamedList, Integer, true)]
-    [InlineData("foo", Single, String, true)]
-    [InlineData("0", Single, Integer, true)]
-    [InlineData("-0101", Single, Integer, true)]
-    [InlineData("0.1", Single, Integer, false)]
-    [InlineData("1f", Single, Integer, false)]
-    [InlineData("00.1", Single, Decimal, true)]
-    [InlineData("-01", Single, Decimal, true)]
-    [InlineData("1f", Single, Decimal, false)]
-    [InlineData("true", Single, Boolean, true)]
-    [InlineData("false", Single, Boolean, true)]
-    [InlineData("True", Single, Boolean, true)]
-    [InlineData("False", Single, Boolean, true)]
-    [InlineData("+", Single, Boolean, false)]
-    [InlineData("yes", Single, Boolean, false)]
-    [InlineData("1,2,3", List, Integer, true)]
-    [InlineData("1,0.2,3", List, Integer, false)]
-    [InlineData(".,foo.0.2,bar", NamedList, Decimal, true)]
+    [InlineData(null, ValueContainerType.Single, ValueType.String, true)]
+    [InlineData(null, ValueContainerType.List, ValueType.Boolean, true)]
+    [InlineData(null, ValueContainerType.Named, ValueType.Decimal, true)]
+    [InlineData(null, ValueContainerType.NamedList, ValueType.Integer, true)]
+    [InlineData(" ", ValueContainerType.Single, ValueType.String, true)]
+    [InlineData(" ", ValueContainerType.List, ValueType.Boolean, false)]
+    [InlineData(" ", ValueContainerType.Named, ValueType.Decimal, false)]
+    [InlineData(" ", ValueContainerType.NamedList, ValueType.Integer, false)]
+    [InlineData(",,", ValueContainerType.List, ValueType.Boolean, true)]
+    [InlineData(".", ValueContainerType.Named, ValueType.Decimal, true)]
+    [InlineData(".,,.", ValueContainerType.NamedList, ValueType.Integer, true)]
+    [InlineData("foo", ValueContainerType.Single, ValueType.String, true)]
+    [InlineData("0", ValueContainerType.Single, ValueType.Integer, true)]
+    [InlineData("-0101", ValueContainerType.Single, ValueType.Integer, true)]
+    [InlineData("0.1", ValueContainerType.Single, ValueType.Integer, false)]
+    [InlineData("1f", ValueContainerType.Single, ValueType.Integer, false)]
+    [InlineData("00.1", ValueContainerType.Single, ValueType.Decimal, true)]
+    [InlineData("-01", ValueContainerType.Single, ValueType.Decimal, true)]
+    [InlineData("1f", ValueContainerType.Single, ValueType.Decimal, false)]
+    [InlineData("true", ValueContainerType.Single, ValueType.Boolean, true)]
+    [InlineData("false", ValueContainerType.Single, ValueType.Boolean, true)]
+    [InlineData("True", ValueContainerType.Single, ValueType.Boolean, true)]
+    [InlineData("False", ValueContainerType.Single, ValueType.Boolean, true)]
+    [InlineData("+", ValueContainerType.Single, ValueType.Boolean, false)]
+    [InlineData("yes", ValueContainerType.Single, ValueType.Boolean, false)]
+    [InlineData("1,2,3", ValueContainerType.List, ValueType.Integer, true)]
+    [InlineData("1,0.2,3", ValueContainerType.List, ValueType.Integer, false)]
+    [InlineData(".,foo.0.2,bar", ValueContainerType.NamedList, ValueType.Decimal, true)]
     public void ValidationTheory (string value, ValueContainerType container, ValueType type, bool expected)
     {
         Assert.Equal(expected, validator.Validate(value, container, type));

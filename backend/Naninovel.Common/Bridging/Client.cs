@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Naninovel.Bridging;
 
 public class Client : IDisposable
@@ -10,10 +6,10 @@ public class Client : IDisposable
     private readonly IClientTransport transport;
     private Task? maintainTask;
 
-    public Client (IClientTransport transport)
+    public Client (IClientTransport transport, ISerializer serializer)
     {
         this.transport = transport;
-        connection = new Connection(transport);
+        connection = new Connection(transport, serializer);
     }
 
     public async Task<ConnectionStatus> ConnectAsync (int port, CancellationToken token = default)

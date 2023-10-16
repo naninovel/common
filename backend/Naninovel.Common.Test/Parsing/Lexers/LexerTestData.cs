@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Naninovel.Parsing.Test;
 
 public static class LexerTestData

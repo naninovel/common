@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Moq;
-using Xunit;
 
 namespace Naninovel.Bridging.Test;
 
@@ -14,7 +9,7 @@ public class ClientTest
 
     public ClientTest ()
     {
-        client = new Client(transport);
+        client = new Client(transport, new JsonSerializer());
     }
 
     [Fact]

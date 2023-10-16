@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net.WebSockets;
 using Bootsharp;
 using Naninovel.Bridging;
 using Naninovel.Metadata;
@@ -11,32 +6,25 @@ using static Naninovel.Bindings.JSLogger;
 
 namespace Naninovel.Bindings.Bridging;
 
-public static partial class Bridging
+public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSpan timeout)
 {
-    private static readonly TimeSpan scanDelay = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
-    private static readonly ServerFinder serverFinder = new();
+    private readonly ServerFinder finder = new(serializer);
+    private CancellationTokenSource? tcs;
+    private int preferredPort;
+    private Client? client;
 
-    private static CancellationTokenSource? tcs;
-    private static int preferredPort;
-    private static Client? client;
-
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ConnectionAccepted))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UpdateMetadata))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(UpdatePlaybackStatus))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GotoRequest))]
     [JSInvokable]
-    public static async void ConnectToServerInLoop (int preferredPort)
+    public async void ConnectToServerInLoop (int preferredPort)
     {
         BreakConnectionLoop();
-        Bridging.preferredPort = preferredPort;
+        this.preferredPort = preferredPort;
         while (tcs is { IsCancellationRequested: false })
             try { await ConnectToServerAsync(tcs.Token); }
             catch (Exception e) { LogError($"Bridging error: {e.Message}"); }
     }
 
     [JSInvokable]
-    public static void BreakConnectionLoop ()
+    public void BreakConnectionLoop ()
     {
         tcs?.Cancel();
         tcs?.Dispose();
@@ -44,16 +32,16 @@ public static partial class Bridging
     }
 
     [JSInvokable]
-    public static void RequestGoto (string scriptName, int lineIndex)
+    public void RequestGoto (string scriptName, int lineIndex)
     {
         var spot = new PlaybackSpot { ScriptName = scriptName, LineIndex = lineIndex };
         client?.Send(new GotoRequest { PlaybackSpot = spot });
     }
 
-    [JSFunction] public static partial void OnMetadataUpdated (Project metadata);
-    [JSFunction] public static partial void OnPlaybackStatusUpdated (PlaybackStatus status);
+    [JSFunction] public partial void OnMetadataUpdated (Project metadata);
+    [JSFunction] public partial void OnPlaybackStatusUpdated (PlaybackStatus status);
 
-    private static async Task ConnectToServerAsync (CancellationToken token)
+    private async Task ConnectToServerAsync (CancellationToken token)
     {
         await Task.Delay(scanDelay, token);
         using var client = CreateClient();
@@ -62,23 +50,23 @@ public static partial class Bridging
         await MaintainConnectionAsync(status);
     }
 
-    private static Client CreateClient ()
+    private Client CreateClient ()
     {
-        client = new Client(new NetClientTransport());
+        client = new Client(new NetClientTransport(), serializer);
         client.Subscribe<UpdateMetadata>(m => OnMetadataUpdated(m.Metadata));
         client.Subscribe<UpdatePlaybackStatus>(m => OnPlaybackStatusUpdated(m.PlaybackStatus));
         return client;
     }
 
-    private static async Task<ServerInfo?> FindServerAsync ()
+    private async Task<ServerInfo?> FindServerAsync ()
     {
         var startPort = preferredPort;
         var endPort = startPort + 2;
-        var servers = await serverFinder.FindServersAsync(startPort, endPort, timeout);
+        var servers = await finder.FindServersAsync(startPort, endPort, timeout);
         return servers.FirstOrDefault();
     }
 
-    private static async Task<ConnectionStatus?> TryConnectAsync (Client client, int port)
+    private async Task<ConnectionStatus?> TryConnectAsync (Client client, int port)
     {
         using var cts = new CancellationTokenSource(timeout);
         try { return await client.ConnectAsync(port, cts.Token); }
@@ -86,7 +74,7 @@ public static partial class Bridging
         catch (OperationCanceledException) { return null; }
     }
 
-    private static async Task MaintainConnectionAsync (ConnectionStatus status)
+    private async Task MaintainConnectionAsync (ConnectionStatus status)
     {
         LogInfo($"Connected to {status.ServerInfo.Name} bridging server.");
         try { await status.MaintainTask; }

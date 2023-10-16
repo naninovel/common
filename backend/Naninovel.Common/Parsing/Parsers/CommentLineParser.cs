@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using static Naninovel.Parsing.ParsingErrors;
+﻿using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;

@@ -1,6 +1,3 @@
-using System;
-using Xunit;
-
 namespace Naninovel.Parsing.Test;
 
 public class LineRangeTest

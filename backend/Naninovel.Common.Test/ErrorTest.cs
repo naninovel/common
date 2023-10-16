@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using Xunit;
-
-namespace Naninovel.Test;
+﻿namespace Naninovel.Test;
 
 public class ErrorTest
 {

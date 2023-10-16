@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Naninovel;
 
 /// <inheritdoc cref="IObserverRegistry{TObserver}"/>

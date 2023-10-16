@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace Naninovel.ManagedText.Test;
+﻿namespace Naninovel.ManagedText.Test;
 
 public class ManagedTextRecordTest
 {

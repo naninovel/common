@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using static Naninovel.Parsing.Utilities;
 using static Naninovel.Parsing.Identifiers;
 

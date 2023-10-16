@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Naninovel.Metadata.Test;
 
 public class ProjectTest

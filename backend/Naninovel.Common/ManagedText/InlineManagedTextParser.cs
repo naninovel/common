@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Naninovel.Utilities;
+﻿using Naninovel.Utilities;
 using static Naninovel.ManagedText.ManagedTextConstants;
 
 namespace Naninovel.ManagedText;

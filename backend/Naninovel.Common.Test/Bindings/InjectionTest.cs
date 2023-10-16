@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-using Bootsharp;
+﻿using Bootsharp;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Naninovel.Bindings.Test;
 using Naninovel.Observing.Test;
-using Xunit;
 
 [assembly: JSExport(new[] { typeof(IServiceOneA) })]
 [assembly: JSImport(new[] { typeof(IServiceOneB) })]

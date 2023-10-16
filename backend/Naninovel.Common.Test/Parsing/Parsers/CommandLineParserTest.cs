@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Xunit;
-using static Naninovel.Parsing.TokenType;
+﻿using static Naninovel.Parsing.TokenType;
 using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
 

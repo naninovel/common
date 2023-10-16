@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Naninovel.ManagedText;
+﻿namespace Naninovel.ManagedText;
 
 /// <summary>
 /// An immutable collection of <see cref="ManagedTextRecord"/> with unique keys.

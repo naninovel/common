@@ -1,8 +1,5 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace Naninovel.Bridging.Test;
 
@@ -13,6 +10,7 @@ public class MockTransport : ITransport
     private readonly Channel<string> readChannel = Channel.CreateUnbounded<string>();
     private readonly Channel<string> writeChannel = Channel.CreateUnbounded<string>();
     private readonly CancellationTokenSource cts = new();
+    private readonly JsonSerializer serializer = new();
 
     public virtual async Task<string> WaitMessageAsync (CancellationToken token)
     {
@@ -28,7 +26,7 @@ public class MockTransport : ITransport
 
     public void MockIncoming (IMessage message)
     {
-        var data = Serializer.Serialize(message);
+        var data = serializer.Serialize(message);
         readChannel.Writer.TryWrite(data);
     }
 
@@ -43,7 +41,7 @@ public class MockTransport : ITransport
         while (!cts.IsCancellationRequested)
         {
             var data = await writeChannel.Reader.ReadAsync(cts.Token);
-            if (Serializer.TryDeserialize(data, out var m) && m is T result) return result;
+            if (serializer.TryDeserialize<T>(data, out var result)) return result;
         }
         throw new OperationCanceledException();
     }

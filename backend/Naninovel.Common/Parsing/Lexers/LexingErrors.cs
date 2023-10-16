@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Naninovel.Parsing;
 
 public static class LexingErrors

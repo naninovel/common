@@ -3,37 +3,38 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Represents parameter of a script command.
 /// </summary>
+[Serializable]
 public class Parameter
 {
     /// <summary>
     /// Unique (command-wide) identifier of the parameter.
     /// </summary>
-    public string Id { get; set; } = string.Empty;
+    public string Id = string.Empty;
     /// <summary>
     /// Optional short version of the identifier used to reference
     /// the parameter in scenario scripts.
     /// </summary>
-    public string? Alias { get; set; }
+    public string? Alias;
     /// <summary>
     /// Whether the parameter can be specified without the identifier.
     /// </summary>
-    public bool Nameless { get; set; }
+    public bool Nameless;
     /// <summary>
     /// Whether the parameter is expected to always be specified.
     /// </summary>
-    public bool Required { get; set; } = default;
+    public bool Required;
     /// <summary>
     /// Whether the parameter can be translated.
     /// </summary>
-    public bool Localizable { get; set; } = default;
+    public bool Localizable;
     /// <summary>
     /// Type of the data container that stores value of the parameter.
     /// </summary>
-    public ValueContainerType ValueContainerType { get; set; }
+    public ValueContainerType ValueContainerType;
     /// <summary>
     /// Type of the parameter value.
     /// </summary>
-    public ValueType ValueType { get; set; }
+    public ValueType ValueType;
     /// <summary>
     /// Optional information about the context in which the value is used.
     /// </summary>
@@ -41,22 +42,22 @@ public class Parameter
     /// Multiple elements can be specified to map contexts to specific value indexes,
     /// in case the parameter value is of list or named container types.
     /// </remarks>
-    public ValueContext?[]? ValueContext { get; set; }
+    public ValueContext?[]? ValueContext;
     /// <summary>
     /// The value of the parameter has when it's not explicitly specified in script.
     /// </summary>
-    public string? DefaultValue { get; set; } = default;
+    public string? DefaultValue;
     /// <summary>
     /// Human-readable description of the parameter.
     /// </summary>
-    public string? Summary { get; set; } = default;
+    public string? Summary;
 
     /// <summary>
     /// User-facing formatted identifier of the parameter.
     /// </summary>
-    public string Label => Utilities.BuildLabel(Alias, Id);
+    public string Label => BuildLabel(Alias, Id);
     /// <summary>
     /// User-facing formatted name of the parameter's type.
     /// </summary>
-    public string TypeLabel => Utilities.BuildTypeLabel(ValueType, ValueContainerType);
+    public string TypeLabel => BuildTypeLabel(ValueType, ValueContainerType);
 }

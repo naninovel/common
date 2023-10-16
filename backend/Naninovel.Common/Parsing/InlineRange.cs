@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Naninovel.Parsing;
+﻿namespace Naninovel.Parsing;
 
 /// <summary>
 /// Represents character range inside a script text line.

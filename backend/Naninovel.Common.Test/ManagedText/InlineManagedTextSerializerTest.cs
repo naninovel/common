@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-
-namespace Naninovel.ManagedText.Test;
+﻿namespace Naninovel.ManagedText.Test;
 
 public class InlineManagedTextSerializerTest
 {

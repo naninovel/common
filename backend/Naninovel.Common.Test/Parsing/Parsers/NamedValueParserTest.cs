@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace Naninovel.Parsing.Test;
+﻿namespace Naninovel.Parsing.Test;
 
 public class NamedValueParserTest
 {

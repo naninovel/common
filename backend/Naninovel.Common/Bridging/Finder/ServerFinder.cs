@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Naninovel.Bridging;
 
 public class ServerFinder
 {
     private readonly Func<IClientTransport> clientFactory;
+    private readonly ISerializer serializer;
 
-    public ServerFinder (Func<IClientTransport>? clientFactory = null)
+    public ServerFinder (ISerializer serializer, Func<IClientTransport>? clientFactory = null)
     {
+        this.serializer = serializer;
         this.clientFactory = clientFactory ?? (() => new NetClientTransport());
     }
 
@@ -33,7 +30,7 @@ public class ServerFinder
 
     private async Task<ServerInfo> GetInfoAsync (int port, CancellationToken token)
     {
-        using var client = new Client(clientFactory());
+        using var client = new Client(clientFactory(), serializer);
         var status = await client.ConnectAsync(port, token);
         return status.ServerInfo;
     }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Naninovel.ManagedText;
+﻿namespace Naninovel.ManagedText;
 
 /// <summary>
 /// A key-value pair with an optional comment contained in <see cref="ManagedTextDocument"/>.

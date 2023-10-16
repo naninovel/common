@@ -1,5 +1,3 @@
-using System;
-
 namespace Naninovel.Parsing;
 
 public readonly struct Token : IEquatable<Token>
