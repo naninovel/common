@@ -10,9 +10,9 @@ namespace Naninovel.Bindings;
 public static class Injection
 {
     private const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ServiceProvider))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.NonPublicProperties, typeof(ServiceProvider))]
     private static readonly PropertyInfo callSiteProperty = typeof(ServiceProvider).GetProperty("CallSiteFactory", flags)!;
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, "Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory", "Microsoft.Extensions.DependencyInjection")]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.NonPublicFields, "Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory", "Microsoft.Extensions.DependencyInjection")]
     private static readonly FieldInfo descriptorsField = callSiteProperty.PropertyType.GetField("_descriptors", flags)!;
 
     public static IEnumerable<T> GetAll<T> (this IServiceProvider provider)
@@ -20,7 +20,6 @@ public static class Injection
         return GetAll(provider).OfType<T>();
     }
 
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ServiceDescriptor))]
     public static IEnumerable<object> GetAll (this IServiceProvider provider, Predicate<Type>? predicate = null)
     {
         var site = callSiteProperty.GetValue(provider);
@@ -38,7 +37,7 @@ public static class Injection
         return services;
     }
 
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ObserverRegistry<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicMethods, typeof(ObserverRegistry<>))]
     public static IServiceProvider RegisterObservers (this IServiceProvider provider)
     {
         foreach (var registry in provider.GetAll(IsObserverRegistry))
@@ -59,8 +58,8 @@ public static class Injection
         return provider;
     }
 
-    public static IServiceProvider Register<TRegistrar> (this IServiceProvider provider,
-        Type genericHandler, string registerMethodName = "Register", int specifierIndex = 0) where TRegistrar : notnull
+    public static IServiceProvider Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TRegistrar> (
+        this IServiceProvider provider, Type genericHandler, string registerMethodName = "Register", int specifierIndex = 0) where TRegistrar : notnull
     {
         var registerMethod = typeof(TRegistrar).GetMethods().First(m =>
             m.Name == registerMethodName &&
