@@ -36,12 +36,12 @@ public class MockTransport : ITransport
     }
 
     [ExcludeFromCodeCoverage]
-    public async Task<T> WaitOutcomingAsync<T> () where T : IMessage
+    public async Task<T> WaitOutcomingAsync<T> () where T : class, IMessage
     {
         while (!cts.IsCancellationRequested)
         {
             var data = await writeChannel.Reader.ReadAsync(cts.Token);
-            if (serializer.TryDeserialize(data, out var m) && m is T result) return result;
+            if (serializer.TryDeserialize<T>(data, out var result)) return result;
         }
         throw new OperationCanceledException();
     }

@@ -1,6 +1,6 @@
 namespace Naninovel.Bridging;
 
-public class MessageSerializer
+public sealed class MessageSerializer
 {
     private readonly ISerializer serializer;
 
@@ -32,5 +32,12 @@ public class MessageSerializer
             message = null!;
             return false;
         }
+    }
+
+    public bool TryDeserialize<T> (string serializedMessage, out T message)
+        where T : class, IMessage
+    {
+        TryDeserialize(serializedMessage, out var baseMessage);
+        return (message = (baseMessage as T)!) != null;
     }
 }
