@@ -3,7 +3,7 @@ namespace Naninovel.Bridging.Test;
 public class FinderTest
 {
     private readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
-    private readonly JsonSerializer serializer = new();
+    private readonly MockSerializer serializer = new();
 
     [Fact]
     public async Task CanFindServer ()

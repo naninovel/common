@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Naninovel.Metadata;
@@ -6,8 +7,8 @@ namespace Naninovel.Bridging.Test;
 
 public class SerializerTest
 {
-    public record Record(string Value);
-    public record Message(Record[] Records);
+    [ExcludeFromCodeCoverage] public record Record(string Value);
+    [ExcludeFromCodeCoverage] public record Message(Record[] Records);
 
     [Fact]
     public void CanSerializeCommonTypes ()

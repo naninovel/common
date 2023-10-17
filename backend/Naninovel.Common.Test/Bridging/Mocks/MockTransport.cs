@@ -10,7 +10,7 @@ public class MockTransport : ITransport
     private readonly Channel<string> readChannel = Channel.CreateUnbounded<string>();
     private readonly Channel<string> writeChannel = Channel.CreateUnbounded<string>();
     private readonly CancellationTokenSource cts = new();
-    private readonly JsonSerializer serializer = new();
+    private readonly MessageSerializer serializer = new(new MockSerializer());
 
     public virtual async Task<string> WaitMessageAsync (CancellationToken token)
     {
@@ -41,7 +41,7 @@ public class MockTransport : ITransport
         while (!cts.IsCancellationRequested)
         {
             var data = await writeChannel.Reader.ReadAsync(cts.Token);
-            if (serializer.TryDeserialize<T>(data, out var result)) return result;
+            if (serializer.TryDeserialize(data, out var m) && m is T result) return result;
         }
         throw new OperationCanceledException();
     }

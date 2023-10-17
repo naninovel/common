@@ -2,11 +2,10 @@ using System.Collections.Concurrent;
 
 namespace Naninovel.Bridging;
 
-internal class Waiter
+internal sealed class Waiter
 {
     private readonly object @lock = new();
-    private readonly IDictionary<Type, List<TaskCompletionSource<IMessage>>> waiters =
-        new ConcurrentDictionary<Type, List<TaskCompletionSource<IMessage>>>();
+    private readonly ConcurrentDictionary<Type, List<TaskCompletionSource<IMessage>>> waiters = new();
 
     public async Task<T> WaitAsync<T> (CancellationToken token) where T : IMessage
     {

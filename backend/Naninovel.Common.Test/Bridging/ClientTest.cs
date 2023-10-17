@@ -9,7 +9,7 @@ public class ClientTest
 
     public ClientTest ()
     {
-        client = new Client(transport, new JsonSerializer());
+        client = new Client(transport, new MockSerializer());
     }
 
     [Fact]

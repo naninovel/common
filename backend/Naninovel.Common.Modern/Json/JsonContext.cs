@@ -7,4 +7,5 @@ namespace Naninovel;
 [JsonSerializable(typeof(UpdateMetadata))]
 [JsonSerializable(typeof(UpdatePlaybackStatus))]
 [JsonSerializable(typeof(GotoRequest))]
+[JsonSerializable(typeof(MessageContent))]
 internal partial class JsonContext : JsonSerializerContext;
