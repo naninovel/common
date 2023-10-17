@@ -9,8 +9,6 @@ public class JsonSerializer : ISerializer
     public JsonSerializer (JsonSerializerOptions? options = null)
     {
         this.options = options ?? new();
-        // TODO: Remove after Unity supports non-field JSON serialization.
-        this.options.IncludeFields = true;
         this.options.TypeInfoResolverChain.Add(JsonContext.Default);
     }
 
