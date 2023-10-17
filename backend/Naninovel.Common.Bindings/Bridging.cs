@@ -6,25 +6,28 @@ using static Naninovel.Bindings.JSLogger;
 
 namespace Naninovel.Bindings.Bridging;
 
-public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSpan timeout)
+public static partial class Bridging
 {
-    private readonly ServerFinder finder = new(serializer);
-    private CancellationTokenSource? tcs;
-    private int preferredPort;
-    private Client? client;
+    private static readonly TimeSpan scanDelay = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
+    private static readonly JsonSerializer serializer = new();
+    private static readonly ServerFinder finder = new(serializer);
+    private static CancellationTokenSource? tcs;
+    private static int preferredPort;
+    private static Client? client;
 
     [JSInvokable]
-    public async void ConnectToServerInLoop (int preferredPort)
+    public static async void ConnectToServerInLoop (int preferredPort)
     {
         BreakConnectionLoop();
-        this.preferredPort = preferredPort;
+        Bridging.preferredPort = preferredPort;
         while (tcs is { IsCancellationRequested: false })
             try { await ConnectToServerAsync(tcs.Token); }
             catch (Exception e) { LogError($"Bridging error: {e.Message}"); }
     }
 
     [JSInvokable]
-    public void BreakConnectionLoop ()
+    public static void BreakConnectionLoop ()
     {
         tcs?.Cancel();
         tcs?.Dispose();
@@ -32,16 +35,16 @@ public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSp
     }
 
     [JSInvokable]
-    public void RequestGoto (string scriptName, int lineIndex)
+    public static void RequestGoto (string scriptName, int lineIndex)
     {
         var spot = new PlaybackSpot { ScriptName = scriptName, LineIndex = lineIndex };
         client?.Send(new GotoRequest { PlaybackSpot = spot });
     }
 
-    [JSFunction] public partial void OnMetadataUpdated (Project metadata);
-    [JSFunction] public partial void OnPlaybackStatusUpdated (PlaybackStatus status);
+    [JSFunction] public static partial void OnMetadataUpdated (Project metadata);
+    [JSFunction] public static partial void OnPlaybackStatusUpdated (PlaybackStatus status);
 
-    private async Task ConnectToServerAsync (CancellationToken token)
+    private static async Task ConnectToServerAsync (CancellationToken token)
     {
         await Task.Delay(scanDelay, token);
         using var client = CreateClient();
@@ -50,7 +53,7 @@ public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSp
         await MaintainConnectionAsync(status);
     }
 
-    private Client CreateClient ()
+    private static Client CreateClient ()
     {
         client = new Client(new NetClientTransport(), serializer);
         client.Subscribe<UpdateMetadata>(m => OnMetadataUpdated(m.Metadata));
@@ -58,7 +61,7 @@ public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSp
         return client;
     }
 
-    private async Task<ServerInfo?> FindServerAsync ()
+    private static async Task<ServerInfo?> FindServerAsync ()
     {
         var startPort = preferredPort;
         var endPort = startPort + 2;
@@ -66,7 +69,7 @@ public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSp
         return servers.FirstOrDefault();
     }
 
-    private async Task<ConnectionStatus?> TryConnectAsync (Client client, int port)
+    private static async Task<ConnectionStatus?> TryConnectAsync (Client client, int port)
     {
         using var cts = new CancellationTokenSource(timeout);
         try { return await client.ConnectAsync(port, cts.Token); }
@@ -74,7 +77,7 @@ public partial class Bridging(ISerializer serializer, TimeSpan scanDelay, TimeSp
         catch (OperationCanceledException) { return null; }
     }
 
-    private async Task MaintainConnectionAsync (ConnectionStatus status)
+    private static async Task MaintainConnectionAsync (ConnectionStatus status)
     {
         LogInfo($"Connected to {status.ServerInfo.Name} bridging server.");
         try { await status.MaintainTask; }
