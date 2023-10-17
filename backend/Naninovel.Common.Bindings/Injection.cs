@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Naninovel.Bindings;
 
-[UnconditionalSuppressMessage("Trimming", "IL2075")]
+[UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "False-positive?")]
 public static class Injection
 {
     private const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
