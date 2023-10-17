@@ -10,7 +10,7 @@ public static partial class Bridging
 {
     private static readonly TimeSpan scanDelay = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
-    private static readonly JsonSerializer serializer = new();
+    private static readonly JsonSerializer serializer = new(Serializer.Options);
     private static readonly ServerFinder finder = new(serializer);
     private static CancellationTokenSource? tcs;
     private static int preferredPort;
