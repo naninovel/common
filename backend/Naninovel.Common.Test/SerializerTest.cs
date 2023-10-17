@@ -59,6 +59,32 @@ public class SerializerTest
     {
         Assert.False(new JsonSerializer().TryDeserialize<Resource>("{", out _));
     }
+
+    [Fact]
+    public void CanSerializeNull ()
+    {
+        var options = new JsonSerializerOptions();
+        options.TypeInfoResolverChain.Add(AdditionalContext.Default);
+        var serializer = new JsonSerializer(options);
+        Assert.NotNull(serializer.SerializeOrNull(new Record("foo")));
+        Assert.Null(serializer.SerializeOrNull(null));
+    }
+
+    [Fact]
+    public void CanDeserializeNull ()
+    {
+        var options = new JsonSerializerOptions();
+        options.TypeInfoResolverChain.Add(AdditionalContext.Default);
+        var serializer = new JsonSerializer(options);
+        Assert.NotNull(serializer.DeserializeOrNull("{ \"Value\": \"foo\" }", typeof(Record)));
+        Assert.NotNull(serializer.DeserializeOrNull<Record>("{ \"Value\": \"foo\" }"));
+        Assert.Null(serializer.DeserializeOrNull(null, typeof(Record)));
+        Assert.Null(serializer.DeserializeOrNull<Record>(null));
+        Assert.Null(serializer.DeserializeOrNull("", typeof(Record)));
+        Assert.Null(serializer.DeserializeOrNull<Record>(""));
+        Assert.Null(serializer.DeserializeOrNull(" ", typeof(Record)));
+        Assert.Null(serializer.DeserializeOrNull<Record>(" "));
+    }
 }
 
 [JsonSerializable(typeof(SerializerTest.Message))]

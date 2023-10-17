@@ -5,6 +5,18 @@ namespace Naninovel;
 /// </summary>
 public static class SerializerExtensions
 {
+    /// <inheritdoc cref="ISerializer.Serialize"/>
+    public static string? SerializeOrNull (this ISerializer serializer, object? poco) =>
+        poco is null ? null : serializer.Serialize(poco);
+
+    /// <inheritdoc cref="ISerializer.Deserialize"/>
+    public static object? DeserializeOrNull (this ISerializer serializer, string? serialized, Type type) =>
+        string.IsNullOrWhiteSpace(serialized) ? null : serializer.Deserialize(serialized!, type);
+
+    /// <inheritdoc cref="Deserialize{T}"/>
+    public static T? DeserializeOrNull<T> (this ISerializer serializer, string? serialized) =>
+        string.IsNullOrWhiteSpace(serialized) ? default : Deserialize<T>(serializer, serialized!);
+
     /// <summary>
     /// Deserializes specified serialized object string into original object.
     /// </summary>
