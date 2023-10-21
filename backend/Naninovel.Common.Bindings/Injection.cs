@@ -72,6 +72,7 @@ public static class Injection
         Type[] GetHandlerTypes (object service) => service.GetType().GetInterfaces()
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == genericHandler).ToArray();
 
+        [UnconditionalSuppressMessage("Trimming", "IL2060", Justification = "MakeGenericMethod() is not analyzable.")]
         void RegisterHandler (object handler, Type handlerType)
         {
             var specifier = handlerType.GetGenericArguments()[specifierIndex];
