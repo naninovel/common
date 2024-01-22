@@ -12,8 +12,8 @@ public static class ConstantEvaluator
     private const char paramIdSymbol = ':';
     private const char paramIndexStartSymbol = '[';
     private const char paramIndexEndSymbol = ']';
-    private static readonly string[] concatSeparator = { concatSymbol };
-    private static readonly string[] nullSeparator = { nullCoalescingSymbol };
+    private static readonly string[] concatSeparator = [concatSymbol];
+    private static readonly string[] nullSeparator = [nullCoalescingSymbol];
 
     public static IReadOnlyList<string> EvaluateNames (string value, string script, GetParamValue getParamValue)
     {

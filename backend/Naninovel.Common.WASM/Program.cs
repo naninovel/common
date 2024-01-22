@@ -1,7 +1,7 @@
 using Bootsharp;
-using static Naninovel.Bindings.Utilities;
+using Naninovel.Bindings;
 
-[assembly: JSNamespace(NamespacePattern, NamespaceReplacement)]
+[assembly: JSPreferences(Space = [Space.Pattern, Space.Replacement])]
 
 namespace Naninovel.WASM;
 

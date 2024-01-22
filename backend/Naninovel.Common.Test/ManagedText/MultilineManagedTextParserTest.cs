@@ -65,6 +65,6 @@ public class MultilineManagedTextParserTest
 
     private static object[] Fact (string text, params ManagedTextRecord[] records)
     {
-        return new object[] { text, records };
+        return [text, records];
     }
 }

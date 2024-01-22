@@ -21,11 +21,11 @@ public class ManagedTextDetectorTest
 
     private static object[] IsMultiline (string text)
     {
-        return new object[] { text, true };
+        return [text, true];
     }
 
     private static object[] IsInline (string text)
     {
-        return new object[] { text, false };
+        return [text, false];
     }
 }

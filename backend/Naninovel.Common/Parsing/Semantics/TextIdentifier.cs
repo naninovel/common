@@ -5,17 +5,12 @@ namespace Naninovel.Parsing;
 /// <summary>
 /// Persistent identifier component of <see cref="IdentifiedText"/>.
 /// </summary>
-public class TextIdentifier : ILineComponent
+public class TextIdentifier (PlainText body) : ILineComponent
 {
     /// <summary>
     /// Value of the identifier.
     /// </summary>
-    public PlainText Body { get; }
-
-    public TextIdentifier (PlainText body)
-    {
-        Body = body;
-    }
+    public PlainText Body { get; } = body;
 
     public override string ToString ()
     {

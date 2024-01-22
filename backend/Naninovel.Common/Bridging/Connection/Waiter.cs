@@ -29,6 +29,6 @@ internal sealed class Waiter
     private List<TaskCompletionSource<IMessage>> GetWaiters (Type type)
     {
         if (waiters.TryGetValue(type, out var result)) return result;
-        return waiters[type] = new List<TaskCompletionSource<IMessage>>();
+        return waiters[type] = [];
     }
 }

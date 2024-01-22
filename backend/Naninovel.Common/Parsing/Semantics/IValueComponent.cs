@@ -10,4 +10,4 @@
 /// [1] <see cref="Expression"/>("expr")<br/>
 /// [2] <see cref="PlainText"/>("text2")
 /// </example>
-public interface IValueComponent { }
+public interface IValueComponent;

@@ -21,6 +21,6 @@ public class MultilineManagedTextSerializerTest
 
     private static object[] Fact (string expected, string header, int indent, params ManagedTextRecord[] records)
     {
-        return new object[] { expected, indent, new ManagedTextDocument(records, header) };
+        return [expected, indent, new ManagedTextDocument(records, header)];
     }
 }

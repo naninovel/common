@@ -6,27 +6,21 @@
 /// <remarks>
 /// Hashed (identified) by <see cref="Key"/> only.
 /// </remarks>
-public readonly struct ManagedTextRecord : IEquatable<ManagedTextRecord>
+public readonly struct ManagedTextRecord (string key, string? value = null, string? comment = null)
+    : IEquatable<ManagedTextRecord>
 {
     /// <summary>
     /// Unique (inside document) identifier of the record.
     /// </summary>
-    public readonly string Key;
+    public readonly string Key = key;
     /// <summary>
     /// Value of the record or empty.
     /// </summary>
-    public readonly string Value;
+    public readonly string Value = value ?? string.Empty;
     /// <summary>
     /// Optional remark associated with the record or empty.
     /// </summary>
-    public readonly string Comment;
-
-    public ManagedTextRecord (string key, string? value = null, string? comment = null)
-    {
-        Key = key;
-        Value = value ?? string.Empty;
-        Comment = comment ?? string.Empty;
-    }
+    public readonly string Comment = comment ?? string.Empty;
 
     public override string ToString ()
     {

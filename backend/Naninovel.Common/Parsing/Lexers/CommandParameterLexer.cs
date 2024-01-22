@@ -2,28 +2,19 @@ using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;
 
-internal class CommandParameterLexer
+internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdentifierLexer textIdLexer)
 {
-    private readonly ExpressionLexer expressionLexer;
-    private readonly TextIdentifierLexer textIdLexer;
-
     private LexState state = null!;
     private int startIndex;
     private int idEndIndex;
     private bool quoted;
     private bool addedNameless;
 
-    public CommandParameterLexer (ExpressionLexer expressionLexer, TextIdentifierLexer textIdLexer)
-    {
-        this.expressionLexer = expressionLexer;
-        this.textIdLexer = textIdLexer;
-    }
-
     public void AddParameters (LexState state, bool inlined)
     {
         Reset(state);
         while (!CommandBodyLexer.IsEndReached(state, inlined))
-            if (!TryToggleQuoted() && !TryAddExpression() &&!TryAddTextId() && !TryAddIdentifier() && !TryAddValue())
+            if (!TryToggleQuoted() && !TryAddExpression() && !TryAddTextId() && !TryAddIdentifier() && !TryAddValue())
                 state.Move();
         AddFinalValue();
     }

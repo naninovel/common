@@ -5,8 +5,8 @@ namespace Naninovel.Utilities;
 /// </summary>
 public static class TextUtilities
 {
-    private static readonly string[] breaks = { "\r\n", "\n", "\r" };
-    private static readonly char[] junk = { '\uFEFF', '\u200B' };
+    private static readonly string[] breaks = ["\r\n", "\n", "\r"];
+    private static readonly char[] junk = ['\uFEFF', '\u200B'];
 
     /// <summary>
     /// Splits the string with line break symbol as separator.

@@ -40,7 +40,7 @@ public static class Injection
     {
         foreach (var registry in provider.GetAll(IsObserverRegistry))
         foreach (var observer in provider.GetAll().Where(s => CanBeRegistered(s, registry)))
-            registry.GetType().GetMethod("Register")!.Invoke(registry, new[] { observer });
+            registry.GetType().GetMethod("Register")!.Invoke(registry, [observer]);
         return provider;
 
         bool IsObserverRegistry (Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObserverRegistry<>);
@@ -77,7 +77,7 @@ public static class Injection
         {
             var specifier = handlerType.GetGenericArguments()[specifierIndex];
             var method = registerMethod.MakeGenericMethod(specifier);
-            method.Invoke(registrar, new[] { handler });
+            method.Invoke(registrar, [handler]);
         }
     }
 }

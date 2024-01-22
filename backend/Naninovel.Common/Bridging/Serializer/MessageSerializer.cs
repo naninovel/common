@@ -3,15 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace Naninovel.Bridging;
 
 [UnconditionalSuppressMessage("Trimming", "IL2057", Justification = "Message types are specified in JsonContext.")]
-public sealed class MessageSerializer
+public sealed class MessageSerializer (ISerializer serializer)
 {
-    private readonly ISerializer serializer;
-
-    public MessageSerializer (ISerializer serializer)
-    {
-        this.serializer = serializer;
-    }
-
     public string Serialize (IMessage message)
     {
         var content = new MessageContent {

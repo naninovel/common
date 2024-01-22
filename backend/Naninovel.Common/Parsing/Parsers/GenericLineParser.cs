@@ -2,19 +2,14 @@
 
 namespace Naninovel.Parsing;
 
-public class GenericLineParser
+public class GenericLineParser (ParseHandlers handlers)
 {
     private readonly CommandParser commandParser = new();
     private readonly MixedValueParser valueParser = new(false);
-    private readonly List<IGenericContent> content = new();
-    private readonly LineWalker walker;
+    private readonly List<IGenericContent> content = [];
+    private readonly LineWalker walker = new(handlers);
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
-
-    public GenericLineParser (ParseHandlers handlers)
-    {
-        walker = new(handlers);
-    }
 
     public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {

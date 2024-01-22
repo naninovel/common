@@ -1,23 +1,19 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Naninovel.Parsing;
 
 /// <summary>
 /// Represents plain text content.
 /// </summary>
-public class PlainText : ILineComponent, IValueComponent, IEnumerable<char>
+public class PlainText (string text) : ILineComponent, IValueComponent, IEnumerable<char>
 {
     public static readonly PlainText Empty = new(string.Empty);
 
     /// <summary>
     /// The underlying text content.
     /// </summary>
-    public string Text { get; }
-
-    public PlainText (string text)
-    {
-        Text = text;
-    }
+    public string Text { get; } = text;
 
     public static implicit operator string (PlainText? plainText)
     {
@@ -38,6 +34,7 @@ public class PlainText : ILineComponent, IValueComponent, IEnumerable<char>
         return Text.GetEnumerator();
     }
 
+    [ExcludeFromCodeCoverage]
     IEnumerator IEnumerable.GetEnumerator ()
     {
         return GetEnumerator();

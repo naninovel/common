@@ -1,29 +1,20 @@
 namespace Naninovel.Bridging;
 
-public class Server : IDisposable
+public class Server (string name, IServerTransport listener, ISerializer serializer) : IDisposable
 {
     public event Action<Connection>? OnClientConnected;
     public event Action<Connection>? OnClientDisconnected;
     public event Action<Exception, Connection>? OnClientException;
 
-    public string Name { get; }
+    public string Name { get; } = name;
     public bool Listening => listener.Listening;
     public int ListenedPort { get; private set; }
     public int ConnectionsCount => connections.Count;
     public Task? WaitForExit { get; private set; }
 
-    private readonly IServerTransport listener;
-    private readonly ISerializer serializer;
     private readonly Connections connections = new();
     private readonly Subscriber subscriber = new();
     private readonly Waiter waiter = new();
-
-    public Server (string name, IServerTransport listener, ISerializer serializer)
-    {
-        Name = name;
-        this.listener = listener;
-        this.serializer = serializer;
-    }
 
     public void Start (int port, CancellationToken token = default)
     {

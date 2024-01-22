@@ -3,15 +3,10 @@ using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommentLineParser
+public class CommentLineParser (ParseHandlers handlers)
 {
-    private readonly LineWalker walker;
+    private readonly LineWalker walker = new(handlers);
     private PlainText comment = PlainText.Empty;
-
-    public CommentLineParser (ParseHandlers handlers)
-    {
-        walker = new(handlers);
-    }
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {

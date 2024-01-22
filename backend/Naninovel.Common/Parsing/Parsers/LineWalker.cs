@@ -1,16 +1,10 @@
 ﻿namespace Naninovel.Parsing;
 
-internal class LineWalker
+internal class LineWalker (ParseHandlers handlers)
 {
-    private readonly ParseHandlers handlers;
     private string lineText = "";
     private IReadOnlyList<Token> tokens = Array.Empty<Token>();
     private int index = -1;
-
-    public LineWalker (ParseHandlers handlers)
-    {
-        this.handlers = handlers;
-    }
 
     public void Reset (string lineText, IReadOnlyList<Token> tokens)
     {

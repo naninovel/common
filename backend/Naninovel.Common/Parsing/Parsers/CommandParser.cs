@@ -9,7 +9,7 @@ internal class CommandParser
     private static readonly Command emptyBody = new(PlainText.Empty);
     private static readonly MixedValue emptyValue = new(Array.Empty<IValueComponent>());
     private readonly MixedValueParser valueParser = new(true);
-    private readonly List<Parameter> parameters = new();
+    private readonly List<Parameter> parameters = [];
     private LineWalker walker = null!;
     private Command commandBody = emptyBody;
     private PlainText commandId = PlainText.Empty;

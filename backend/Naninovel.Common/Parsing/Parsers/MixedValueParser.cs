@@ -2,18 +2,12 @@ using static Naninovel.Parsing.Utilities;
 
 namespace Naninovel.Parsing;
 
-internal class MixedValueParser
+internal class MixedValueParser (bool unwrap)
 {
-    private readonly bool unwrap;
-    private readonly List<IValueComponent> value = new();
+    private readonly List<IValueComponent> value = [];
     private readonly Queue<Token> expressions = new();
     private readonly Queue<Token> textIds = new();
     private readonly Queue<Token> textIdBodies = new();
-
-    public MixedValueParser (bool unwrap)
-    {
-        this.unwrap = unwrap;
-    }
 
     public void AddExpressionToken (Token token)
     {

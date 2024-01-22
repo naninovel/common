@@ -17,7 +17,7 @@ namespace Naninovel.ManagedText;
 /// </remarks>
 public class MultilineManagedTextParser
 {
-    private readonly HashSet<ManagedTextRecord> records = new();
+    private readonly HashSet<ManagedTextRecord> records = [];
     private readonly StringBuilder valueBuilder = new();
     private string header = "", lastKey = "", lastComment = "";
 

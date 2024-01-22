@@ -2,18 +2,11 @@ using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;
 
-internal class CommandBodyLexer
+internal class CommandBodyLexer (CommandParameterLexer parameterLexer)
 {
-    private readonly CommandParameterLexer parameterLexer;
-
     private LexState state = null!;
     private int bodyStartIndex;
     private bool inlined;
-
-    public CommandBodyLexer (CommandParameterLexer parameterLexer)
-    {
-        this.parameterLexer = parameterLexer;
-    }
 
     public static bool IsInlinedOpening (LexState state)
     {

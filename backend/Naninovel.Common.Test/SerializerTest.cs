@@ -14,7 +14,7 @@ public class SerializerTest
     public void CanSerializeCommonTypes ()
     {
         var serializer = new JsonSerializer();
-        var update = new UpdateMetadata { Metadata = new Project { Resources = new[] { new Resource { Type = "foo", Path = "bar" } } } };
+        var update = new UpdateMetadata { Metadata = new Project { Resources = [new Resource { Type = "foo", Path = "bar" }] } };
         Assert.True(serializer.TrySerialize(update, out var serialized));
         Assert.True(serializer.TryDeserialize<UpdateMetadata>(serialized, out var deserialized));
         Assert.Equal("foo", deserialized.Metadata.Resources[0].Type);
@@ -27,7 +27,7 @@ public class SerializerTest
         var options = new JsonSerializerOptions();
         options.TypeInfoResolverChain.Add(AdditionalContext.Default);
         var serializer = new JsonSerializer(options);
-        var message = new Message(new[] { new Record("foo") });
+        var message = new Message([new Record("foo")]);
         Assert.True(serializer.TrySerialize(message, out var serialized));
         Assert.True(serializer.TryDeserialize<Message>(serialized, out var deserialized));
         Assert.Equal("foo", deserialized.Records[0].Value);

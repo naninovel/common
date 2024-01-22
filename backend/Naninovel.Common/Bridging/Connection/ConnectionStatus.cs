@@ -1,14 +1,8 @@
 namespace Naninovel.Bridging;
 
-public class ConnectionStatus
+public class ConnectionStatus (Task maintainTask, ServerInfo serverInfo)
 {
     public bool Connected => !MaintainTask.IsCompleted;
-    public Task MaintainTask { get; }
-    public ServerInfo ServerInfo { get; }
-
-    public ConnectionStatus (Task maintainTask, ServerInfo serverInfo)
-    {
-        MaintainTask = maintainTask;
-        ServerInfo = serverInfo;
-    }
+    public Task MaintainTask { get; } = maintainTask;
+    public ServerInfo ServerInfo { get; } = serverInfo;
 }

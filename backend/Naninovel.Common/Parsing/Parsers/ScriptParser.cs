@@ -10,7 +10,7 @@ public class ScriptParser
     private static readonly ParseHandlers nullHandlers = new();
 
     private readonly Lexer lexer = new();
-    private readonly List<Token> tokens = new();
+    private readonly List<Token> tokens = [];
     private readonly CommandLineParser commandParser;
     private readonly CommentLineParser commentParser;
     private readonly GenericLineParser genericParser;
@@ -35,7 +35,7 @@ public class ScriptParser
     /// <param name="scriptText">The script text to split.</param>
     public static string[] SplitText (string? scriptText)
     {
-        return scriptText?.TrimJunk().SplitLines() ?? new[] { string.Empty };
+        return scriptText?.TrimJunk().SplitLines() ?? [string.Empty];
     }
 
     /// <summary>

@@ -5,15 +5,9 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Allows resolving <see cref="Endpoint"/> from parsed commands.
 /// </summary>
-public class EndpointResolver
+public class EndpointResolver (MetadataProvider provider)
 {
     private readonly NamedValueParser namedParser = new();
-    private readonly MetadataProvider provider;
-
-    public EndpointResolver (MetadataProvider provider)
-    {
-        this.provider = provider;
-    }
 
     /// <summary>
     /// Builds constant expression for label component of endpoint parameter.

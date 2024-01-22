@@ -3,22 +3,17 @@
 /// <summary>
 /// Represents navigation position inside scenario script.
 /// </summary>
-public readonly struct Endpoint : IEquatable<Endpoint>
+public readonly struct Endpoint (string? script, string? label)
+    : IEquatable<Endpoint>
 {
     /// <summary>
     /// Name of the script; when null represents current script.
     /// </summary>
-    public string? Script { get; }
+    public string? Script { get; } = script;
     /// <summary>
     /// Label inside script; when null represents start of the script.
     /// </summary>
-    public string? Label { get; }
-
-    public Endpoint (string? script, string? label)
-    {
-        Script = script;
-        Label = label;
-    }
+    public string? Label { get; } = label;
 
     public bool Equals (Endpoint other)
     {

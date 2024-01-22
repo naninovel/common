@@ -10,7 +10,7 @@ public class ScriptSerializer
 {
     private readonly StringBuilder builder = new();
     private readonly StringBuilder mixedBuilder = new();
-    private readonly List<(int, int)> ignoreRanges = new();
+    private readonly List<(int, int)> ignoreRanges = [];
 
     /// <summary>
     /// Transforms provided script line semantic model back to text form.

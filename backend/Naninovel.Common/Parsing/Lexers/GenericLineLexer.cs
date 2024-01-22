@@ -2,13 +2,10 @@ using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;
 
-internal class GenericLineLexer
+internal class GenericLineLexer (ExpressionLexer expressionLexer,
+    CommandBodyLexer commandLexer, TextIdentifierLexer textIdLexer)
 {
     private bool hasAppearance => firstAppearance > -1;
-
-    private readonly ExpressionLexer expressionLexer;
-    private readonly TextIdentifierLexer textIdLexer;
-    private readonly CommandBodyLexer commandLexer;
 
     private LexState state = null!;
     private bool authorAdded;
@@ -18,13 +15,6 @@ internal class GenericLineLexer
     private int lastTextStart;
     private int lastNotSpace;
     private int firstAppearance;
-
-    public GenericLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer, TextIdentifierLexer textIdLexer)
-    {
-        this.expressionLexer = expressionLexer;
-        this.commandLexer = commandLexer;
-        this.textIdLexer = textIdLexer;
-    }
 
     public LineType AddGenericLine (LexState state)
     {

@@ -3,17 +3,12 @@ using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommandLineParser
+public class CommandLineParser (ParseHandlers handlers)
 {
     private static readonly Command emptyBody = new(PlainText.Empty, Array.Empty<Parameter>());
     private readonly CommandParser commandParser = new();
-    private readonly LineWalker walker;
+    private readonly LineWalker walker = new(handlers);
     private Command command = emptyBody;
-
-    public CommandLineParser (ParseHandlers handlers)
-    {
-        walker = new(handlers);
-    }
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {

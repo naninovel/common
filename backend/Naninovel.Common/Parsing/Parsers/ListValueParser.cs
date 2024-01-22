@@ -8,7 +8,7 @@ namespace Naninovel.Parsing;
 /// </summary>
 public class ListValueParser
 {
-    private readonly List<string?> items = new();
+    private readonly List<string?> items = [];
 
     private int prevDelimiterIndex;
     private string value = "";

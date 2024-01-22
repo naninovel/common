@@ -41,7 +41,7 @@ public class EndpointResolverTest
     public void WhenUnknownParameterReturnsFalse ()
     {
         meta.Update(new() {
-            Commands = new[] { new Command { Id = "c" } }
+            Commands = [new Command { Id = "c" }]
         });
         Assert.False(resolver.TryResolve(new("c"), out _));
     }
@@ -50,7 +50,7 @@ public class EndpointResolverTest
     public void WhenOtherParameterReturnsFalse ()
     {
         meta.Update(new() {
-            Commands = new[] { new Command { Id = "c", Parameters = new[] { new Parameter { Id = "p" } } } }
+            Commands = [new Command { Id = "c", Parameters = [new Parameter { Id = "p" }] }]
         });
         Assert.False(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("v") }) }), out _));
     }
@@ -59,7 +59,7 @@ public class EndpointResolverTest
     public void CanResolveScript ()
     {
         meta.Update(new() {
-            Commands = new[] { new Command { Id = "c", Parameters = new[] { CreateEndpointParameterMeta("p") } } }
+            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
         });
         Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s") }) }), out var point));
         Assert.Equal("s", point.Script);
@@ -69,7 +69,7 @@ public class EndpointResolverTest
     public void CanResolveLabel ()
     {
         meta.Update(new() {
-            Commands = new[] { new Command { Id = "c", Parameters = new[] { CreateEndpointParameterMeta("p") } } }
+            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
         });
         Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText(".l") }) }), out var point));
         Assert.Equal("l", point.Label);
@@ -79,7 +79,7 @@ public class EndpointResolverTest
     public void CanResolveScriptAndLabel ()
     {
         meta.Update(new() {
-            Commands = new[] { new Command { Id = "c", Parameters = new[] { CreateEndpointParameterMeta("p") } } }
+            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
         });
         Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s.l") }) }), out var point));
         Assert.Equal("s", point.Script);
@@ -92,10 +92,10 @@ public class EndpointResolverTest
             Id = id,
             ValueType = ValueType.String,
             ValueContainerType = ValueContainerType.Named,
-            ValueContext = new ValueContext[] {
+            ValueContext = [
                 new() { Type = ValueContextType.Resource, SubType = "Scripts" },
                 new() { Type = ValueContextType.Constant, SubType = EndpointResolver.BuildEndpointExpression(id) }
-            }
+            ]
         };
     }
 }

@@ -1,15 +1,8 @@
 namespace Naninovel.Bridging;
 
-public class ServerFinder
+public class ServerFinder (ISerializer serializer, Func<IClientTransport>? clientFactory = null)
 {
-    private readonly Func<IClientTransport> clientFactory;
-    private readonly ISerializer serializer;
-
-    public ServerFinder (ISerializer serializer, Func<IClientTransport>? clientFactory = null)
-    {
-        this.serializer = serializer;
-        this.clientFactory = clientFactory ?? (() => new NetClientTransport());
-    }
+    private readonly Func<IClientTransport> clientFactory = clientFactory ?? (() => new NetClientTransport());
 
     public async Task<List<ServerInfo>> FindServersAsync (int startPort, int endPort, TimeSpan timeout)
     {

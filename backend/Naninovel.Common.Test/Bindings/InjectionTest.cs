@@ -4,8 +4,8 @@ using Moq;
 using Naninovel.Bindings.Test;
 using Naninovel.Observing.Test;
 
-[assembly: JSExport(new[] { typeof(IServiceOneA) })]
-[assembly: JSImport(new[] { typeof(IServiceOneB) })]
+[assembly: JSExport([typeof(IServiceOneA)])]
+[assembly: JSImport([typeof(IServiceOneB)])]
 
 namespace Naninovel.Bindings.Test;
 

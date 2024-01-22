@@ -3,4 +3,4 @@
 /// <summary>
 /// Represents a part of a <see cref="IScriptLine"/>.
 /// </summary>
-public interface ILineComponent { }
+public interface ILineComponent;
