@@ -1,22 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Naninovel.Parsing;
 
-namespace Naninovel.Parsing;
-
-internal class LineWalker
+internal class LineWalker (ParseHandlers handlers)
 {
-    private readonly IErrorHandler? errorHandler;
-    private readonly IAssociator? associator;
-
     private string lineText = "";
     private IReadOnlyList<Token> tokens = Array.Empty<Token>();
     private int index = -1;
-
-    public LineWalker (IErrorHandler? errorHandler, IAssociator? associator)
-    {
-        this.errorHandler = errorHandler;
-        this.associator = associator;
-    }
 
     public void Reset (string lineText, IReadOnlyList<Token> tokens)
     {
@@ -35,27 +23,35 @@ internal class LineWalker
 
     public string Extract (Token token)
     {
-        return Extract(token.StartIndex, token.Length);
+        return Extract(token.Start, token.Length);
     }
 
     public void Error (string message)
     {
-        errorHandler?.HandleError(new(message, index, lineText.Length - index));
+        handlers.ErrorHandler?.HandleError(new(message, index, lineText.Length - index));
     }
 
     public void Error (Token token)
     {
-        errorHandler?.HandleError(new(token));
+        handlers.ErrorHandler?.HandleError(new(token));
     }
 
-    public void Associate (ILineComponent component, LineRange range)
+    public void Associate (ILineComponent component, InlineRange range)
     {
-        associator?.Associate(component, range);
+        handlers.RangeAssociator?.Associate(component, range);
     }
 
     public void Associate (ILineComponent component, Token token)
     {
         Associate(component, token.Range);
+    }
+
+    public void Identify (MixedValue mixed)
+    {
+        if (handlers.TextIdentifier is null) return;
+        foreach (var component in mixed)
+            if (component is IdentifiedText idText)
+                handlers.TextIdentifier.Identify(idText.Id.Body, idText.Text);
     }
 
     public bool Next (TokenType types, ErrorType errors, out Token token)

@@ -1,4 +1,3 @@
-using Xunit;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing.Test;

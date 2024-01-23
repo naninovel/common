@@ -6,23 +6,33 @@ namespace Naninovel.Metadata;
 public enum ValueContextType
 {
     /// <summary>
-    /// A script expression.
+    /// A script expression containing <see cref="Project.Variables"/> and <see cref="Project.Functions"/>.
     /// </summary>
     Expression,
     /// <summary>
-    /// Value from a project constant.
+    /// A value from <see cref="Project.Constants"/>; name is specified via <see cref="ValueContext.SubType"/>.
     /// </summary>
     Constant,
     /// <summary>
-    /// A project resource.
+    /// A value from <see cref="Project.Resources"/>; type is specified via <see cref="ValueContext.SubType"/>.
     /// </summary>
     Resource,
     /// <summary>
-    /// Identifier of an actor.
+    /// Identifier of an actor from <see cref="Project.Actors"/>; type is specified via <see cref="ValueContext.SubType"/>.
     /// </summary>
     Actor,
     /// <summary>
-    /// Identifier of an actor appearance.
+    /// Actor appearance from <see cref="Project.Actors"/>; actor ID may be specified via <see cref="ValueContext.SubType"/>
+    /// or otherwise is evaluated from another value with <see cref="Actor"/> context under the same parameter.
     /// </summary>
-    Appearance
+    Appearance,
+    /// <summary>
+    /// A color string in hex format.
+    /// </summary>
+    Color,
+    /// <summary>
+    /// Fixed-length array with named components; the components (separated by comma)
+    /// are specified via <see cref="ValueContext.SubType"/>, eg "x,y,z".
+    /// </summary>
+    Vector
 }

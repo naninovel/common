@@ -1,4 +1,4 @@
-using System;
+global using static Naninovel.Metadata.Utilities;
 using System.Text;
 using ContainerType = Naninovel.Metadata.ValueContainerType;
 

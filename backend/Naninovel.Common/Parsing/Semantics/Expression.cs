@@ -3,17 +3,12 @@
 /// <summary>
 /// Script expression evaluated at runtime.
 /// </summary>
-public class Expression : ILineComponent, IValueComponent
+public class Expression (PlainText body) : ILineComponent, IValueComponent
 {
     /// <summary>
     /// The evaluated body of the expression.
     /// </summary>
-    public PlainText Body { get; }
-
-    public Expression (PlainText body)
-    {
-        Body = body;
-    }
+    public PlainText Body { get; } = body;
 
     public override string ToString ()
     {

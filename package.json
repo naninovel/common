@@ -1,29 +1,28 @@
 {
     "name": "@naninovel/common",
-    "version": "1.0.14",
+    "version": "1.2.0",
     "description": "Systems used by multiple consumers: runtime, editor, language server, etc.",
-    "main": "dist/index.js",
+    "main": "dist/index.mjs",
     "types": "dist/index.d.ts",
     "files": ["dist/*"],
-    "jest": {
-        "preset": "ts-jest",
-        "testMatch": ["**/test/**/*.ts"],
-        "coveragePathIgnorePatterns": ["backend/*"]
-    },
     "scripts": {
-        "test": "jest --silent=true",
-        "cover": "npm test -- --coverage",
-        "build": "webpack --mode production && tsc --outDir ./dist --declaration --emitDeclarationOnly",
+        "backend": "dotnet publish backend",
+        "update": "ncu --interactive",
+        "test": "vitest run --silent",
+        "cover": "npm test -- --coverage.enabled --coverage.include=**/src/**",
+        "bundle": "esbuild src/index.ts --bundle --outfile=dist/index.mjs --format=esm --external:backend",
+        "types": "tsc --outDir dist --declaration --emitDeclarationOnly",
+        "build": "rimraf dist && npm run bundle && npm run types",
         "publish-npm": "npm publish --access public"
     },
     "devDependencies": {
-        "typescript": "^4.7.2",
-        "ts-jest": "^28.0.3",
-        "ts-loader": "^9.3.0",
-        "@types/jest": "^27.5.1",
-        "@types/node": "^17.0.35",
-        "webpack": "^5.72.1",
-        "webpack-cli": "^4.9.2",
-        "backend": "file:./backend"
+        "backend": "file:backend",
+        "typescript": "^5.3.3",
+        "@types/node": "^20.11.5",
+        "vitest": "^1.2.1",
+        "@vitest/coverage-v8": "^1.2.1",
+        "esbuild": "^0.19.12",
+        "rimraf": "^5.0.5",
+        "npm-check-updates": "^16.14.12"
     }
 }

@@ -1,10 +1,6 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Naninovel.Bridging;
 
@@ -57,7 +53,7 @@ public class NetClientTransport : IClientTransport
 
     public Task CloseAsync (CancellationToken token)
     {
-        return socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", token);
+        return socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", token);
     }
 
     public void Dispose () => socket.Dispose();

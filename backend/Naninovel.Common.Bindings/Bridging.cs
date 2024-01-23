@@ -1,22 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
-using DotNetJS;
-using Microsoft.JSInterop;
+﻿using System.Net.WebSockets;
+using Bootsharp;
 using Naninovel.Bridging;
 using Naninovel.Metadata;
-using static Naninovel.Common.Bindings.JSLogger;
+using static Naninovel.Bindings.JSLogger;
 
-namespace Naninovel.Common.Bindings.Bridging;
+namespace Naninovel.Bindings.Bridging;
 
 public static partial class Bridging
 {
     private static readonly TimeSpan scanDelay = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
-    private static readonly ServerFinder serverFinder = new(() => new NetClientTransport());
-
+    private static readonly JsonSerializer serializer = new(Serializer.Options);
+    private static readonly ServerFinder finder = new(serializer);
     private static CancellationTokenSource? tcs;
     private static int preferredPort;
     private static Client? client;
@@ -60,7 +55,7 @@ public static partial class Bridging
 
     private static Client CreateClient ()
     {
-        client = new Client(new NetClientTransport());
+        client = new Client(new NetClientTransport(), serializer);
         client.Subscribe<UpdateMetadata>(m => OnMetadataUpdated(m.Metadata));
         client.Subscribe<UpdatePlaybackStatus>(m => OnPlaybackStatusUpdated(m.PlaybackStatus));
         return client;
@@ -70,7 +65,7 @@ public static partial class Bridging
     {
         var startPort = preferredPort;
         var endPort = startPort + 2;
-        var servers = await serverFinder.FindServersAsync(startPort, endPort, timeout);
+        var servers = await finder.FindServersAsync(startPort, endPort, timeout);
         return servers.FirstOrDefault();
     }
 

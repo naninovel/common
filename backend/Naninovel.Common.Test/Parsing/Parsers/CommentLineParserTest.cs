@@ -1,10 +1,8 @@
-﻿using Xunit;
-
-namespace Naninovel.Parsing.Test;
+﻿namespace Naninovel.Parsing.Test;
 
 public class CommentLineParserTest
 {
-    private readonly ParseTestHelper<CommentLine> parser = new((e, a) => new CommentLineParser(e, a).Parse);
+    private readonly ParseTestHelper<CommentLine> parser = new(h => new CommentLineParser(h).Parse);
 
     [Fact]
     public void ParsesCommentText ()
@@ -37,7 +35,7 @@ public class CommentLineParserTest
     [Fact]
     public void RangesAreAssociatedCorrectly ()
     {
-        var parser = new ParseTestHelper<CommentLine>((e, a) => new CommentLineParser(e, a).Parse);
+        var parser = new ParseTestHelper<CommentLine>(h => new CommentLineParser(h).Parse);
         var line = parser.Parse("; comment");
         Assert.Equal(new(2, 7), parser.Resolve(line.Comment));
     }

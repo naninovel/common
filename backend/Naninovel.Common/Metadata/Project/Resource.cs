@@ -7,7 +7,7 @@ public class Resource
 {
     /// <summary>
     /// Unique (type-wide) identifier of the resource,
-    /// scoped via path structure (seperated with '/').
+    /// scoped via path structure (separated with '/').
     /// </summary>
     public string Path { get; set; } = string.Empty;
     /// <summary>

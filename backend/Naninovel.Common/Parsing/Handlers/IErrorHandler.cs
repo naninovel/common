@@ -1,7 +1,7 @@
 ﻿namespace Naninovel.Parsing;
 
 /// <summary>
-/// Implementation is able to handle errors occured while parsing.
+/// Handles errors occured while parsing.
 /// </summary>
 public interface IErrorHandler
 {

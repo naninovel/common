@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using static Naninovel.Parsing.TokenType;
+﻿using static Naninovel.Parsing.TokenType;
 using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
 
@@ -11,7 +9,7 @@ internal class CommandParser
     private static readonly Command emptyBody = new(PlainText.Empty);
     private static readonly MixedValue emptyValue = new(Array.Empty<IValueComponent>());
     private readonly MixedValueParser valueParser = new(true);
-    private readonly List<Parameter> parameters = new();
+    private readonly List<Parameter> parameters = [];
     private LineWalker walker = null!;
     private Command commandBody = emptyBody;
     private PlainText commandId = PlainText.Empty;
@@ -40,7 +38,6 @@ internal class CommandParser
     {
         paramId = null;
         paramValue = emptyValue;
-        valueParser.ClearAddedExpressions();
     }
 
     private bool TryCommandId ()
@@ -70,6 +67,12 @@ internal class CommandParser
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
                 return true;
+            case TextIdBody:
+                valueParser.AddTextIdBodyToken(token);
+                return true;
+            case TextId:
+                valueParser.AddTextIdToken(token);
+                return true;
             case ParamValue:
                 ParseParameterValue(token);
                 return true;
@@ -95,8 +98,9 @@ internal class CommandParser
 
     private void ParseParameterValue (Token valueToken)
     {
-        paramValue = new MixedValue(valueParser.Parse(valueToken, walker));
+        paramValue = new MixedValue(valueParser.Parse(valueToken, walker, false));
         walker.Associate(paramValue, valueToken);
+        walker.Identify(paramValue);
     }
 
     private void ParseParameter (Token paramToken)

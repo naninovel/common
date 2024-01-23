@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Naninovel.Parsing.Test;
 
 public class TokenTest
@@ -7,7 +5,10 @@ public class TokenTest
     [Fact]
     public void EqualityWorksCorrectly ()
     {
+        Assert.False(new Token().Equals(null));
+        Assert.False(new Token(TokenType.Expression, 0, 1).Equals(new Token(TokenType.Inlined, 0, 1)));
         Assert.False(new Token(TokenType.Inlined, 0, 1).Equals(new Token(TokenType.Inlined, 1, 1)));
+        Assert.False(new Token(TokenType.Inlined, 0, 1).Equals(new Token(TokenType.Inlined, 0, 0)));
         Assert.True(new Token(TokenType.Inlined, 0, 1).Equals((object)new Token(TokenType.Inlined, 0, 1)));
     }
 

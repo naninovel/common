@@ -1,5 +1,3 @@
-using System;
-
 namespace Naninovel.Metadata;
 
 /// <summary>
@@ -40,5 +38,5 @@ public class Command
     /// <summary>
     /// User-facing formatted identifier of the command.
     /// </summary>
-    public string Label => Utilities.BuildLabel(Alias, Id);
+    public string Label => BuildLabel(Alias, Id);
 }

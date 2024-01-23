@@ -1,19 +1,13 @@
-﻿using System.Collections.Generic;
-using static Naninovel.Parsing.ErrorType;
+﻿using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class LabelLineParser
+public class LabelLineParser (ParseHandlers handlers)
 {
-    private readonly LineWalker walker;
+    private readonly LineWalker walker = new(handlers);
     private PlainText label = PlainText.Empty;
-
-    public LabelLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
-    {
-        walker = new(errorHandler, associator);
-    }
 
     public LabelLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {

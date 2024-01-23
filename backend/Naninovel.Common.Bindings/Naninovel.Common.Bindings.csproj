@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
         <PackageId>Naninovel.Common.Bindings</PackageId>
         <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</Version>
         <Authors>Elringus</Authors>
@@ -12,7 +13,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DotNetJS" Version="0.18.0"/>
+        <PackageReference Include="Bootsharp.Common" Version="0.2.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

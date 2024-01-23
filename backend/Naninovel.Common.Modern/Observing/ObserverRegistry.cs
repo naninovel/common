@@ -1,24 +1,24 @@
-﻿using System.Collections.Generic;
-
 namespace Naninovel;
 
 /// <inheritdoc cref="IObserverRegistry{TObserver}"/>
 public class ObserverRegistry<TObserver> : IObserverRegistry<TObserver>
 {
-    private readonly ICollection<TObserver> observers;
+    public IReadOnlyCollection<TObserver> Observers => (IReadOnlyCollection<TObserver>)set;
 
-    public ObserverRegistry (ICollection<TObserver> observers)
-    {
-        this.observers = observers;
-    }
+    private ISet<TObserver> set = new HashSet<TObserver>();
 
     public void Register (TObserver observer)
     {
-        observers.Add(observer);
+        set.Add(observer);
     }
 
     public void Unregister (TObserver observer)
     {
-        observers.Remove(observer);
+        set.Remove(observer);
+    }
+
+    public void Order (IComparer<TObserver> comparer)
+    {
+        set = new SortedSet<TObserver>(set, comparer);
     }
 }

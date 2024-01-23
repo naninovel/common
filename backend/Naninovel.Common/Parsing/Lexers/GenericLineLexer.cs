@@ -2,32 +2,25 @@ using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;
 
-internal class GenericLineLexer
+internal class GenericLineLexer (ExpressionLexer expressionLexer,
+    CommandBodyLexer commandLexer, TextIdentifierLexer textIdLexer)
 {
     private bool hasAppearance => firstAppearance > -1;
-
-    private readonly ExpressionLexer expressionLexer;
-    private readonly CommandBodyLexer commandLexer;
 
     private LexState state = null!;
     private bool authorAdded;
     private bool canAddAuthor;
+    private bool expressionAdded;
     private int startIndex;
     private int lastTextStart;
     private int lastNotSpace;
     private int firstAppearance;
 
-    public GenericLineLexer (ExpressionLexer expressionLexer, CommandBodyLexer commandLexer)
-    {
-        this.expressionLexer = expressionLexer;
-        this.commandLexer = commandLexer;
-    }
-
     public LineType AddGenericLine (LexState state)
     {
         Reset(state);
         while (!state.EndReached)
-            if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression())
+            if (!TryAddAuthorPrefix() && !TryAddInlinedCommand() && !TryAddExpression() && !TryAddTextId())
                 Move();
         AddPrecedingText();
         return LineType.Generic;
@@ -38,6 +31,7 @@ internal class GenericLineLexer
         this.state = state;
         authorAdded = false;
         canAddAuthor = true;
+        expressionAdded = false;
         startIndex = state.Index;
         lastTextStart = startIndex;
         lastNotSpace = -1;
@@ -54,6 +48,7 @@ internal class GenericLineLexer
         state.AddToken(TokenType.AuthorAssign, state.Index - 1, 2);
         authorAdded = true;
         lastTextStart = state.Move();
+        if (expressionAdded) state.AddError(ErrorType.ExpressionInGenericPrefix, 0, state.Index);
         return true;
 
         bool ShouldTryAdd () => !authorAdded
@@ -109,6 +104,15 @@ internal class GenericLineLexer
     {
         if (!ExpressionLexer.IsOpening(state)) return false;
         expressionLexer.AddExpression(state);
+        lastNotSpace = state.Index - 1;
+        expressionAdded = true;
+        return true;
+    }
+
+    private bool TryAddTextId ()
+    {
+        if (!TextIdentifierLexer.IsOpening(state)) return false;
+        textIdLexer.AddIdentifier(state);
         lastNotSpace = state.Index - 1;
         return true;
     }

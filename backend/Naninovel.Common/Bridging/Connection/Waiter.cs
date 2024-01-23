@@ -1,16 +1,11 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Naninovel.Bridging;
 
-internal class Waiter
+internal sealed class Waiter
 {
     private readonly object @lock = new();
-    private readonly IDictionary<Type, List<TaskCompletionSource<IMessage>>> waiters =
-        new ConcurrentDictionary<Type, List<TaskCompletionSource<IMessage>>>();
+    private readonly ConcurrentDictionary<Type, List<TaskCompletionSource<IMessage>>> waiters = new();
 
     public async Task<T> WaitAsync<T> (CancellationToken token) where T : IMessage
     {
@@ -34,6 +29,6 @@ internal class Waiter
     private List<TaskCompletionSource<IMessage>> GetWaiters (Type type)
     {
         if (waiters.TryGetValue(type, out var result)) return result;
-        return waiters[type] = new List<TaskCompletionSource<IMessage>>();
+        return waiters[type] = [];
     }
 }

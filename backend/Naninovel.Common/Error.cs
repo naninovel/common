@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace Naninovel;
+﻿namespace Naninovel;
 
 /// <summary>
-/// Represents error occured in Naninovel internal behaviour.
+/// Exception thrown from Naninovel internal behaviour.
 /// </summary>
 public class Error : Exception
 {

@@ -1,20 +1,9 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Naninovel.Bridging;
 
-public class Client : IDisposable
+public class Client (IClientTransport transport, ISerializer serializer) : IDisposable
 {
-    private readonly Connection connection;
-    private readonly IClientTransport transport;
+    private readonly Connection connection = new(transport, serializer);
     private Task? maintainTask;
-
-    public Client (IClientTransport transport)
-    {
-        this.transport = transport;
-        connection = new Connection(transport);
-    }
 
     public async Task<ConnectionStatus> ConnectAsync (int port, CancellationToken token = default)
     {

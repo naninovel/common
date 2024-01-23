@@ -1,12 +1,11 @@
-﻿using Xunit;
-using static Naninovel.Parsing.ErrorType;
+﻿using static Naninovel.Parsing.ErrorType;
 using static Naninovel.Parsing.ParsingErrors;
 
 namespace Naninovel.Parsing.Test;
 
 public class LabelLineParserTest
 {
-    private readonly ParseTestHelper<LabelLine> parser = new((e, a) => new LabelLineParser(e, a).Parse);
+    private readonly ParseTestHelper<LabelLine> parser = new(h => new LabelLineParser(h).Parse);
 
     [Fact]
     public void ParsesLabelText ()

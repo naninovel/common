@@ -1,6 +1,4 @@
-using Xunit;
 using static Naninovel.Metadata.ValueContainerType;
-using static Naninovel.Metadata.ValueType;
 
 namespace Naninovel.Metadata.Test;
 
@@ -32,9 +30,9 @@ public class LabelTest
     [Fact]
     public void TypeLabelHasCorrectFormat ()
     {
-        Assert.Equal("boolean", new Parameter { ValueType = Boolean }.TypeLabel);
-        Assert.Equal("named decimal", new Parameter { ValueType = Decimal, ValueContainerType = Named }.TypeLabel);
-        Assert.Equal("integer list", new Parameter { ValueType = Integer, ValueContainerType = List }.TypeLabel);
-        Assert.Equal("named string list", new Parameter { ValueType = String, ValueContainerType = NamedList }.TypeLabel);
+        Assert.Equal("boolean", new Parameter { ValueType = ValueType.Boolean }.TypeLabel);
+        Assert.Equal("named decimal", new Parameter { ValueType = ValueType.Decimal, ValueContainerType = Named }.TypeLabel);
+        Assert.Equal("integer list", new Parameter { ValueType = ValueType.Integer, ValueContainerType = List }.TypeLabel);
+        Assert.Equal("named string list", new Parameter { ValueType = ValueType.String, ValueContainerType = NamedList }.TypeLabel);
     }
 }

@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Naninovel.Bridging;
 
-internal class Connections : IEnumerable<Connection>
+internal class Connections
 {
     private readonly IDictionary<Connection, byte> connections =
         new ConcurrentDictionary<Connection, byte>();
@@ -27,11 +24,8 @@ internal class Connections : IEnumerable<Connection>
         connections.Clear();
     }
 
-    public IEnumerator<Connection> GetEnumerator ()
+    public IEnumerable<Connection> Enumerate ()
     {
-        return connections.Keys.GetEnumerator();
+        return connections.Keys;
     }
-
-    [ExcludeFromCodeCoverage]
-    IEnumerator IEnumerable.GetEnumerator () => GetEnumerator();
 }

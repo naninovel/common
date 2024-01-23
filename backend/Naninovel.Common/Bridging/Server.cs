@@ -1,32 +1,20 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Naninovel.Bridging;
 
-public class Server : IDisposable
+public class Server (string name, IServerTransport listener, ISerializer serializer) : IDisposable
 {
     public event Action<Connection>? OnClientConnected;
     public event Action<Connection>? OnClientDisconnected;
     public event Action<Exception, Connection>? OnClientException;
 
-    public string Name { get; }
+    public string Name { get; } = name;
     public bool Listening => listener.Listening;
     public int ListenedPort { get; private set; }
     public int ConnectionsCount => connections.Count;
     public Task? WaitForExit { get; private set; }
 
-    private readonly IServerTransport listener;
     private readonly Connections connections = new();
     private readonly Subscriber subscriber = new();
     private readonly Waiter waiter = new();
-
-    public Server (string name, IServerTransport listener)
-    {
-        Name = name;
-        this.listener = listener;
-    }
 
     public void Start (int port, CancellationToken token = default)
     {
@@ -38,7 +26,7 @@ public class Server : IDisposable
 
     public Task StopAsync (CancellationToken token = default)
     {
-        var tasks = connections.Select(c => c.CloseAsync(token)
+        var tasks = connections.Enumerate().Select(c => c.CloseAsync(token)
             .ContinueWith(_ => c.Dispose(), token)).ToList();
         connections.Clear();
         listener.StopListening();
@@ -48,7 +36,7 @@ public class Server : IDisposable
 
     public void Broadcast (IServerMessage message)
     {
-        foreach (var connection in connections)
+        foreach (var connection in connections.Enumerate())
             connection.Send(message);
     }
 
@@ -69,7 +57,7 @@ public class Server : IDisposable
 
     public void Dispose ()
     {
-        foreach (var connection in connections)
+        foreach (var connection in connections.Enumerate())
             connection.Dispose();
         listener.Dispose();
     }
@@ -83,7 +71,7 @@ public class Server : IDisposable
 
     private void AcceptConnection (ITransport transport)
     {
-        var connection = new Connection(transport, subscriber, waiter);
+        var connection = new Connection(transport, serializer, subscriber, waiter);
         connection.Send(new ConnectionAccepted { ServerName = Name });
         connections.Add(connection);
         MaintainConnection(connection);

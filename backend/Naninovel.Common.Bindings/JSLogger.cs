@@ -1,6 +1,6 @@
-﻿using DotNetJS;
+﻿using Bootsharp;
 
-namespace Naninovel.Common.Bindings;
+namespace Naninovel.Bindings;
 
 public partial class JSLogger : ILogger
 {

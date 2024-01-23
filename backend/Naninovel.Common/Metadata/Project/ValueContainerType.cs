@@ -14,7 +14,7 @@ public enum ValueContainerType
     /// </summary>
     List,
     /// <summary>
-    /// A key-value span with a string key; seperated by a dot.
+    /// A key-value span with a string key; separated by a dot.
     /// </summary>
     Named,
     /// <summary>

@@ -1,13 +1,7 @@
 namespace Naninovel.Bridging;
 
-public class ServerInfo
+public class ServerInfo (string name, int port)
 {
-    public string Name { get; }
-    public int Port { get; }
-
-    internal ServerInfo (string name, int port)
-    {
-        Name = name;
-        Port = port;
-    }
+    public string Name { get; } = name;
+    public int Port { get; } = port;
 }

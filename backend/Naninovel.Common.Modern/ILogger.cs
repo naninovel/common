@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Naninovel;
+﻿namespace Naninovel;
 
 public interface ILogger
 {

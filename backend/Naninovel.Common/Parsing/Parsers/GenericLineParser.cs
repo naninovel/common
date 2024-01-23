@@ -1,22 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using static Naninovel.Parsing.TokenType;
+﻿using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class GenericLineParser
+public class GenericLineParser (ParseHandlers handlers)
 {
     private readonly CommandParser commandParser = new();
     private readonly MixedValueParser valueParser = new(false);
-    private readonly List<IGenericContent> content = new();
-    private readonly LineWalker walker;
+    private readonly List<IGenericContent> content = [];
+    private readonly LineWalker walker = new(handlers);
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
-
-    public GenericLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
-    {
-        walker = new(errorHandler, associator);
-    }
 
     public GenericLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {
@@ -54,6 +47,12 @@ public class GenericLineParser
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
                 return true;
+            case TextIdBody:
+                valueParser.AddTextIdBodyToken(token);
+                return true;
+            case TextId:
+                valueParser.AddTextIdToken(token);
+                return true;
             case InlinedOpen:
                 ParseInlined();
                 return true;
@@ -83,16 +82,15 @@ public class GenericLineParser
     {
         valueParser.ClearAddedExpressions();
         prefix = new GenericPrefix(authorId!, authorAppearance);
-        walker.Associate(prefix, new LineRange(0, authorAssignToken.EndIndex + 1));
+        walker.Associate(prefix, new InlineRange(0, authorAssignToken.EndIndex + 1));
     }
 
     private void ParseGenericText (Token textToken)
     {
-        var value = valueParser.Parse(textToken, walker);
-        var text = new MixedValue(value);
+        var text = valueParser.Parse(textToken, walker, content.Count == 0);
         content.Add(text);
         walker.Associate(text, textToken);
-        valueParser.ClearAddedExpressions();
+        walker.Identify(text);
     }
 
     private void ParseInlined ()

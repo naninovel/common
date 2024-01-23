@@ -7,10 +7,10 @@ on:
     branches: [ main ]
 
 jobs:
-  lint-editor:
+  editor:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: editorconfig
         run: |
-          docker run --rm --volume=$PWD:/check mstruebing/editorconfig-checker
+          docker run --rm --volume=$PWD:/check mstruebing/editorconfig-checker ec --exclude .git

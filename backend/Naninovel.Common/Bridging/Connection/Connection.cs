@@ -1,21 +1,19 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Naninovel.Bridging;
 
 public class Connection : IDisposable
 {
     private readonly ITransport transport;
+    private readonly MessageSerializer serializer;
     private readonly Subscriber subscriber;
     private readonly Waiter waiter;
     private readonly SendQueue sendQueue = new();
     private readonly CancellationTokenSource cts = new();
 
-    internal Connection (ITransport transport,
+    internal Connection (ITransport transport, ISerializer serializer,
         Subscriber? subscriber = default, Waiter? waiter = default)
     {
         this.transport = transport;
+        this.serializer = new MessageSerializer(serializer);
         this.subscriber = subscriber ?? new Subscriber();
         this.waiter = waiter ?? new Waiter();
     }
@@ -65,7 +63,7 @@ public class Connection : IDisposable
         while (transport.Open && !cts.IsCancellationRequested)
         {
             var message = await sendQueue.WaitAsync(cts.Token);
-            var data = Serializer.Serialize(message);
+            var data = serializer.Serialize(message);
             await transport.SendMessageAsync(data, cts.Token);
         }
     }
@@ -75,7 +73,7 @@ public class Connection : IDisposable
         while (transport.Open && !cts.IsCancellationRequested)
         {
             var data = await transport.WaitMessageAsync(cts.Token);
-            if (!Serializer.TryDeserialize(data, out var message)) continue;
+            if (!serializer.TryDeserialize(data, out var message)) continue;
             subscriber.InvokeHandlers(message);
             waiter.SetResult(message);
         }

@@ -1,6 +1,4 @@
-﻿using System;
-using Moq;
-using Xunit;
+﻿using Moq;
 
 namespace Naninovel.Test;
 

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>Naninovel.Common.TestUtilities</PackageId>
+        <Version>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</Version>
+        <Authors>Elringus</Authors>
+        <Company>ReWaffle LLC</Company>
+        <PackageDescription>Common test utilities used by multiple consumers: runtime, editor, language server, etc.</PackageDescription>
+        <RepositoryUrl>https://github.com/Naninovel/Common</RepositoryUrl>
+        <NoWarn>1591,1573</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Moq" Version="4.20.70"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Naninovel.Common.Modern/Naninovel.Common.Modern.csproj"/>
+    </ItemGroup>
+
+</Project>

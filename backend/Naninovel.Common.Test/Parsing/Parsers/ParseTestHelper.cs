@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Moq;
+﻿using Moq;
 
 namespace Naninovel.Parsing.Test;
 
@@ -9,18 +6,26 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
 {
     public List<Token> Tokens { get; } = new();
     public List<ParseError> Errors { get; } = new();
-    public Dictionary<ILineComponent, LineRange> Associations { get; } = new();
+    public Dictionary<ILineComponent, InlineRange> Associations { get; } = new();
+    public Dictionary<string, string> Identifications { get; } = new();
 
     private readonly Func<string, IReadOnlyList<Token>, TLine> parse;
     private readonly Lexer lexer = new();
 
-    public ParseTestHelper (Func<IErrorHandler, IAssociator, Func<string, IReadOnlyList<Token>, TLine>> ctor)
+    public ParseTestHelper (Func<ParseHandlers, Func<string, IReadOnlyList<Token>, TLine>> ctor)
     {
         var errorHandler = new Mock<IErrorHandler>();
         errorHandler.Setup(h => h.HandleError(Capture.In(Errors)));
-        var associator = new Mock<IAssociator>();
-        associator.Setup(a => a.Associate(It.IsAny<ILineComponent>(), It.IsAny<LineRange>())).Callback(Associations.Add);
-        parse = ctor(errorHandler.Object, associator.Object);
+        var associator = new Mock<IRangeAssociator>();
+        associator.Setup(a => a.Associate(It.IsAny<ILineComponent>(), It.IsAny<InlineRange>())).Callback(Associations.Add);
+        var identifier = new Mock<ITextIdentifier>();
+        identifier.Setup(i => i.Identify(It.IsAny<string>(), It.IsAny<string>())).Callback(Identifications.Add);
+        var handlers = new ParseHandlers {
+            ErrorHandler = errorHandler.Object,
+            RangeAssociator = associator.Object,
+            TextIdentifier = identifier.Object
+        };
+        parse = ctor(handlers);
     }
 
     public TLine Parse (string lineText)
@@ -40,7 +45,7 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
         return Errors.Any(e => e.Message == LexingErrors.GetFor(error));
     }
 
-    public LineRange? Resolve (ILineComponent component)
+    public InlineRange? Resolve (ILineComponent component)
     {
         return Associations.TryGetValue(component, out var range) ? range : null;
     }

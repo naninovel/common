@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Naninovel.Observing.Test;
+﻿namespace Naninovel.Observing.Test;
 
 public interface IMockObserver
 {

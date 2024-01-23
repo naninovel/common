@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Naninovel.Parsing;
 
 internal class LexState
@@ -11,7 +8,7 @@ internal class LexState
     public bool EndReached => Index > EndIndex;
     public bool IsSpace => IsIndexValid(Index) && char.IsWhiteSpace(text[Index]);
     public bool IsNotSpace => IsIndexValid(Index) && !char.IsWhiteSpace(text[Index]);
-    public bool IsPreviousSpace => IsIndexValid(Index - 1) && char.IsWhiteSpace(text[Index - 1]);
+    public bool IsPreviousSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index - 1));
 
     private string text = "";
     private ICollection<Token> tokens = Array.Empty<Token>();
@@ -46,6 +43,11 @@ internal class LexState
     public bool Is (char @char)
     {
         return IsIndexValid(Index) && text[Index] == @char;
+    }
+
+    public bool IsNext (char @char)
+    {
+        return IsIndexValid(Index + 1) && text[Index + 1] == @char;
     }
 
     public bool IsUnescaped (char @char)

@@ -1,6 +1,6 @@
 {
-    "private": true,
     "name": "backend",
-    "main": "Naninovel.Common.WASM/bin/dotnet.js",
-    "types": "Naninovel.Common.WASM/bin/dotnet.d.ts"
+    "type": "module",
+    "main": "Naninovel.Common.WASM/bin/backend/index.mjs",
+    "types": "Naninovel.Common.WASM/bin/backend/types/index.d.ts"
 }

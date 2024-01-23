@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
+using Moq;
 
 namespace Naninovel.Bridging.Test;
 
 public class ServerTest
 {
     private readonly MockServerTransport listener = new();
+    private readonly MockSerializer serializer = new();
     private readonly Server server;
 
     public ServerTest ()
     {
-        server = new Server("", listener);
+        server = new Server("", listener, serializer);
     }
 
     [Fact]
@@ -163,15 +158,15 @@ public class ServerTest
         Assert.Equal(0, cde.CurrentCount);
     }
 
-    [Fact, ExcludeFromCodeCoverage]
+    [Fact]
     public async Task UnsubscribedHandlerNotInvoked ()
     {
-        var message = default(ClientMessage);
-        server.Subscribe<ClientMessage>(m => message = m);
-        server.Unsubscribe<ClientMessage>(m => message = m);
+        var handler = new Mock<Action<ClientMessage>>();
+        server.Subscribe<ClientMessage>(handler.Object);
+        server.Unsubscribe<ClientMessage>(handler.Object);
         var transport = await ConnectAsync();
         await MockIncomingAsync<ClientMessage>(transport);
-        Assert.Null(message);
+        handler.VerifyNoOtherCalls();
     }
 
     [Fact]
@@ -181,6 +176,19 @@ public class ServerTest
         server.Subscribe<ClientMessage>(_ => throw new Exception());
         server.Start(0);
         server.OnClientException += (_, _) => mre.Set();
+        var transport = await ConnectAsync();
+        transport.MockIncoming(new ClientMessage());
+        await Task.Run(() => mre.Wait(TimeSpan.FromSeconds(1)));
+        Assert.True(mre.IsSet);
+    }
+
+    [Fact]
+    public async Task WhenExceptionHandlerMissingExceptionIsIgnored ()
+    {
+        var mre = new ManualResetEventSlim();
+        server.Subscribe<ClientMessage>(_ => throw new Exception());
+        server.Start(0);
+        server.OnClientDisconnected += _ => mre.Set();
         var transport = await ConnectAsync();
         transport.MockIncoming(new ClientMessage());
         await Task.Run(() => mre.Wait(TimeSpan.FromSeconds(1)));

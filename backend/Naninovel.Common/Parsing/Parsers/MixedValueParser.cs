@@ -1,22 +1,27 @@
-﻿using System.Collections.Generic;
 using static Naninovel.Parsing.Utilities;
 
 namespace Naninovel.Parsing;
 
-internal class MixedValueParser
+internal class MixedValueParser (bool unwrap)
 {
-    private readonly bool unwrap;
-    private readonly List<IValueComponent> value = new();
+    private readonly List<IValueComponent> value = [];
     private readonly Queue<Token> expressions = new();
+    private readonly Queue<Token> textIds = new();
+    private readonly Queue<Token> textIdBodies = new();
 
-    public MixedValueParser (bool unwrap)
+    public void AddExpressionToken (Token token)
     {
-        this.unwrap = unwrap;
+        expressions.Enqueue(token);
     }
 
-    public void AddExpressionToken (Token expressionToken)
+    public void AddTextIdToken (Token token)
     {
-        expressions.Enqueue(expressionToken);
+        textIds.Enqueue(token);
+    }
+
+    public void AddTextIdBodyToken (Token token)
+    {
+        textIdBodies.Enqueue(token);
     }
 
     public void ClearAddedExpressions ()
@@ -24,63 +29,100 @@ internal class MixedValueParser
         expressions.Clear();
     }
 
-    public MixedValue Parse (Token valueToken, LineWalker walker)
+    public MixedValue Parse (Token valueToken, LineWalker walker, bool unescapeAuthor)
     {
         value.Clear();
 
         var unescapeQuotes = unwrap && IsValueWrapped();
-        var startIndex = valueToken.StartIndex + (unescapeQuotes ? 1 : 0);
+        var startIndex = valueToken.Start + (unescapeQuotes ? 1 : 0);
         var endIndex = valueToken.EndIndex - (unescapeQuotes ? 1 : 0);
 
         var index = startIndex;
         var textStartIndex = -1;
         for (; index <= endIndex; index++)
             if (ShouldProcessExpression()) ProcessExpression();
+            else if (ShouldProcessIdentifiedText()) ProcessIdentifiedText();
             else if (!IsTextStarted()) textStartIndex = index;
-        if (IsTextStarted()) AddText(endIndex - textStartIndex + 1);
+        if (IsTextStarted()) value.Add(ParseText(endIndex - textStartIndex + 1));
+
+        textIds.Clear();
+        textIdBodies.Clear();
+        expressions.Clear();
+
         return new MixedValue(value);
+
+        bool IsTextStarted () => textStartIndex != -1;
 
         bool IsValueWrapped ()
         {
-            return walker.GetCharAt(valueToken.StartIndex) == '\"' &&
+            return walker.GetCharAt(valueToken.Start) == '\"' &&
                    walker.GetCharAt(valueToken.EndIndex) == '\"';
         }
 
         bool ShouldProcessExpression ()
         {
             return expressions.Count > 0 &&
-                   expressions.Peek().StartIndex == index;
+                   expressions.Peek().Start == index;
+        }
+
+        bool ShouldProcessIdentifiedText ()
+        {
+            return textIds.Count > 0 &&
+                   textIds.Peek().Start == index;
         }
 
         void ProcessExpression ()
         {
             var expression = expressions.Dequeue();
-            if (IsTextStarted()) AddText(expression.StartIndex - textStartIndex);
-            AddExpression(expression);
+            if (IsTextStarted()) value.Add(ParseText(expression.Start - textStartIndex));
+            value.Add(ParseExpression(expression));
             index = expression.EndIndex;
         }
 
-        bool IsTextStarted () => textStartIndex != -1;
-
-        void AddText (int length)
+        void ProcessIdentifiedText ()
         {
-            var text = walker.Extract(textStartIndex, length);
-            var plain = new PlainText(UnescapePlain(text, unescapeQuotes));
-            walker.Associate(plain, new LineRange(textStartIndex, length));
-            value.Add(plain);
-            textStartIndex = -1;
+            var identifiedText = textIds.Dequeue();
+            var bodyToken = textIdBodies.Count > 0 && textIdBodies.Peek().EndIndex <= identifiedText.EndIndex
+                ? textIdBodies.Dequeue() : default(Token?);
+            value.Add(ParseIdentifiedText(identifiedText, bodyToken));
+            index = identifiedText.EndIndex;
         }
 
-        void AddExpression (Token expressionToken)
+        Expression ParseExpression (Token expressionToken)
         {
-            var bodyStart = expressionToken.StartIndex + 1;
-            var bodyLength = expressionToken.EndIndex - expressionToken.StartIndex - 1;
+            var bodyStart = expressionToken.Start + 1;
+            var bodyLength = expressionToken.EndIndex - expressionToken.Start - 1;
             var body = new PlainText(walker.Extract(bodyStart, bodyLength));
             if (bodyLength > 0)
-                walker.Associate(body, new LineRange(bodyStart, bodyLength));
+                walker.Associate(body, new InlineRange(bodyStart, bodyLength));
             var expression = new Expression(body);
             walker.Associate(expression, expressionToken);
-            value.Add(expression);
+            return expression;
+        }
+
+        PlainText ParseText (int length)
+        {
+            var text = walker.Extract(textStartIndex, length);
+            if (unescapeAuthor) text = UnescapeAuthor(text);
+            var plain = new PlainText(UnescapePlain(text, unescapeQuotes));
+            walker.Associate(plain, new InlineRange(textStartIndex, length));
+            textStartIndex = -1;
+            return plain;
+        }
+
+        IdentifiedText ParseIdentifiedText (Token textIdToken, Token? textIdBodyToken)
+        {
+            var textStart = IsTextStarted() ? textStartIndex : textIdToken.Start;
+            var textLength = textIdToken.Start - textStart;
+            var text = textLength > 0 ? ParseText(textLength) : PlainText.Empty;
+            var body = textIdBodyToken.HasValue ? new PlainText(walker.Extract(textIdBodyToken.Value)) : PlainText.Empty;
+            if (textIdBodyToken.HasValue)
+                walker.Associate(body, textIdBodyToken.Value);
+            var textId = new TextIdentifier(body);
+            walker.Associate(textId, textIdToken);
+            var identifiedText = new IdentifiedText(text, textId);
+            walker.Associate(identifiedText, new InlineRange(textStart, textLength + textIdToken.Length));
+            return identifiedText;
         }
     }
 
@@ -94,8 +136,19 @@ internal class MixedValueParser
         bool ShouldRemove (int i)
         {
             if (value[i] != '\\' || IsEscaped(value, i)) return false;
-            var prevChar = value[i + 1];
-            return unescapeQuotes && prevChar == '"' || IsControlChar(prevChar);
+            var prev = value[i + 1];
+            return unescapeQuotes && prev == '"' || IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
         }
+    }
+
+    private static string UnescapeAuthor (string value)
+    {
+        const string target = $"\\{Identifiers.AuthorAssign}";
+        var targetIndex = value.IndexOf(target, StringComparison.Ordinal);
+        if (targetIndex < 1) return value;
+        for (int i = 0; i < targetIndex; i++)
+            if (char.IsWhiteSpace(value[i]))
+                return value;
+        return value.Remove(targetIndex, 1);
     }
 }

@@ -1,4 +1,4 @@
-﻿using static Naninovel.Parsing.Utilities;
+using static Naninovel.Parsing.Utilities;
 using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;

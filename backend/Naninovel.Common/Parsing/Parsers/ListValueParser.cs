@@ -1,5 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
 using static Naninovel.Parsing.Utilities;
 using static Naninovel.Parsing.Identifiers;
 
@@ -10,7 +8,7 @@ namespace Naninovel.Parsing;
 /// </summary>
 public class ListValueParser
 {
-    private readonly List<string?> items = new();
+    private readonly List<string?> items = [];
 
     private int prevDelimiterIndex;
     private string value = "";

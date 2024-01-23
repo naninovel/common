@@ -1,18 +1,12 @@
-﻿using System.Collections.Generic;
-using static Naninovel.Parsing.ParsingErrors;
+﻿using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommentLineParser
+public class CommentLineParser (ParseHandlers handlers)
 {
-    private readonly LineWalker walker;
+    private readonly LineWalker walker = new(handlers);
     private PlainText comment = PlainText.Empty;
-
-    public CommentLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
-    {
-        walker = new(errorHandler, associator);
-    }
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {

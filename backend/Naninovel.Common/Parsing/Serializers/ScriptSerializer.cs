@@ -1,5 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using static Naninovel.Parsing.Utilities;
 
@@ -12,7 +10,7 @@ public class ScriptSerializer
 {
     private readonly StringBuilder builder = new();
     private readonly StringBuilder mixedBuilder = new();
-    private readonly List<(int, int)> ignoreRanges = new();
+    private readonly List<(int, int)> ignoreRanges = [];
 
     /// <summary>
     /// Transforms provided script line semantic model back to text form.
@@ -35,18 +33,18 @@ public class ScriptSerializer
             AppendLine(line);
             builder.Append('\n');
         }
-        return builder.ToString();
+        return TrimTrailingLineBreaks(builder).ToString();
     }
 
     /// <summary>
     /// Transforms provided mixed value semantic model back to text form.
     /// </summary>
     /// <param name="value">The value to transform.</param>
-    /// <param name="wrap">Whether to wrap in quotes when whitespace is detected in plain text.</param>
-    public string Serialize (IEnumerable<IValueComponent> value, bool wrap)
+    /// <param name="context">Context of the parsed content (eg, whether it's a parameter value or generic text).</param>
+    public string Serialize (IEnumerable<IValueComponent> value, SerializationContext context)
     {
         builder.Clear();
-        AppendMixed(value, wrap);
+        AppendMixed(value, context.ParameterValue, context.FirstGenericContent);
         return builder.ToString();
     }
 
@@ -78,13 +76,13 @@ public class ScriptSerializer
         AppendCommand(commandLine.Command);
     }
 
-    private void AppendGenericLine (GenericLine genericLine)
+    private void AppendGenericLine (GenericLine line)
     {
-        if (genericLine.Prefix != null)
-            AppendGenericPrefix(genericLine.Prefix);
-        foreach (var content in genericLine.Content)
-            if (content is MixedValue text) AppendMixed(text, false);
-            else AppendInlinedCommand((InlinedCommand)content);
+        if (line.Prefix != null)
+            AppendGenericPrefix(line.Prefix);
+        for (var i = 0; i < line.Content.Count; i++)
+            if (line.Content[i] is MixedValue text) AppendMixed(text, false, i == 0);
+            else AppendInlinedCommand((InlinedCommand)line.Content[i]);
     }
 
     private void AppendCommand (Command command)
@@ -107,7 +105,7 @@ public class ScriptSerializer
             builder.Append(Identifiers.ParameterAssign[0]);
         }
 
-        AppendMixed(parameter.Value, true);
+        AppendMixed(parameter.Value, true, false);
     }
 
     private void AppendGenericPrefix (GenericPrefix prefix)
@@ -128,29 +126,44 @@ public class ScriptSerializer
         builder.Append(Identifiers.InlinedClose[0]);
     }
 
-    private void AppendMixed (IEnumerable<IValueComponent> mixed, bool wrap)
+    private void AppendMixed (IEnumerable<IValueComponent> mixed, bool wrap, bool escapeAuthor)
     {
         ignoreRanges.Clear();
         mixedBuilder.Clear();
         foreach (var component in mixed)
             AppendComponent(component);
-        builder.Append(Encode(mixedBuilder.ToString(), wrap));
+        var content = Encode(mixedBuilder.ToString(), wrap);
+        if (escapeAuthor) content = EscapeAuthor(content);
+        builder.Append(content);
     }
 
     private void AppendComponent (IValueComponent component)
     {
         if (component is PlainText text) mixedBuilder.Append(text);
-        else if (component is Expression expression)
-        {
-            var startIndex = mixedBuilder.Length;
-            mixedBuilder.Append(Identifiers.ExpressionOpen);
-            mixedBuilder.Append(expression.Body);
-            mixedBuilder.Append(Identifiers.ExpressionClose);
-            ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
-        }
+        else if (component is Expression expression) AppendExpression(expression);
+        else if (component is IdentifiedText identifiedText) AppendIdentifiedText(identifiedText);
     }
 
-    private string Encode (string value, bool wrap = true)
+    private void AppendExpression (Expression expression)
+    {
+        var startIndex = mixedBuilder.Length;
+        mixedBuilder.Append(Identifiers.ExpressionOpen);
+        mixedBuilder.Append(expression.Body);
+        mixedBuilder.Append(Identifiers.ExpressionClose);
+        ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
+    }
+
+    private void AppendIdentifiedText (IdentifiedText identifiedText)
+    {
+        mixedBuilder.Append(identifiedText.Text);
+        var startIndex = mixedBuilder.Length;
+        mixedBuilder.Append(Identifiers.TextIdOpen);
+        mixedBuilder.Append(identifiedText.Id.Body);
+        mixedBuilder.Append(Identifiers.TextIdClose);
+        ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
+    }
+
+    private string Encode (string value, bool wrap)
     {
         wrap = wrap && !string.IsNullOrEmpty(value) && (value[0] == '\"' || IsAnySpaceOrUnclosedQuotes());
         for (int i = value.Length - 1; i >= 0; i--)
@@ -172,7 +185,7 @@ public class ScriptSerializer
         bool ShouldEscape (int i)
         {
             if (IsIgnored(ignoreRanges, i)) return false;
-            return IsControlChar(value[i]) || wrap && value[i] == '"';
+            return IsPlainTextControlChar(value[i], value.ElementAtOrDefault(i + 1)) || wrap && value[i] == '"';
         }
 
         static bool IsIgnored (IEnumerable<(int start, int length)> ignoredRanges, int i)
@@ -182,5 +195,27 @@ public class ScriptSerializer
                     return true;
             return false;
         }
+    }
+
+    private string EscapeAuthor (string value)
+    {
+        var targetIndex = value.IndexOf(Identifiers.AuthorAssign[0]);
+        if (targetIndex < 1) return value;
+        for (int i = 0; i < targetIndex; i++)
+            if (char.IsWhiteSpace(value[i]))
+                return value;
+        return value.Insert(targetIndex, "\\");
+    }
+
+    public static StringBuilder TrimTrailingLineBreaks (StringBuilder builder)
+    {
+        var trimIndex = builder.Length - 1;
+        for (; trimIndex >= 0; trimIndex--)
+            if (builder[trimIndex] != '\n')
+                break;
+        trimIndex++;
+        if (trimIndex < builder.Length - 1)
+            builder.Length = trimIndex + 1;
+        return builder;
     }
 }

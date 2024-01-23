@@ -1,17 +1,22 @@
-﻿import { Bindings } from "backend";
+let injectedLog: ((message: string) => void) | undefined;
+let injectedWarn: ((message: string) => void) | undefined;
+let injectedError: ((message: string) => void) | undefined;
 
-let injectedLog: (message: string) => void;
-let injectedWarn: (message: string) => void;
-let injectedError: (message: string) => void;
+export type Logger = {
+    logInfo?: (message: string) => void;
+    logWarning?: (message: string) => void;
+    logError?: (message: string) => void;
+}
 
 export function injectLogger(
-    log: (message: string) => void,
+    logger: Logger,
+    log?: (message: string) => void,
     warn?: (message: string) => void,
     error?: (message: string) => void
 ) {
-    Bindings.LogInfo = injectedLog = log;
-    Bindings.LogWarning = injectedWarn = warn ?? log;
-    Bindings.LogError = injectedError = error ?? log;
+    logger.logInfo = injectedLog = log;
+    logger.logWarning = injectedWarn = warn ?? log;
+    logger.logError = injectedError = error ?? log;
 }
 
 export function log(message: string) {

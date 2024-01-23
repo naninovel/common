@@ -37,13 +37,13 @@ public class Parameter
     /// <summary>
     /// Optional information about the context in which the value is used.
     /// </summary>
-    public ValueContext? ValueContext { get; set; }
+    /// <remarks>
+    /// Multiple elements can be specified to map contexts to specific value indexes,
+    /// in case the parameter value is of list or named container types.
+    /// </remarks>
+    public ValueContext?[]? ValueContext { get; set; }
     /// <summary>
-    /// When value container is of a named type, represents context of the named part.
-    /// </summary>
-    public ValueContext? NamedValueContext { get; set; }
-    /// <summary>
-    /// The value the parameter has when it's not explicitly specified in script.
+    /// The value of the parameter has when it's not explicitly specified in script.
     /// </summary>
     public string? DefaultValue { get; set; }
     /// <summary>
@@ -54,9 +54,9 @@ public class Parameter
     /// <summary>
     /// User-facing formatted identifier of the parameter.
     /// </summary>
-    public string Label => Utilities.BuildLabel(Alias, Id);
+    public string Label => BuildLabel(Alias, Id);
     /// <summary>
     /// User-facing formatted name of the parameter's type.
     /// </summary>
-    public string TypeLabel => Utilities.BuildTypeLabel(ValueType, ValueContainerType);
+    public string TypeLabel => BuildTypeLabel(ValueType, ValueContainerType);
 }

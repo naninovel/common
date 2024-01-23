@@ -14,6 +14,10 @@ public static class Constants
     /// </summary>
     public const string BackgroundType = "Backgrounds";
     /// <summary>
+    /// Default type of the scenario scripts.
+    /// </summary>
+    public const string ScriptsType = "Scripts";
+    /// <summary>
     /// Flag representing any type.
     /// </summary>
     public const string WildcardType = "*";

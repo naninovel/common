@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Naninovel.Metadata;
 
 /// <summary>
@@ -16,12 +12,12 @@ public class MetadataProvider
     public IReadOnlyCollection<string> Variables => variables;
     public IReadOnlyCollection<string> Functions => functions;
 
-    private readonly List<Actor> actors = new();
-    private readonly List<Command> commands = new();
-    private readonly List<Constant> constants = new();
-    private readonly List<Resource> resources = new();
-    private readonly List<string> variables = new();
-    private readonly List<string> functions = new();
+    private readonly List<Actor> actors = [];
+    private readonly List<Command> commands = [];
+    private readonly List<Constant> constants = [];
+    private readonly List<Resource> resources = [];
+    private readonly List<string> variables = [];
+    private readonly List<string> functions = [];
     private readonly Dictionary<string, Command> commandById = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Command> commandByAlias = new(StringComparer.OrdinalIgnoreCase);
 

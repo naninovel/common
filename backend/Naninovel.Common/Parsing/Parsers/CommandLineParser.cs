@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using static Naninovel.Parsing.ParsingErrors;
+﻿using static Naninovel.Parsing.ParsingErrors;
 using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommandLineParser
+public class CommandLineParser (ParseHandlers handlers)
 {
     private static readonly Command emptyBody = new(PlainText.Empty, Array.Empty<Parameter>());
     private readonly CommandParser commandParser = new();
-    private readonly LineWalker walker;
+    private readonly LineWalker walker = new(handlers);
     private Command command = emptyBody;
-
-    public CommandLineParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
-    {
-        walker = new(errorHandler, associator);
-    }
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens)
     {

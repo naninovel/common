@@ -5,4 +5,4 @@ namespace Naninovel.Parsing;
 /// Can be either <see cref="CommentLine"/>, <see cref="LabelLine"/>,
 /// <see cref="CommandLine"/> or <see cref="GenericLine"/>.
 /// </summary>
-public interface IScriptLine { }
+public interface IScriptLine;

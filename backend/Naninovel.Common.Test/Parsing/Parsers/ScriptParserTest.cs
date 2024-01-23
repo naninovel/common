@@ -1,5 +1,3 @@
-﻿using Xunit;
-
 namespace Naninovel.Parsing.Test;
 
 public class ScriptParserTest
@@ -9,7 +7,7 @@ public class ScriptParserTest
 
     public ScriptParserTest ()
     {
-        parser = new(errors);
+        parser = new(new ParseHandlers { ErrorHandler = errors });
     }
 
     [Fact]
@@ -58,5 +56,11 @@ Generic text line
         Assert.Equal(3, errors[0].StartIndex);
         Assert.Equal(2, errors[0].Length);
         Assert.Equal(4, errors[0].EndIndex);
+    }
+
+    [Fact]
+    public void CanCreateParserWithoutHandlers ()
+    {
+        _ = new ScriptParser();
     }
 }

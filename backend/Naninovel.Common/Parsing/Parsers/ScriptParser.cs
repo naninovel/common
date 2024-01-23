@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+using Naninovel.Utilities;
 
 namespace Naninovel.Parsing;
 
@@ -8,10 +7,10 @@ namespace Naninovel.Parsing;
 /// </summary>
 public class ScriptParser
 {
-    private static readonly string[] lineBreakSymbols = { "\r\n", "\n", "\r" };
+    private static readonly ParseHandlers nullHandlers = new();
 
     private readonly Lexer lexer = new();
-    private readonly List<Token> tokens = new();
+    private readonly List<Token> tokens = [];
     private readonly CommandLineParser commandParser;
     private readonly CommentLineParser commentParser;
     private readonly GenericLineParser genericParser;
@@ -20,14 +19,14 @@ public class ScriptParser
     /// <summary>
     /// Creates a new parser instance.
     /// </summary>
-    /// <param name="errorHandler">Optional handler for parsing errors.</param>
-    /// <param name="associator">Optional handler for associating parse models with text ranges.</param>
-    public ScriptParser (IErrorHandler? errorHandler = null, IAssociator? associator = null)
+    /// <param name="handlers">Optional parse handlers (hooks).</param>
+    public ScriptParser (ParseHandlers? handlers = null)
     {
-        commandParser = new(errorHandler, associator);
-        commentParser = new(errorHandler, associator);
-        genericParser = new(errorHandler, associator);
-        labelParser = new(errorHandler, associator);
+        handlers ??= nullHandlers;
+        commandParser = new(handlers);
+        commentParser = new(handlers);
+        genericParser = new(handlers);
+        labelParser = new(handlers);
     }
 
     /// <summary>
@@ -36,8 +35,7 @@ public class ScriptParser
     /// <param name="scriptText">The script text to split.</param>
     public static string[] SplitText (string? scriptText)
     {
-        return scriptText?.Trim('\uFEFF', '\u200B') // Remove BOM and zero-width space.
-            .Split(lineBreakSymbols, StringSplitOptions.None) ?? new[] { string.Empty };
+        return scriptText?.TrimJunk().SplitLines() ?? [string.Empty];
     }
 
     /// <summary>

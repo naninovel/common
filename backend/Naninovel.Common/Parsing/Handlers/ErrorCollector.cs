@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Naninovel.Parsing;
+﻿namespace Naninovel.Parsing;
 
 /// <summary>
 /// Collects errors occured while parsing.
