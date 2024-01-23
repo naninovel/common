@@ -1,6 +1,6 @@
 {
     "name": "@naninovel/common",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Systems used by multiple consumers: runtime, editor, language server, etc.",
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts",
@@ -17,11 +17,12 @@
     },
     "devDependencies": {
         "backend": "file:backend",
-        "typescript": "^5.2.2",
-        "vitest": "^0.34.6",
-        "@vitest/coverage-v8": "^0.34.6",
-        "esbuild": "^0.19.4",
+        "typescript": "^5.3.3",
+        "@types/node": "^20.11.5",
+        "vitest": "^1.2.1",
+        "@vitest/coverage-v8": "^1.2.1",
+        "esbuild": "^0.19.12",
         "rimraf": "^5.0.5",
-        "npm-check-updates": "^16.14.6"
+        "npm-check-updates": "^16.14.12"
     }
 }
