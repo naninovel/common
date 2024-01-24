@@ -3,4 +3,4 @@
 [![codecov](https://codecov.io/gh/naninovel/common/branch/main/graph/badge.svg?token=XW6TBDZOG6)](https://codecov.io/gh/naninovel/common)
 [![CodeQL](https://github.com/naninovel/common/actions/workflows/codeql.yml/badge.svg)](https://github.com/naninovel/common/actions/workflows/codeql.yml)
 
-Domain is implemented in C# under `backend` directory and published as `Naninovel.Common` NuGet package; it's .NET Standard 2.0 compatible, which is required by Unity environment. `Naninovel.Common.Modern` targets .NET 6 and is consumed by web editor, language server, VS Code extension, etc. JavaScript bindings and utilities are stored under `src` directory and published as `@naninovel/common` NPM package.
+Domain is implemented in C# under `backend` directory and published as `Naninovel.Common` NuGet package; it's .NET Standard 2.0 compatible, which is required by Unity environment. `Naninovel.Common.Modern` targets .NET 8 and is consumed by web editor, language server, VS Code extension, etc. JavaScript bindings and utilities are stored under `src` directory and published as `@naninovel/common` NPM package.
