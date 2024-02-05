@@ -10,7 +10,7 @@
         <Authors>Elringus</Authors>
         <Company>ReWaffle LLC</Company>
         <PackageDescription>Systems used by multiple modern .NET consumers: runtime, editor, language server, etc. Excluding v1 Unity runtime.</PackageDescription>
-        <RepositoryUrl>https://github.com/Naninovel/Common</RepositoryUrl>
+        <RepositoryUrl>https://github.com/naninovel/common</RepositoryUrl>
         <NoWarn>1591,1573</NoWarn>
     </PropertyGroup>
 

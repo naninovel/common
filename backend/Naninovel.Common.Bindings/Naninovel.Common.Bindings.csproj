@@ -9,7 +9,7 @@
         <Authors>Elringus</Authors>
         <Company>ReWaffle LLC</Company>
         <PackageDescription>JavaScript bindings for common systems.</PackageDescription>
-        <RepositoryUrl>https://github.com/Naninovel/Common</RepositoryUrl>
+        <RepositoryUrl>https://github.com/naninovel/common</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
