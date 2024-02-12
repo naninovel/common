@@ -60,10 +60,14 @@ public class MetadataProvider
     /// <param name="paramAliasOrId">Alias or ID of the parameter; use empty or null for nameless.</param>
     public Parameter? FindParameter (string commandAliasOrId, string paramAliasOrId)
     {
-        return FindCommand(commandAliasOrId)?.Parameters
-            .FirstOrDefault(p => p.Nameless && string.IsNullOrEmpty(paramAliasOrId) ||
-                                 !string.IsNullOrEmpty(p.Alias) && string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase) ||
-                                 string.Equals(p.Id, paramAliasOrId, StringComparison.OrdinalIgnoreCase));
+        return FindCommand(commandAliasOrId)?.Parameters.FirstOrDefault(IsMatch);
+
+        bool IsMatch (Parameter p)
+        {
+            if (p.Nameless && string.IsNullOrEmpty(paramAliasOrId)) return true;
+            if (!string.IsNullOrEmpty(p.Alias) && string.Equals(p.Alias, paramAliasOrId, StringComparison.OrdinalIgnoreCase)) return true;
+            return string.Equals(p.Id, paramAliasOrId, StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     private void Reset ()
