@@ -16,4 +16,6 @@ public static class Identifiers
     public const string NamedDelimiter = ".";
     public const string TextIdOpen = "|#";
     public const string TextIdClose = "|";
+    public const string WaitTrue = " <";
+    public const string WaitFalse = " >";
 }

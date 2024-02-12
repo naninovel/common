@@ -19,6 +19,12 @@ internal class CommandBodyLexer (CommandParameterLexer parameterLexer)
         return state.EndReached;
     }
 
+    public static bool IsLast (LexState state, bool inlined)
+    {
+        if (inlined && state.IsNextUnescaped(InlinedClose[0])) return true;
+        return state.IsLast;
+    }
+
     public void AddCommandBody (LexState state, bool inlined)
     {
         Reset(state, inlined);

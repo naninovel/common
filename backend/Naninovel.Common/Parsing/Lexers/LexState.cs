@@ -5,6 +5,7 @@ internal class LexState
     public int Index { get; private set; }
     public int Length => text.Length;
     public int EndIndex => text.Length - 1;
+    public bool IsLast => Index == EndIndex;
     public bool EndReached => Index > EndIndex;
     public bool IsSpace => IsIndexValid(Index) && char.IsWhiteSpace(text[Index]);
     public bool IsNotSpace => IsIndexValid(Index) && !char.IsWhiteSpace(text[Index]);
@@ -53,6 +54,11 @@ internal class LexState
     public bool IsUnescaped (char @char)
     {
         return Is(@char) && !Utilities.IsEscaped(text, Index);
+    }
+
+    public bool IsNextUnescaped (char @char)
+    {
+        return IsNext(@char) && !Utilities.IsEscaped(text, Index + 1);
     }
 
     private bool IsIndexValid (int index)
