@@ -1,7 +1,6 @@
 ﻿using Bootsharp;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Naninovel.Bindings.Test;
 using Naninovel.Observing.Test;
 
 [assembly: JSExport([typeof(IServiceOneA)])]
