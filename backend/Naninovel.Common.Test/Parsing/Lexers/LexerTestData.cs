@@ -2,7 +2,7 @@ namespace Naninovel.Parsing.Test;
 
 public static class LexerTestData
 {
-    public static IEnumerable<object[]> CommentLines { get; } = new[] {
+    public static IEnumerable<object[]> CommentLines { get; } = [
         T(
             "; Comment",
             LineId(0, 1), CommentText(2, 7)
@@ -27,9 +27,9 @@ public static class LexerTestData
             "\t; \t ",
             LineId(1, 1)
         )
-    };
+    ];
 
-    public static IEnumerable<object[]> LabelLines { get; } = new[] {
+    public static IEnumerable<object[]> LabelLines { get; } = [
         T(
             "# Label",
             LineId(0, 1), LabelText(2, 5)
@@ -54,9 +54,9 @@ public static class LexerTestData
             "\t# \t ",
             LineId(1, 1), MissingLabel(0, 5)
         )
-    };
+    ];
 
-    public static IEnumerable<object[]> CommandLines { get; } = new[] {
+    public static IEnumerable<object[]> CommandLines { get; } = [
         T(
             "@command",
             LineId(0, 1), CommandId(1, 7), CommandBody(1, 7)
@@ -249,10 +249,48 @@ public static class LexerTestData
             ParamId(3, 1), ParamAssign(4, 1),
             TextIdOpen(6, 2), TextIdBody(8, 1), TextIdClose(9, 1), TextId(6, 4),
             ParamValue(5, 6), NamedParam(3, 8), CommandBody(1, 10)
+        ),
+        T(
+            "@c <",
+            LineId(0, 1), CommandId(1, 1), WaitTrue(2, 2), CommandBody(1, 3)
+        ),
+        T(
+            "@c >",
+            LineId(0, 1), CommandId(1, 1), WaitFalse(2, 2), CommandBody(1, 3)
+        ),
+        T(
+            "@c x >",
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 1), NamelessParam(3, 1),
+            WaitFalse(4, 2), CommandBody(1, 5)
+        ),
+        T(
+            "@c x p:x <",
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 1), NamelessParam(3, 1),
+            ParamId(5, 1), ParamAssign(6, 1), ParamValue(7, 1), NamedParam(5, 3),
+            WaitTrue(8, 2), CommandBody(1, 9)
+        ),
+        T(
+            "@c \">\"",
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 3), NamelessParam(3, 3), CommandBody(1, 5)
+        ),
+        T(
+            "@c x<",
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 2), NamelessParam(3, 2), CommandBody(1, 4)
+        ),
+        T(
+            "@c < p:>",
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 1), NamelessParam(3, 1),
+            ParamId(5, 1), ParamAssign(6, 1), ParamValue(7, 1), NamedParam(5, 3),
+            CommandBody(1, 7)
         )
-    };
+    ];
 
-    public static IEnumerable<object[]> GenericLines { get; } = new[] {
+    public static IEnumerable<object[]> GenericLines { get; } = [
         T(
             ""
         ),
@@ -449,8 +487,13 @@ public static class LexerTestData
             InlinedOpen(5, 1), CommandId(6, 1), TextIdOpen(9, 2), TextIdBody(11, 1), TextIdClose(12, 1), TextId(9, 4),
             ParamValue(8, 5), NamelessParam(8, 5), CommandBody(6, 7), InlinedClose(13, 1), Inlined(5, 9),
             TextIdOpen(15, 2), TextIdBody(17, 1), TextIdClose(18, 1), TextId(15, 4), GenericText(14, 5)
+        ),
+        T(
+            "[i >]",
+            InlinedOpen(0, 1), CommandId(1, 1), WaitFalse(2, 2),
+            CommandBody(1, 3), InlinedClose(4, 1), Inlined(0, 5)
         )
-    };
+    ];
 
     private static object[] T (string text, params Token[] tokens)
     {
@@ -488,6 +531,8 @@ public static class LexerTestData
     private static Token TextIdBody (int startIndex, int length) => Token(TokenType.TextIdBody, startIndex, length);
     private static Token TextIdOpen (int startIndex, int length) => Token(TokenType.TextIdOpen, startIndex, length);
     private static Token TextIdClose (int startIndex, int length) => Token(TokenType.TextIdClose, startIndex, length);
+    private static Token WaitTrue (int startIndex, int length) => Token(TokenType.WaitTrue, startIndex, length);
+    private static Token WaitFalse (int startIndex, int length) => Token(TokenType.WaitFalse, startIndex, length);
 
     private static Token Error (ErrorType type, int startIndex, int length) => new(type, startIndex, length);
     private static Token MissingParamId (int startIndex, int length) => Error(ErrorType.MissingParamId, startIndex, length);

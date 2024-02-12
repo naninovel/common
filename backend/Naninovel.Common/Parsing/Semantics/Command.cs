@@ -10,7 +10,8 @@ namespace Naninovel.Parsing;
 /// <see cref="CommandLine"/> and <see cref="InlinedCommand"/>.
 /// </remarks>
 public class Command (PlainText identifier,
-    IReadOnlyList<Parameter> parameters) : ILineComponent
+    IReadOnlyList<Parameter>? parameters = null,
+    bool? wait = null) : ILineComponent
 {
     /// <summary>
     /// Unique identifier of the command.
@@ -23,15 +24,21 @@ public class Command (PlainText identifier,
     /// <summary>
     /// Parameters of the command describing its behaviour.
     /// </summary>
-    public IReadOnlyList<Parameter> Parameters { get; } = parameters;
-
-    public Command (PlainText identifier) : this(identifier, Array.Empty<Parameter>()) { }
+    public IReadOnlyList<Parameter> Parameters { get; } = parameters ?? [];
+    /// <summary>
+    /// Whether the command execution should be awaited before executing next one.
+    /// Can be null, in which case runtime/config-default value is assumed.
+    /// </summary>
+    public bool? Wait { get; } = wait;
 
     public override string ToString ()
     {
         var builder = new StringBuilder(Identifier.Text);
         foreach (var parameter in Parameters)
             builder.Append(' ').Append(parameter);
+        if (Wait.HasValue)
+            if (Wait.Value) builder.Append(Identifiers.WaitTrue);
+            else builder.Append(Identifiers.WaitFalse);
         return builder.ToString();
     }
 }
