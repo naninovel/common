@@ -167,4 +167,28 @@ public class SemanticsTest
     {
         Assert.Equal("|#|", new IdentifiedText(new(""), new("")).ToString());
     }
+
+    [Fact]
+    public void WaitFlagIsNullByDefault ()
+    {
+        Assert.Null(new Command("").Wait);
+    }
+
+    [Fact]
+    public void WaitFlagImplicitlyConvertedToBool ()
+    {
+        #pragma warning disable xUnit2025
+        Assert.True(new Command("", null, true).Wait == true);
+        Assert.True(new Command("", null, false).Wait == false);
+        Assert.False(new Command("").Wait == true);
+        Assert.False(new Command("").Wait == false);
+        #pragma warning restore xUnit2025
+    }
+
+    [Fact]
+    public void WaitFlagToStringIsCorrect ()
+    {
+        Assert.Equal("c <", new Command("c", null, true).ToString());
+        Assert.Equal("c >", new Command("c", null, false).ToString());
+    }
 }

@@ -11,7 +11,7 @@ namespace Naninovel.Parsing;
 /// </remarks>
 public class Command (PlainText identifier,
     IReadOnlyList<Parameter>? parameters = null,
-    bool? wait = null) : ILineComponent
+    WaitFlag? wait = null) : ILineComponent
 {
     /// <summary>
     /// Unique identifier of the command.
@@ -29,16 +29,14 @@ public class Command (PlainText identifier,
     /// Whether the command execution should be awaited before executing next one.
     /// Can be null, in which case runtime/config-default value is assumed.
     /// </summary>
-    public bool? Wait { get; } = wait;
+    public WaitFlag? Wait { get; } = wait;
 
     public override string ToString ()
     {
         var builder = new StringBuilder(Identifier.Text);
         foreach (var parameter in Parameters)
             builder.Append(' ').Append(parameter);
-        if (Wait.HasValue)
-            if (Wait.Value) builder.Append(Identifiers.WaitTrue);
-            else builder.Append(Identifiers.WaitFalse);
+        if (Wait != null) builder.Append(Wait);
         return builder.ToString();
     }
 }
