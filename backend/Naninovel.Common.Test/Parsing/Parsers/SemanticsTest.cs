@@ -171,17 +171,17 @@ public class SemanticsTest
     [Fact]
     public void WaitFlagIsNullByDefault ()
     {
-        Assert.Null(new Command("").Wait);
+        Assert.Null(new Command("").WaitFlag);
     }
 
     [Fact]
     public void WaitFlagImplicitlyConvertedToBool ()
     {
         #pragma warning disable xUnit2025
-        Assert.True(new Command("", null, true).Wait == true);
-        Assert.True(new Command("", null, false).Wait == false);
-        Assert.False(new Command("").Wait == true);
-        Assert.False(new Command("").Wait == false);
+        Assert.True(new Command("", null, true).WaitFlag == true);
+        Assert.True(new Command("", null, false).WaitFlag == false);
+        Assert.False(new Command("").WaitFlag == true);
+        Assert.False(new Command("").WaitFlag == false);
         #pragma warning restore xUnit2025
     }
 

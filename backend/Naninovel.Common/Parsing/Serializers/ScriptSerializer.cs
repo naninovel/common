@@ -93,7 +93,7 @@ public class ScriptSerializer
         foreach (var param in command.Parameters)
             if (!param.Nameless)
                 AppendParameter(param);
-        if (command.Wait is { } flag)
+        if (command.WaitFlag is { } flag)
             AppendWaitFlag(flag);
     }
 

@@ -163,7 +163,7 @@ public class CommandLineParserTest
     public void WaitTrueFlagParsedCorrectly ()
     {
         var line = parser.Parse("@c <");
-        Assert.True(line.Command.Wait);
+        Assert.True(line.Command.WaitFlag);
         Assert.Empty(parser.Errors);
     }
 
@@ -171,7 +171,7 @@ public class CommandLineParserTest
     public void WaitFalseFlagParsedCorrectly ()
     {
         var line = parser.Parse("@c >");
-        Assert.False(line.Command.Wait);
+        Assert.False(line.Command.WaitFlag);
         Assert.Empty(parser.Errors);
     }
 
@@ -179,7 +179,7 @@ public class CommandLineParserTest
     public void WhenWaitFlagNotSpecifiedItsNull ()
     {
         var line = parser.Parse("@c");
-        Assert.Null(line.Command.Wait);
+        Assert.Null(line.Command.WaitFlag);
         Assert.Empty(parser.Errors);
     }
 
@@ -275,7 +275,7 @@ public class CommandLineParserTest
         Assert.Equal(new(11, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
         Assert.Equal(new(12, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
         Assert.Equal(new(13, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
-        Assert.Equal(new(15, 2), parser.Resolve(line.Command.Wait));
+        Assert.Equal(new(15, 2), parser.Resolve(line.Command.WaitFlag));
     }
 
     [Fact]
