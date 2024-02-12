@@ -5,10 +5,13 @@ using Naninovel.Metadata;
 
 namespace Naninovel.Bridging.Test;
 
-public class SerializerTest
+public partial class SerializerTest
 {
-    [ExcludeFromCodeCoverage] public record Record(string Value);
-    [ExcludeFromCodeCoverage] public record Message(Record[] Records);
+    [JsonSerializable(typeof(Message))]
+    internal partial class AdditionalContext : JsonSerializerContext;
+
+    [ExcludeFromCodeCoverage] public record Record (string Value);
+    [ExcludeFromCodeCoverage] public record Message (Record[] Records);
 
     [Fact]
     public void CanSerializeCommonTypes ()
@@ -86,6 +89,3 @@ public class SerializerTest
         Assert.Null(serializer.DeserializeOrNull<Record>(" "));
     }
 }
-
-[JsonSerializable(typeof(SerializerTest.Message))]
-internal partial class AdditionalContext : JsonSerializerContext;

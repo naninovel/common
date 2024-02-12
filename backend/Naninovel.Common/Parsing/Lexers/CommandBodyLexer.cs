@@ -15,7 +15,8 @@ internal class CommandBodyLexer (CommandParameterLexer parameterLexer)
 
     public static bool IsEndReached (LexState state, bool inlined)
     {
-        return state.EndReached || inlined && state.IsUnescaped(InlinedClose[0]);
+        if (inlined && state.IsUnescaped(InlinedClose[0])) return true;
+        return state.EndReached;
     }
 
     public void AddCommandBody (LexState state, bool inlined)

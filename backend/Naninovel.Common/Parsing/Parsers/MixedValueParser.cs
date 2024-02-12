@@ -137,7 +137,8 @@ internal class MixedValueParser (bool unwrap)
         {
             if (value[i] != '\\' || IsEscaped(value, i)) return false;
             var prev = value[i + 1];
-            return unescapeQuotes && prev == '"' || IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
+            if (unescapeQuotes && prev == '"') return true;
+            return IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
         }
     }
 
