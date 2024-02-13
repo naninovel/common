@@ -4,8 +4,8 @@ namespace Naninovel.Parsing.Test;
 
 public class ParseTestHelper<TLine> where TLine : IScriptLine
 {
-    public List<Token> Tokens { get; } = new();
-    public List<ParseError> Errors { get; } = new();
+    public List<Token> Tokens { get; } = [];
+    public List<ParseError> Errors { get; } = [];
     public Dictionary<ILineComponent, InlineRange> Associations { get; } = new();
     public Dictionary<string, string> Identifications { get; } = new();
 
