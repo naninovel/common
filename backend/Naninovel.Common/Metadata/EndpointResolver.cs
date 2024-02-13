@@ -10,20 +10,6 @@ public class EndpointResolver (MetadataProvider provider)
     private readonly NamedValueParser namedParser = new();
 
     /// <summary>
-    /// Builds constant expression for label component of endpoint parameter.
-    /// </summary>
-    /// <param name="paramId">ID of the parameter the expression is built for.</param>
-    /// <remarks>
-    /// Endpoints are expected to be named parameters where name component is script
-    /// name and value is the label. The expression will first attempt to get script name
-    /// from the parameter and fallback to currently edited script when it's not specified.
-    /// </remarks>
-    public static string BuildEndpointExpression (string paramId)
-    {
-        return $"Labels/{{:{paramId}[0]??$Script}}";
-    }
-
-    /// <summary>
     /// When specified command has a parameter with navigation context (script name and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
     /// </summary>
@@ -62,10 +48,12 @@ public class EndpointResolver (MetadataProvider provider)
     private bool HasEndpointContext (string commandAliasOrId, string? paramAliasOrId)
     {
         var param = provider.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
-        if (param?.ValueContext is null || param.ValueContext.Length < 2) return false;
-        return param.ValueContext[0]?.Type == ValueContextType.Resource &&
-               param.ValueContext[0]?.SubType == Constants.ScriptsType &&
-               param.ValueContext[1]?.Type == ValueContextType.Constant &&
-               param.ValueContext[1]?.SubType == BuildEndpointExpression(param.Id);
+        if (param?.ValueContext is null ||
+            param.ValueContext.Length != 2 ||
+            param.ValueContext.Any(c => c is null)) return false;
+        return param.ValueContext[0]!.Type == ValueContextType.Endpoint &&
+               param.ValueContext[0]!.SubType == Constants.EndpointScript &&
+               param.ValueContext[1]!.Type == ValueContextType.Endpoint &&
+               param.ValueContext[1]!.SubType == Constants.EndpointLabel;
     }
 }
