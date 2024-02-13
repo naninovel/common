@@ -4,7 +4,7 @@ using Naninovel.Bridging;
 using Naninovel.Metadata;
 using static Naninovel.Bindings.JSLogger;
 
-namespace Naninovel.Bindings.Bridging;
+namespace Naninovel.Bindings;
 
 public static partial class Bridging
 {
@@ -17,7 +17,7 @@ public static partial class Bridging
     private static Client? client;
 
     [JSInvokable]
-    public static async void ConnectToServerInLoop (int preferredPort)
+    public static async Task ConnectToServerInLoop (int preferredPort)
     {
         BreakConnectionLoop();
         Bridging.preferredPort = preferredPort;
