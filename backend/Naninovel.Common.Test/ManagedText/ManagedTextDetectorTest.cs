@@ -8,6 +8,7 @@ public class ManagedTextDetectorTest
         IsInline("; comment"),
         IsInline(" # space before id"),
         IsMultiline("# id"),
+        IsMultiline("# id1|id2"),
         IsMultiline("; comment\n# id\nfoo bar baz"),
         IsMultiline("# foo\nauthor: text"),
         IsMultiline("author: text\n# id")
