@@ -8,20 +8,10 @@ namespace Naninovel.ManagedText;
 /// </summary>
 public class MultilineManagedTextSerializer
 {
-    /// <summary>
-    /// Record index ranges to join into single line when serializing.
-    /// </summary>
-    /// <param name="startIndex">First record index to merge.</param>
-    /// <param name="endIndex">Last record index to merge (inclusive).</param>
-    public readonly struct JoinRange (int startIndex, int endIndex)
-    {
-        public readonly int StartIndex = startIndex;
-        public readonly int EndIndex = endIndex;
-    }
-
+    private readonly ManagedTextRecord[] singleRecord = new ManagedTextRecord[1];
     private readonly StringBuilder builder = new();
-    private readonly List<JoinRange> ranges = [];
-    private readonly List<ManagedTextRecord> bucket = [];
+    private readonly HashSet<object> buckets = [];
+    private readonly Dictionary<string, List<ManagedTextRecord>> keyToBuckets = [];
     private readonly int spacing;
 
     /// <param name="spacing">Line breaks between records.</param>
@@ -32,23 +22,42 @@ public class MultilineManagedTextSerializer
 
     /// <summary>
     /// Serializes specified document into text string.
-    /// When join indexes specified, will serialize affected records into single line.
+    /// When join keys specified, will join associated records into single lines.
     /// </summary>
-    public string Serialize (ManagedTextDocument document, IEnumerable<JoinRange>? join = null)
+    public string Serialize (ManagedTextDocument document, IEnumerable<IEnumerable<string>>? join = null)
     {
-        Reset(join);
+        Reset();
+        BuildBuckets(document.Records, join ?? []);
         if (!string.IsNullOrEmpty(document.Header))
             AppendHeader(document.Header);
-        AppendRecords(document.Records);
+        foreach (var bucket in buckets)
+            AppendBucket(bucket);
         return builder.ToString();
     }
 
-    private void Reset (IEnumerable<JoinRange>? ranges = null)
+    private void Reset ()
     {
         builder.Clear();
-        bucket.Clear();
-        this.ranges.Clear();
-        if (ranges != null) this.ranges.AddRange(ranges.OrderBy(r => r.StartIndex));
+        buckets.Clear();
+        keyToBuckets.Clear();
+    }
+
+    private void BuildBuckets (IReadOnlyCollection<ManagedTextRecord> records, IEnumerable<IEnumerable<string>> join)
+    {
+        foreach (var joinedKeys in join)
+        {
+            var bucket = new List<ManagedTextRecord>();
+            foreach (var joinedKey in joinedKeys)
+                keyToBuckets[joinedKey] = bucket;
+        }
+
+        foreach (var record in records)
+            if (keyToBuckets.TryGetValue(record.Key, out var bucket))
+            {
+                bucket.Add(record);
+                buckets.Add(bucket);
+            }
+            else buckets.Add(record);
     }
 
     private void AppendHeader (string header)
@@ -59,84 +68,67 @@ public class MultilineManagedTextSerializer
             .Append('\n');
     }
 
-    private void AppendRecords (IReadOnlyCollection<ManagedTextRecord> records)
+    private void AppendBucket (object bucket)
     {
-        var index = -1;
-        foreach (var record in records)
+        IReadOnlyList<ManagedTextRecord> records = null!;
+        if (bucket is ManagedTextRecord record)
         {
-            bucket.Add(record);
-            if (ShouldAppendBucket(++index))
-                AppendBucket();
+            singleRecord[0] = record;
+            records = singleRecord;
         }
-    }
+        else records = (List<ManagedTextRecord>)bucket;
 
-    private void AppendBucket ()
-    {
         for (int i = 0; i < spacing; i++)
             builder.Append('\n');
         AppendKey();
-        if (bucket.Any(r => !string.IsNullOrWhiteSpace(r.Comment)))
+        if (records.Any(r => !string.IsNullOrWhiteSpace(r.Comment)))
             AppendComment();
         AppendValue();
-        bucket.Clear();
-    }
 
-    private void AppendKey ()
-    {
-        builder.Append(RecordMultilineKeyLiteral).Append(' ');
-        for (var i = 0; i < bucket.Count; i++)
+        void AppendKey ()
         {
-            if (ShouldAppendJoin(i))
-                builder.Append(RecordJoinLiteral);
-            builder.Append(bucket[i].Key);
+            builder.Append(RecordMultilineKeyLiteral).Append(' ');
+            for (var i = 0; i < records.Count; i++)
+            {
+                if (ShouldAppendJoin(i))
+                    builder.Append(RecordJoinLiteral);
+                builder.Append(records[i].Key);
+            }
+            builder.Append('\n');
         }
-        builder.Append('\n');
-    }
 
-    private void AppendComment ()
-    {
-        builder.Append(RecordCommentLiteral).Append(' ');
-        for (var i = 0; i < bucket.Count; i++)
+        void AppendComment ()
         {
-            if (ShouldAppendJoin(i))
-                builder.Append(RecordJoinLiteral);
-            builder.Append(EscapeJoinLiteral(bucket[i].Comment));
+            builder.Append(RecordCommentLiteral).Append(' ');
+            for (var i = 0; i < records.Count; i++)
+            {
+                if (ShouldAppendJoin(i))
+                    builder.Append(RecordJoinLiteral);
+                builder.Append(EscapeJoinLiteral(records[i].Comment));
+            }
+            builder.Append('\n');
         }
-        builder.Append('\n');
-    }
 
-    private void AppendValue ()
-    {
-        for (var i = 0; i < bucket.Count; i++)
+        void AppendValue ()
         {
-            if (ShouldAppendJoin(i))
-                builder.Append(RecordJoinLiteral);
-            builder.Append(EscapeJoinLiteral(InsertLineBreaksAfterBrTags(bucket[i].Value)));
+            for (var i = 0; i < records.Count; i++)
+            {
+                if (ShouldAppendJoin(i))
+                    builder.Append(RecordJoinLiteral);
+                builder.Append(EscapeJoinLiteral(InsertLineBreaksAfterBrTags(records[i].Value)));
+            }
+            builder.Append('\n');
         }
-        builder.Append('\n');
+
+        bool ShouldAppendJoin (int index)
+        {
+            return index > 0 && index < records.Count;
+        }
     }
 
     private string InsertLineBreaksAfterBrTags (string value)
     {
         return value.Replace(LineBreakTag, LineBreakTag + '\n');
-    }
-
-    private bool ShouldAppendBucket (int index)
-    {
-        var insideAny = false;
-        foreach (var range in ranges)
-        {
-            if (range.EndIndex == index)
-                return true;
-            if (!insideAny && index >= range.StartIndex && index <= range.EndIndex)
-                insideAny = true;
-        }
-        return !insideAny;
-    }
-
-    private bool ShouldAppendJoin (int index)
-    {
-        return index > 0 && index < bucket.Count;
     }
 
     private string EscapeJoinLiteral (string content)
