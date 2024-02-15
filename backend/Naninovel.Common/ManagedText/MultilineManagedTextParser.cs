@@ -10,16 +10,26 @@ namespace Naninovel.ManagedText;
 /// <remarks>
 /// Multiline format spec:
 /// <code>
-/// # key (space around key is ignored)
+/// # key1 (space around key is ignored)
 /// ; comment (optional, space around comment is ignored)
 /// value (all lines until next key are joined, space is preserved)
+/// </code>
+/// Multiple records can be joined into single line with pipes:
+/// <code>
+/// # key1|key2|key3
+/// ; comment1|comment2|co\|ent3 (pipes in comments are escaped)
+/// value1|value2|va\|ue3 (pipes in values are escaped)
 /// </code>
 /// </remarks>
 public class MultilineManagedTextParser
 {
     private readonly HashSet<ManagedTextRecord> records = [];
+    private readonly List<string> keys = [];
+    private readonly List<string> comments = [];
+    private readonly List<string> values = [];
     private readonly StringBuilder valueBuilder = new();
-    private string header = "", lastKey = "", lastComment = "";
+    private readonly StringBuilder commentBuilder = new();
+    private string header = "";
 
     /// <summary>
     /// Creates document from specified serialized text string.
@@ -33,24 +43,36 @@ public class MultilineManagedTextParser
             else if (line.StartsWithOrdinal(RecordCommentLiteral))
                 ParseCommentLine(line, index);
             else ParseValueLine(line);
-        if (!string.IsNullOrEmpty(lastKey)) AddLastRecord();
+        if (keys.Count > 0) AddLastRecord();
         return new ManagedTextDocument(records, header);
+    }
+
+    private void Reset ()
+    {
+        records.Clear();
+        keys.Clear();
+        comments.Clear();
+        valueBuilder.Clear();
+        commentBuilder.Clear();
+        values.Clear();
+        header = "";
     }
 
     private void ParseKeyLine (string line)
     {
-        if (!string.IsNullOrEmpty(lastKey)) AddLastRecord();
-        lastKey = line.GetAfterFirst(RecordMultilineKeyLiteral).Trim();
-        valueBuilder.Clear();
-        lastComment = "";
+        if (keys.Count > 0) AddLastRecord();
+        Split(line.GetAfterFirst(RecordMultilineKeyLiteral).Trim(), keys);
+        if (keys.Any(string.IsNullOrWhiteSpace))
+            throw new Error($"Managed text key can't be empty: {line}");
     }
 
     private void ParseCommentLine (string line, int index)
     {
-        lastComment = line.GetAfterFirst(RecordCommentLiteral);
-        if (lastComment.Length > 0 && lastComment[0] == ' ')
-            lastComment = lastComment.Substring(1);
-        if (index == 0) header = lastComment;
+        var comment = line.GetAfterFirst(RecordCommentLiteral);
+        if (comment.Length > 0 && comment[0] == ' ')
+            comment = comment.Substring(1);
+        commentBuilder.Append(comment);
+        if (index == 0) header = comment;
     }
 
     private void ParseValueLine (string line)
@@ -60,15 +82,31 @@ public class MultilineManagedTextParser
 
     private void AddLastRecord ()
     {
-        records.Add(new(lastKey, valueBuilder.ToString(), lastComment));
+        Split(valueBuilder.ToString(), values);
+        if (values.Count > keys.Count)
+            throw new Error($"Managed text has more values than keys. Last key: {keys.Last()}");
+        Split(commentBuilder.ToString(), comments);
+        if (comments.Count > keys.Count)
+            throw new Error($"Managed text has more comments than keys. Last key: {keys.Last()}");
+        for (int i = 0; i < keys.Count; i++)
+            records.Add(new(keys[i], values.ElementAtOrDefault(i), comments.ElementAtOrDefault(i)));
+        keys.Clear();
+        comments.Clear();
+        commentBuilder.Clear();
+        values.Clear();
         valueBuilder.Clear();
-        lastKey = lastComment = "";
     }
 
-    private void Reset ()
+    private void Split (string line, IList<string> collection)
     {
-        records.Clear();
-        valueBuilder.Clear();
-        header = lastKey = lastComment = "";
+        var startIdx = 0;
+        for (int i = 0; i < line.Length; i++)
+            if (line[i] == RecordJoinLiteral[0] && line.ElementAtOrDefault(i - 1) != '\\')
+            {
+                collection.Add(line.Substring(startIdx, i - startIdx)
+                    .Replace($"\\{RecordJoinLiteral}", RecordJoinLiteral));
+                startIdx = i + 1;
+            }
+        collection.Add(line.Substring(startIdx, line.Length - startIdx));
     }
 }

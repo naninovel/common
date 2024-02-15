@@ -182,6 +182,7 @@ public class SemanticsTest
         Assert.True(new Command("", null, false).WaitFlag == false);
         Assert.False(new Command("").WaitFlag == true);
         Assert.False(new Command("").WaitFlag == false);
+        Assert.Null(new Command("", null, default(bool?)).WaitFlag);
         #pragma warning restore xUnit2025
     }
 
