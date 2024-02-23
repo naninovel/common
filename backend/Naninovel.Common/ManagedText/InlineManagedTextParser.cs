@@ -15,7 +15,7 @@ namespace Naninovel.ManagedText;
 /// </remarks>
 public class InlineManagedTextParser
 {
-    private readonly HashSet<ManagedTextRecord> records = new();
+    private readonly HashSet<ManagedTextRecord> records = [];
     private string header = "", lastComment = "";
 
     /// <summary>

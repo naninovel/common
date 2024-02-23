@@ -15,6 +15,7 @@ internal class CommandParser
     private PlainText commandId = PlainText.Empty;
     private MixedValue paramValue = emptyValue;
     private PlainText? paramId;
+    private WaitFlag? waitFlag;
 
     public Command Parse (LineWalker walker)
     {
@@ -37,6 +38,7 @@ internal class CommandParser
     private void ResetParameterState ()
     {
         paramId = null;
+        waitFlag = null;
         paramValue = emptyValue;
     }
 
@@ -80,6 +82,10 @@ internal class CommandParser
             case NamedParam:
                 ParseParameter(token);
                 return true;
+            case WaitTrue:
+            case WaitFalse:
+                ParseWaitFlag(token);
+                return true;
             case CommandBody:
                 ParseCommandBody(token);
                 return false;
@@ -111,9 +117,15 @@ internal class CommandParser
         ResetParameterState();
     }
 
+    private void ParseWaitFlag (Token flagToken)
+    {
+        waitFlag = new WaitFlag(flagToken.Type == WaitTrue);
+        walker.Associate(waitFlag, flagToken);
+    }
+
     private void ParseCommandBody (Token bodyToken)
     {
-        commandBody = new Command(commandId, parameters.ToArray());
+        commandBody = new Command(commandId, parameters.ToArray(), waitFlag);
         walker.Associate(commandBody, bodyToken);
     }
 }

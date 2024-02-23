@@ -13,12 +13,6 @@ public class EndpointResolverTest
     }
 
     [Fact]
-    public void BuildsCorrectEndpointExpression ()
-    {
-        Assert.Equal("Labels/{:Foo[0]??$Script}", EndpointResolver.BuildEndpointExpression("Foo"));
-    }
-
-    [Fact]
     public void EndpointHashingIsCorrect ()
     {
         Assert.True(new Endpoint(null, null).Equals(new(null, null)));
@@ -93,8 +87,8 @@ public class EndpointResolverTest
             ValueType = ValueType.String,
             ValueContainerType = ValueContainerType.Named,
             ValueContext = [
-                new() { Type = ValueContextType.Resource, SubType = "Scripts" },
-                new() { Type = ValueContextType.Constant, SubType = EndpointResolver.BuildEndpointExpression(id) }
+                new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointScript },
+                new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointLabel }
             ]
         };
     }

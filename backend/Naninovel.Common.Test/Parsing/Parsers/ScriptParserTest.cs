@@ -2,7 +2,7 @@ namespace Naninovel.Parsing.Test;
 
 public class ScriptParserTest
 {
-    private readonly ErrorCollector errors = new();
+    private readonly ErrorCollector errors = [];
     private readonly ScriptParser parser;
 
     public ScriptParserTest ()
@@ -21,8 +21,7 @@ public class ScriptParserTest
     [Fact]
     public void TextSplitsCorrectly ()
     {
-        const string text = " 0 \n\r \r\n3 ";
-        var lines = ScriptParser.SplitText(text);
+        var lines = ScriptParser.SplitText(" 0 \n\r \r\n3 ");
         Assert.Equal(4, lines.Length);
         Assert.Equal(" 0 ", lines[0]);
         Assert.Equal("", lines[1]);
@@ -33,13 +32,14 @@ public class ScriptParserTest
     [Fact]
     public void ScriptTextParsed ()
     {
-        const string scriptText = @"
-; Comment line
-@commandLine
-Generic text line
-# LabelLine
-";
-        var lines = parser.ParseText(scriptText);
+        var lines = parser.ParseText(
+            """
+
+            ; Comment line
+            @commandLine
+            Generic text line
+            # LabelLine
+            """);
         Assert.IsType<GenericLine>(lines[0]);
         Assert.IsType<CommentLine>(lines[1]);
         Assert.IsType<CommandLine>(lines[2]);

@@ -7,22 +7,27 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
     private LexState state = null!;
     private int startIndex;
     private int idEndIndex;
+    private bool inlined;
     private bool quoted;
     private bool addedNameless;
+    private bool addedWait;
 
     public void AddParameters (LexState state, bool inlined)
     {
-        Reset(state);
+        Reset(state, inlined);
         while (!CommandBodyLexer.IsEndReached(state, inlined))
-            if (!TryToggleQuoted() && !TryAddExpression() && !TryAddTextId() && !TryAddIdentifier() && !TryAddValue())
+            if (!TryAddWait() && !TryToggleQuoted() && !TryAddExpression() &&
+                !TryAddTextId() && !TryAddIdentifier() && !TryAddValue())
                 state.Move();
         AddFinalValue();
     }
 
-    private void Reset (LexState state)
+    private void Reset (LexState state, bool inlined)
     {
         this.state = state;
+        this.inlined = inlined;
         addedNameless = false;
+        addedWait = false;
         ResetParameterState();
     }
 
@@ -63,6 +68,17 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
         else state.AddToken(TokenType.ParamId, startIndex, idLength);
         state.AddToken(TokenType.ParamAssign, state.Index, 1);
         idEndIndex = state.Move();
+        return true;
+    }
+
+    private bool TryAddWait ()
+    {
+        if (!state.IsPreviousSpace || !CommandBodyLexer.IsLast(state, inlined)) return false;
+        if (!state.Is(WaitTrue[1]) && !state.Is(WaitFalse[1])) return false;
+        var token = state.Is(WaitTrue[1]) ? TokenType.WaitTrue : TokenType.WaitFalse;
+        state.AddToken(token, state.Index - 1, 2);
+        state.Move();
+        addedWait = true;
         return true;
     }
 
@@ -114,6 +130,7 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
     private void AddFinalValue ()
     {
         if (!quoted && state.IsPreviousSpace) return;
+        if (addedWait) return;
         AddValue();
     }
 }

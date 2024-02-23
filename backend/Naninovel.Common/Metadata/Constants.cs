@@ -21,4 +21,12 @@ public static class Constants
     /// Flag representing any type.
     /// </summary>
     public const string WildcardType = "*";
+    /// <summary>
+    /// Subtype of the script part of an endpoint.
+    /// </summary>
+    public const string EndpointScript = "Script";
+    /// <summary>
+    /// Subtype of the label part of an endpoint.
+    /// </summary>
+    public const string EndpointLabel = "Label";
 }
