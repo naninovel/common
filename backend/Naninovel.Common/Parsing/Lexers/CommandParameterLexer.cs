@@ -1,3 +1,4 @@
+using static Naninovel.Parsing.CommandBodyLexer;
 using static Naninovel.Parsing.Identifiers;
 
 namespace Naninovel.Parsing;
@@ -7,25 +8,27 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
     private LexState state = null!;
     private int startIndex;
     private int idEndIndex;
+    private bool inlined;
     private bool quoted;
     private bool addedNameless;
-    private bool addedWait;
+    private int lastBoolFlagIndex;
+    private bool multipleBoolFlags;
 
     public void AddParameters (LexState state, bool inlined)
     {
-        Reset(state);
-        while (!CommandBodyLexer.IsEndReached(state, inlined))
-            if (!TryToggleQuoted() && !TryAddExpression() &&
+        Reset(state, inlined);
+        while (!IsEndReached(state, inlined))
+            if (!TryAddBoolFlag() && !TryToggleQuoted() && !TryAddExpression() &&
                 !TryAddTextId() && !TryAddIdentifier() && !TryAddValue())
                 state.Move();
         AddFinalValue();
     }
 
-    private void Reset (LexState state)
+    private void Reset (LexState state, bool inlined)
     {
         this.state = state;
+        this.inlined = inlined;
         addedNameless = false;
-        addedWait = false;
         ResetParameterState();
     }
 
@@ -34,6 +37,20 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
         startIndex = state.Index;
         idEndIndex = -1;
         quoted = false;
+        lastBoolFlagIndex = -1;
+        multipleBoolFlags = false;
+    }
+
+    private bool TryAddBoolFlag ()
+    {
+        if (!state.Is(BooleanFlag[0]) || quoted || WasIdentifierAdded()) return false;
+        if (!state.IsPreviousSpace && !state.IsNextSpace && !IsLast(state, inlined)) return false;
+        if (state.IsPreviousSpace && (state.IsNextSpace || IsLast(state, inlined))) return false;
+        if (state.IsPrevious(BooleanFlag[0]) || state.IsNext(BooleanFlag[0])) return false;
+        if (WasBoolFlagAdded()) multipleBoolFlags = true;
+        lastBoolFlagIndex = state.Index;
+        state.Move();
+        return true;
     }
 
     private bool TryToggleQuoted ()
@@ -83,10 +100,19 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
 
     private void AddValue ()
     {
-        if (WasIdentifierAdded()) AddNamed();
+        if (WasBoolFlagAdded() && !multipleBoolFlags && !WasIdentifierAdded()) AddFlaggedBool();
+        else if (WasIdentifierAdded()) AddNamed();
         else AddNameless();
 
-        bool WasIdentifierAdded () => idEndIndex > -1;
+        void AddFlaggedBool ()
+        {
+            var positiveFlag = lastBoolFlagIndex == state.Index - 1;
+            var idStart = positiveFlag ? startIndex : startIndex + 1;
+            var idLength = state.Index - startIndex - 1;
+            state.AddToken(TokenType.BoolFlag, lastBoolFlagIndex, 1);
+            state.AddToken(TokenType.ParamId, idStart, idLength);
+            state.AddToken(TokenType.NamedParam, startIndex, state.Index - startIndex);
+        }
 
         void AddNamed ()
         {
@@ -114,10 +140,13 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
         }
     }
 
+    private bool WasIdentifierAdded () => idEndIndex > -1;
+
+    private bool WasBoolFlagAdded () => lastBoolFlagIndex > -1;
+
     private void AddFinalValue ()
     {
         if (!quoted && state.IsPreviousSpace) return;
-        if (addedWait) return;
         AddValue();
     }
 }
