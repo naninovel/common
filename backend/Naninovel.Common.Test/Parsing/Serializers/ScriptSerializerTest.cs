@@ -208,4 +208,14 @@ public class ScriptSerializerTest
             new GenericLine(new[] { new MixedValue(new[] { new PlainText("x : x") }) })
         }));
     }
+
+    [Fact]
+    public void BooleanParametersSerializedAsFlags ()
+    {
+        var param1 = new Parameter("p1", new[] { new PlainText("true") });
+        var param2 = new Parameter("p2", new[] { new PlainText("false") });
+        var command = new Command("c", new[] { param1, param2 });
+        var line = new CommandLine(command);
+        Assert.Equal("@c p1! !p2", serializer.Serialize(line));
+    }
 }

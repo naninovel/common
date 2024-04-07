@@ -92,7 +92,8 @@ public class ScriptSerializer
         if (nameless != null) AppendParameter(nameless);
         foreach (var param in command.Parameters)
             if (!param.Nameless)
-                AppendParameter(param);
+                if (IsBooleanParameter(param)) AppendBooleanParameter(param);
+                else AppendParameter(param);
     }
 
     private void AppendParameter (Parameter parameter)
@@ -106,6 +107,21 @@ public class ScriptSerializer
         }
 
         AppendMixed(parameter.Value, true, false);
+    }
+
+    private void AppendBooleanParameter (Parameter parameter)
+    {
+        builder.Append(' ');
+        if (parameter.Value.FirstOrDefault() is PlainText text && text == "true")
+        {
+            builder.Append(parameter.Identifier!);
+            builder.Append(Identifiers.BooleanFlag);
+        }
+        else
+        {
+            builder.Append(Identifiers.BooleanFlag);
+            builder.Append(parameter.Identifier!);
+        }
     }
 
     private void AppendGenericPrefix (GenericPrefix prefix)
@@ -208,7 +224,7 @@ public class ScriptSerializer
         return value.Insert(targetIndex, "\\");
     }
 
-    public static StringBuilder TrimTrailingLineBreaks (StringBuilder builder)
+    private static StringBuilder TrimTrailingLineBreaks (StringBuilder builder)
     {
         var trimIndex = builder.Length - 1;
         for (; trimIndex >= 0; trimIndex--)
@@ -218,5 +234,11 @@ public class ScriptSerializer
         if (trimIndex < builder.Length - 1)
             builder.Length = trimIndex + 1;
         return builder;
+    }
+
+    private static bool IsBooleanParameter (Parameter parameter)
+    {
+        return parameter.Value.FirstOrDefault() is PlainText text
+               && (text == "true" || text == "false");
     }
 }
