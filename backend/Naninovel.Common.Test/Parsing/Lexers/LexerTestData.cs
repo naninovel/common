@@ -313,26 +313,95 @@ public static class LexerTestData
             TextIdOpen(6, 2), TextIdBody(8, 1), TextIdClose(9, 1), TextId(6, 4),
             ParamValue(5, 6), NamedParam(3, 8), CommandBody(1, 10)
         ),
-        // T(
-        //     "@c p!",
-        //     LineId(0, 1), CommandId(1, 1),
-        //     ParamId(3, 1), BoolFlag(4, 1), NamedParam(3, 2),
-        //     CommandBody(1, 4)
-        // ),
-        // T(
-        //     "@c !p",
-        //     LineId(0, 1), CommandId(1, 1),
-        //     BoolFlag(3, 1), ParamId(4, 1), NamedParam(3, 2),
-        //     CommandBody(1, 4)
-        // ),
-        // T(
-        //     """
-        //     @c "p!"
-        //     """,
-        //     LineId(0, 1), CommandId(1, 1),
-        //     BoolFlag(3, 1), ParamId(4, 1), NamedParam(3, 2),
-        //     CommandBody(1, 4)
-        // ),
+        T(
+            """
+            @c p!
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamId(3, 1), BoolFlag(4, 1), NamedParam(3, 2),
+            CommandBody(1, 4)
+        ),
+        T(
+            """
+            @c !p
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            BoolFlag(3, 1), ParamId(4, 1), NamedParam(3, 2),
+            CommandBody(1, 4)
+        ),
+        T(
+            """
+            @c "p!"
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 4), NamelessParam(3, 4),
+            CommandBody(1, 6)
+        ),
+        T(
+            """
+            @c !p!
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 3), NamelessParam(3, 3),
+            CommandBody(1, 5)
+        ),
+        T(
+            """
+            @c !
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 1), NamelessParam(3, 1),
+            CommandBody(1, 3)
+        ),
+        T(
+            """
+            @c n!!
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 3), NamelessParam(3, 3),
+            CommandBody(1, 5)
+        ),
+        T(
+            """
+            @c !!n
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 3), NamelessParam(3, 3),
+            CommandBody(1, 5)
+        ),
+        T(
+            """
+            @c !! p:v
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamValue(3, 2), NamelessParam(3, 2),
+            ParamId(6, 1), ParamAssign(7, 1), ParamValue(8, 1), NamedParam(6, 3),
+            CommandBody(1, 8)
+        ),
+        T(
+            """
+            @c p:v!
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamId(3, 1), ParamAssign(4, 1), ParamValue(5, 2), NamedParam(3, 4),
+            CommandBody(1, 6)
+        ),
+        T(
+            """
+            @c p:!v
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamId(3, 1), ParamAssign(4, 1), ParamValue(5, 2), NamedParam(3, 4),
+            CommandBody(1, 6)
+        ),
+        T(
+            """
+            @c !p!:!v!
+            """,
+            LineId(0, 1), CommandId(1, 1),
+            ParamId(3, 3), ParamAssign(6, 1), ParamValue(7, 3), NamedParam(3, 7),
+            CommandBody(1, 9)
+        )
     ];
 
     public static IEnumerable<object[]> GenericLines { get; } = [
@@ -600,6 +669,22 @@ public static class LexerTestData
             InlinedOpen(5, 1), CommandId(6, 1), TextIdOpen(9, 2), TextIdBody(11, 1), TextIdClose(12, 1), TextId(9, 4),
             ParamValue(8, 5), NamelessParam(8, 5), CommandBody(6, 7), InlinedClose(13, 1), Inlined(5, 9),
             TextIdOpen(15, 2), TextIdBody(17, 1), TextIdClose(18, 1), TextId(15, 4), GenericText(14, 5)
+        ),
+        T(
+            """
+            [c p!]
+            """,
+            InlinedOpen(0, 1), CommandId(1, 1),
+            ParamId(3, 1), BoolFlag(4, 1), NamedParam(3, 2),
+            CommandBody(1, 4), InlinedClose(5, 1), Inlined(0, 6)
+        ),
+        T(
+            """
+            [c !p]
+            """,
+            InlinedOpen(0, 1), CommandId(1, 1),
+            BoolFlag(3, 1), ParamId(4, 1), NamedParam(3, 2),
+            CommandBody(1, 4), InlinedClose(5, 1), Inlined(0, 6)
         )
     ];
 
