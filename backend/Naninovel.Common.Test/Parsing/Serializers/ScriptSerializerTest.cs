@@ -70,8 +70,8 @@ public class ScriptSerializerTest
     public void CanSerializeGenericLine ()
     {
         var prefix = new GenericPrefix("auth", "app");
-        var inlined1 = new InlinedCommand(new("i", null, true));
-        var inlined2 = new InlinedCommand(new("cmd", new[] { new Parameter("p", new[] { new PlainText("v") }) }, false));
+        var inlined1 = new InlinedCommand(new("i"));
+        var inlined2 = new InlinedCommand(new("cmd", new[] { new Parameter("p", new[] { new PlainText("v") }) }));
         var text1 = new MixedValue(new IValueComponent[] {
             new PlainText(@"""{}"),
             new Expression("x < y"),
@@ -79,7 +79,7 @@ public class ScriptSerializerTest
         });
         var text2 = new MixedValue(new[] { new PlainText("x") });
         var line = new GenericLine(prefix, new IGenericContent[] { text1, inlined1, inlined2, text2 });
-        Assert.Equal(@"auth.app: ""\{\}{x < y}\[\]\\ [i <][cmd p:v >]x", serializer.Serialize(line));
+        Assert.Equal(@"auth.app: ""\{\}{x < y}\[\]\\ [i][cmd p:v]x", serializer.Serialize(line));
     }
 
     [Fact]

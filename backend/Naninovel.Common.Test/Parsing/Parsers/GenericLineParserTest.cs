@@ -102,15 +102,6 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void GenericLineWithWaitFlagsIsParsed ()
-    {
-        var line = parser.Parse("[x <][x >][x]");
-        Assert.True((line.Content[0] as InlinedCommand)!.Command.WaitFlag);
-        Assert.False((line.Content[1] as InlinedCommand)!.Command.WaitFlag);
-        Assert.Null((line.Content[2] as InlinedCommand)!.Command.WaitFlag);
-    }
-
-    [Fact]
     public void PlainTextIdDecoded ()
     {
         var line = parser.Parse("""
