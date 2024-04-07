@@ -30,8 +30,7 @@ public enum TokenType
     TextIdBody = 1 << 24,
     TextIdOpen = 1 << 25,
     TextIdClose = 1 << 26,
-    WaitTrue = 1 << 27,
-    WaitFalse = 1 << 28
+    BoolFlag = 1 << 27
 }
 
 public static class TokenTypeExtensions

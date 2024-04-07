@@ -3,15 +3,9 @@ using Xunit.Abstractions;
 
 namespace Naninovel.Parsing.Test;
 
-public class LexerTest
+public class LexerTest (ITestOutputHelper output)
 {
     private static readonly Lexer lexer = new();
-    private readonly ITestOutputHelper output;
-
-    public LexerTest (ITestOutputHelper output)
-    {
-        this.output = output;
-    }
 
     [Fact]
     public void NullLineThrowsException ()
@@ -35,15 +29,14 @@ public class LexerTest
     public void CommandBodyTokenized ()
     {
         var tokens = new List<Token>();
-        lexer.TokenizeCommandBody("x y:z >", tokens);
-        Assert.Equal(7, tokens.Count);
+        lexer.TokenizeCommandBody("x y:z", tokens);
+        Assert.Equal(6, tokens.Count);
         Assert.Equal(new Token(TokenType.CommandId, 0, 1), tokens[0]);
         Assert.Equal(new Token(TokenType.ParamId, 2, 1), tokens[1]);
         Assert.Equal(new Token(TokenType.ParamAssign, 3, 1), tokens[2]);
         Assert.Equal(new Token(TokenType.ParamValue, 4, 1), tokens[3]);
         Assert.Equal(new Token(TokenType.NamedParam, 2, 3), tokens[4]);
-        Assert.Equal(new Token(TokenType.WaitFalse, 5, 2), tokens[5]);
-        Assert.Equal(new Token(TokenType.CommandBody, 0, 7), tokens[6]);
+        Assert.Equal(new Token(TokenType.CommandBody, 0, 5), tokens[5]);
     }
 
     [Theory, MemberData(nameof(LexerTestData.CommentLines), MemberType = typeof(LexerTestData))]

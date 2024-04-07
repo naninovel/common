@@ -15,7 +15,7 @@ internal class CommandParser
     private PlainText commandId = PlainText.Empty;
     private MixedValue paramValue = emptyValue;
     private PlainText? paramId;
-    private WaitFlag? waitFlag;
+    private Token paramIdToken;
 
     public Command Parse (LineWalker walker)
     {
@@ -38,7 +38,7 @@ internal class CommandParser
     private void ResetParameterState ()
     {
         paramId = null;
-        waitFlag = null;
+        paramIdToken = default;
         paramValue = emptyValue;
     }
 
@@ -66,6 +66,9 @@ internal class CommandParser
             case ParamId:
                 ParseParameterId(token);
                 return true;
+            case BoolFlag:
+                ParseBoolFlag(token);
+                return true;
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
                 return true;
@@ -82,10 +85,6 @@ internal class CommandParser
             case NamedParam:
                 ParseParameter(token);
                 return true;
-            case WaitTrue:
-            case WaitFalse:
-                ParseWaitFlag(token);
-                return true;
             case CommandBody:
                 ParseCommandBody(token);
                 return false;
@@ -98,8 +97,16 @@ internal class CommandParser
 
     private void ParseParameterId (Token paramIdToken)
     {
+        this.paramIdToken = paramIdToken;
         paramId = walker.Extract(paramIdToken);
         walker.Associate(paramId, paramIdToken);
+    }
+
+    private void ParseBoolFlag (Token flagToken)
+    {
+        var value = flagToken.EndIndex > paramIdToken.EndIndex ? "true" : "false";
+        paramValue = new MixedValue(new[] { new PlainText(value) });
+        walker.Associate(paramValue, flagToken);
     }
 
     private void ParseParameterValue (Token valueToken)
@@ -117,15 +124,9 @@ internal class CommandParser
         ResetParameterState();
     }
 
-    private void ParseWaitFlag (Token flagToken)
-    {
-        waitFlag = new WaitFlag(flagToken.Type == WaitTrue);
-        walker.Associate(waitFlag, flagToken);
-    }
-
     private void ParseCommandBody (Token bodyToken)
     {
-        commandBody = new Command(commandId, parameters.ToArray(), waitFlag);
+        commandBody = new Command(commandId, parameters.ToArray());
         walker.Associate(commandBody, bodyToken);
     }
 }

@@ -102,12 +102,14 @@ public class GenericLineParserTest
     }
 
     [Fact]
-    public void GenericLineWithWaitFlagsIsParsed ()
+    public void GenericLineWithBooleanFlagsIsParsed ()
     {
-        var line = parser.Parse("[x <][x >][x]");
-        Assert.True((line.Content[0] as InlinedCommand)!.Command.WaitFlag);
-        Assert.False((line.Content[1] as InlinedCommand)!.Command.WaitFlag);
-        Assert.Null((line.Content[2] as InlinedCommand)!.Command.WaitFlag);
+        var line = parser.Parse("[c p!][c !p]");
+        Assert.Equal("p", (line.Content[0] as InlinedCommand)!.Command.Parameters[0].Identifier);
+        Assert.Equal("true", (line.Content[0] as InlinedCommand)!.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Equal("p", (line.Content[1] as InlinedCommand)!.Command.Parameters[0].Identifier);
+        Assert.Equal("false", (line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Empty(parser.Errors);
     }
 
     [Fact]
