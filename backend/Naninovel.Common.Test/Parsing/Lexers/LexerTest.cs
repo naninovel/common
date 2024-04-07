@@ -3,15 +3,9 @@ using Xunit.Abstractions;
 
 namespace Naninovel.Parsing.Test;
 
-public class LexerTest
+public class LexerTest (ITestOutputHelper output)
 {
     private static readonly Lexer lexer = new();
-    private readonly ITestOutputHelper output;
-
-    public LexerTest (ITestOutputHelper output)
-    {
-        this.output = output;
-    }
 
     [Fact]
     public void NullLineThrowsException ()
