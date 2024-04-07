@@ -318,7 +318,7 @@ public static class LexerTestData
             @c p!
             """,
             LineId(0, 1), CommandId(1, 1),
-            BoolFlag(4, 1), ParamId(3, 1), NamedParam(3, 2),
+            ParamId(3, 1), BoolFlag(4, 1), NamedParam(3, 2),
             CommandBody(1, 4)
         ),
         T(
@@ -326,7 +326,7 @@ public static class LexerTestData
             @c !p
             """,
             LineId(0, 1), CommandId(1, 1),
-            BoolFlag(3, 1), ParamId(4, 1), NamedParam(3, 2),
+            ParamId(4, 1), BoolFlag(3, 1), NamedParam(3, 2),
             CommandBody(1, 4)
         ),
         T(
@@ -675,7 +675,7 @@ public static class LexerTestData
             [c p!]
             """,
             InlinedOpen(0, 1), CommandId(1, 1),
-            BoolFlag(4, 1), ParamId(3, 1), NamedParam(3, 2),
+            ParamId(3, 1), BoolFlag(4, 1), NamedParam(3, 2),
             CommandBody(1, 4), InlinedClose(5, 1), Inlined(0, 6)
         ),
         T(
@@ -683,7 +683,7 @@ public static class LexerTestData
             [c !p]
             """,
             InlinedOpen(0, 1), CommandId(1, 1),
-            BoolFlag(3, 1), ParamId(4, 1), NamedParam(3, 2),
+            ParamId(4, 1), BoolFlag(3, 1), NamedParam(3, 2),
             CommandBody(1, 4), InlinedClose(5, 1), Inlined(0, 6)
         )
     ];

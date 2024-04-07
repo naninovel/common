@@ -109,8 +109,8 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
             var positiveFlag = lastBoolFlagIndex == state.Index - 1;
             var idStart = positiveFlag ? startIndex : startIndex + 1;
             var idLength = state.Index - startIndex - 1;
-            state.AddToken(TokenType.BoolFlag, lastBoolFlagIndex, 1);
             state.AddToken(TokenType.ParamId, idStart, idLength);
+            state.AddToken(TokenType.BoolFlag, lastBoolFlagIndex, 1);
             state.AddToken(TokenType.NamedParam, startIndex, state.Index - startIndex);
         }
 

@@ -15,6 +15,7 @@ internal class CommandParser
     private PlainText commandId = PlainText.Empty;
     private MixedValue paramValue = emptyValue;
     private PlainText? paramId;
+    private Token paramIdToken;
 
     public Command Parse (LineWalker walker)
     {
@@ -37,6 +38,7 @@ internal class CommandParser
     private void ResetParameterState ()
     {
         paramId = null;
+        paramIdToken = default;
         paramValue = emptyValue;
     }
 
@@ -63,6 +65,9 @@ internal class CommandParser
         {
             case ParamId:
                 ParseParameterId(token);
+                return true;
+            case BoolFlag:
+                ParseBoolFlag(token);
                 return true;
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
@@ -92,8 +97,16 @@ internal class CommandParser
 
     private void ParseParameterId (Token paramIdToken)
     {
+        this.paramIdToken = paramIdToken;
         paramId = walker.Extract(paramIdToken);
         walker.Associate(paramId, paramIdToken);
+    }
+
+    private void ParseBoolFlag (Token flagToken)
+    {
+        var value = flagToken.EndIndex > paramIdToken.EndIndex ? "true" : "false";
+        paramValue = new MixedValue(new[] { new PlainText(value) });
+        walker.Associate(paramValue, flagToken);
     }
 
     private void ParseParameterValue (Token valueToken)
