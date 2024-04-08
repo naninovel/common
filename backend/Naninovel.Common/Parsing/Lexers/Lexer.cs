@@ -34,7 +34,7 @@ public class Lexer
 
     private LineType? TryEmptyLine ()
     {
-        state.SkipSpace();
+        state.SkipIndent();
         if (state.EndReached) return LineType.Generic;
         return null;
     }

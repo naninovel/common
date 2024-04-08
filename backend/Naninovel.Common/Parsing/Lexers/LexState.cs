@@ -13,6 +13,7 @@ internal class LexState
     public bool IsNextSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index + 1));
 
     private string text = "";
+    private int startIndentIndex = -1;
     private ICollection<Token> tokens = Array.Empty<Token>();
 
     public void Reset (string text, ICollection<Token> tokens)
@@ -21,6 +22,7 @@ internal class LexState
         this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
         if (tokens.IsReadOnly) throw new ArgumentException("Collection shouldn't be read-only.", nameof(tokens));
         Index = 0;
+        startIndentIndex = -1;
     }
 
     public int Move () => ++Index;
@@ -40,6 +42,26 @@ internal class LexState
     public void SkipSpace ()
     {
         while (IsSpace) Index++;
+    }
+
+    public void SkipIndent ()
+    {
+        while (IsSpace)
+        {
+            if (startIndentIndex == -1 && Is(' '))
+                startIndentIndex = Index;
+
+            if (!Is(' '))
+                startIndentIndex = -1;
+
+            if (startIndentIndex >= 0 && (Index - startIndentIndex) == 3)
+            {
+                AddToken(TokenType.Indent, startIndentIndex, 4);
+                startIndentIndex = -1;
+            }
+
+            Index++;
+        }
     }
 
     public bool Is (char @char)

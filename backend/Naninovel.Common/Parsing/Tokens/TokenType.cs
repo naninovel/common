@@ -30,7 +30,8 @@ public enum TokenType
     TextIdBody = 1 << 24,
     TextIdOpen = 1 << 25,
     TextIdClose = 1 << 26,
-    BoolFlag = 1 << 27
+    BoolFlag = 1 << 27,
+    Indent = 1 << 28
 }
 
 public static class TokenTypeExtensions
