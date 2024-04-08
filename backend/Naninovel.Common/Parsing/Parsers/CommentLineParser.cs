@@ -15,7 +15,7 @@ public class CommentLineParser (ParseHandlers handlers)
             walker.Error(MissingLineId);
         else if (walker.Next(CommentText, out var commentToken))
             ParseComment(commentToken);
-        return new CommentLine(comment);
+        return new CommentLine(comment, walker.GetIndent());
     }
 
     private void Reset (string lineText, IReadOnlyList<Token> tokens)

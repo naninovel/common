@@ -63,4 +63,13 @@ public class ScriptParserTest
     {
         _ = new ScriptParser();
     }
+
+    [Fact]
+    public void IndentsParsedCorrectly ()
+    {
+        Assert.Equal(0, parser.ParseLine("# x").Indent);
+        Assert.Equal(1, parser.ParseLine("    ; x").Indent);
+        Assert.Equal(2, parser.ParseLine("        @c").Indent);
+        Assert.Equal(2, parser.ParseLine("    \t    x").Indent);
+    }
 }
