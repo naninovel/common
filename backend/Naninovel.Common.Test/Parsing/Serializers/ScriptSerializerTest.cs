@@ -218,4 +218,18 @@ public class ScriptSerializerTest
         var line = new CommandLine(command);
         Assert.Equal("@c p1! !p2", serializer.Serialize(line));
     }
+
+    [Fact]
+    public void IndentsSerializedCorrectly ()
+    {
+        var label = new LabelLine("foo");
+        var comment = new CommentLine("bar", 1);
+        var command = new CommandLine(new Command("baz"), -1);
+        var generic = new GenericLine(new GenericPrefix("x"),
+            new[] { new MixedValue(new[] { new PlainText("nya") }) }, 2);
+        Assert.Equal("# foo", serializer.Serialize(label));
+        Assert.Equal("    ; bar", serializer.Serialize(comment));
+        Assert.Equal("@baz", serializer.Serialize(command));
+        Assert.Equal("        x: nya", serializer.Serialize(generic));
+    }
 }

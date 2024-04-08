@@ -50,10 +50,17 @@ public class ScriptSerializer
 
     private void AppendLine (IScriptLine line)
     {
+        AppendIndent(line);
         if (line is CommentLine comment) AppendCommentLine(comment);
         if (line is LabelLine label) AppendLabelLine(label);
         if (line is CommandLine command) AppendCommandLine(command);
         if (line is GenericLine generic) AppendGenericLine(generic);
+    }
+
+    private void AppendIndent (IScriptLine line)
+    {
+        for (int i = 0; i < line.Indent; i++)
+            builder.Append("    ");
     }
 
     private void AppendCommentLine (CommentLine commentLine)
