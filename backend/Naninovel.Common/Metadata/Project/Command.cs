@@ -19,6 +19,14 @@ public class Command
     /// </summary>
     public bool Localizable { get; set; }
     /// <summary>
+    /// Whether the command can contain nested commands.
+    /// </summary>
+    public bool NestedHost { get; set; }
+    /// <summary>
+    /// Whether the command requires nested commands and can't execute otherwise.
+    /// </summary>
+    public bool RequiresNested { get; set; }
+    /// <summary>
     /// Human-readable description of the command.
     /// </summary>
     public string? Summary { get; set; }
@@ -33,7 +41,7 @@ public class Command
     /// <summary>
     /// List of parameters the command supports.
     /// </summary>
-    public Parameter[] Parameters { get; set; } = Array.Empty<Parameter>();
+    public Parameter[] Parameters { get; set; } = [];
 
     /// <summary>
     /// User-facing formatted identifier of the command.
