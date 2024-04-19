@@ -16,7 +16,7 @@ public class CommandLineParser (ParseHandlers handlers)
         if (!walker.Next(LineId, out _))
             walker.Error(MissingLineId);
         else command = commandParser.Parse(walker);
-        return new CommandLine(command);
+        return new CommandLine(command, walker.GetIndent());
     }
 
     private void Reset (string lineText, IReadOnlyList<Token> tokens)

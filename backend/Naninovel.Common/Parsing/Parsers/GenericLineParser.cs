@@ -15,7 +15,7 @@ public class GenericLineParser (ParseHandlers handlers)
     {
         Reset(lineText, tokens);
         while (TryNext()) continue;
-        return new GenericLine(prefix, content.ToArray());
+        return new GenericLine(prefix, content.ToArray(), walker.GetIndent());
     }
 
     private void Reset (string lineText, IReadOnlyList<Token> tokens)

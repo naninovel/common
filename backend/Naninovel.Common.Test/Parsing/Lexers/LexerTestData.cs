@@ -12,6 +12,12 @@ public static class LexerTestData
         ),
         T(
             """
+                ; Comment
+            """,
+            Indent(0, 4), LineId(4, 1), CommentText(6, 7)
+        ),
+        T(
+            """
             ; Comment Text
             """,
             LineId(0, 1), CommentText(2, 12)
@@ -46,6 +52,12 @@ public static class LexerTestData
             LineId(0, 1), LabelText(2, 5)
         ),
         T(
+            """
+                # Label
+            """,
+            Indent(0, 4), LineId(4, 1), LabelText(6, 5)
+        ),
+        T(
             "# Label Text ",
             LineId(0, 1), LabelText(2, 5), SpaceInLabel(7, 5)
         ),
@@ -77,6 +89,12 @@ public static class LexerTestData
             @command
             """,
             LineId(0, 1), CommandId(1, 7), CommandBody(1, 7)
+        ),
+        T(
+            """
+                @command
+            """,
+            Indent(0, 4), LineId(4, 1), CommandId(5, 7), CommandBody(5, 7)
         ),
         T(
             """
@@ -409,7 +427,7 @@ public static class LexerTestData
             ""
         ),
         T(
-            "    "
+            "   "
         ),
         T(
             "\t\t"
@@ -418,10 +436,46 @@ public static class LexerTestData
             " \t  \t "
         ),
         T(
+            "    ",
+            Indent(0, 4)
+        ),
+        T(
+            "\t    ",
+            Indent(1, 4)
+        ),
+        T(
+            "    \t   ",
+            Indent(0, 4)
+        ),
+        T(
+            "        ",
+            Indent(0, 4), Indent(4, 4)
+        ),
+        T(
+            "    \t    ",
+            Indent(0, 4), Indent(5, 4)
+        ),
+        T(
+            "    \t  \t    ",
+            Indent(0, 4), Indent(8, 4)
+        ),
+        T(
             """
             Generic text line.
             """,
             GenericText(0, 18)
+        ),
+        T(
+            """
+                Generic text line.
+            """,
+            Indent(0, 4), GenericText(4, 18)
+        ),
+        T(
+            """
+                    Generic text line.
+            """,
+            Indent(0, 4), Indent(4, 4), GenericText(8, 18)
         ),
         T(
             " g\t ",
@@ -725,6 +779,7 @@ public static class LexerTestData
     private static Token TextIdOpen (int startIndex, int length) => Token(TokenType.TextIdOpen, startIndex, length);
     private static Token TextIdClose (int startIndex, int length) => Token(TokenType.TextIdClose, startIndex, length);
     private static Token BoolFlag (int startIndex, int length) => Token(TokenType.BoolFlag, startIndex, length);
+    private static Token Indent (int startIndex, int length) => Token(TokenType.Indent, startIndex, length);
 
     private static Token Error (ErrorType type, int startIndex, int length) => new(type, startIndex, length);
     private static Token MissingParamId (int startIndex, int length) => Error(ErrorType.MissingParamId, startIndex, length);

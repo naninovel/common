@@ -3,11 +3,11 @@ using System.Text;
 namespace Naninovel.Parsing;
 
 /// <summary>
-/// Represents a script line primarily used to specify printed text,
+/// Represents script line primarily used to specify printed text,
 /// but can also contain commands executed in the midst of printing.
 /// </summary>
 public class GenericLine (GenericPrefix? prefix,
-    IReadOnlyList<IGenericContent> content) : IScriptLine
+    IReadOnlyList<IGenericContent> content, int indent = 0) : IScriptLine
 {
     /// <summary>
     /// Optional (can be null) construct used to associated printed text with an author.
@@ -17,6 +17,7 @@ public class GenericLine (GenericPrefix? prefix,
     /// The text to print; can contain inlined commands and expressions.
     /// </summary>
     public IReadOnlyList<IGenericContent> Content { get; } = content;
+    public int Indent { get; } = indent;
 
     public GenericLine (IReadOnlyList<IGenericContent> content) : this(null, content) { }
 

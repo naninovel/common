@@ -20,7 +20,7 @@ public class LabelLineParser (ParseHandlers handlers)
             if (walker.Next(SpaceInLabel, out var spaceError))
                 walker.Error(spaceError);
             else ParseLabel(labelToken);
-        return new LabelLine(label);
+        return new LabelLine(label, walker.GetIndent());
     }
 
     private void Reset (string lineText, IReadOnlyList<Token> tokens)
