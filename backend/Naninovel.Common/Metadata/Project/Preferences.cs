@@ -8,5 +8,5 @@ public class Preferences
     /// <summary>
     /// Identifier of the command feeding the generic text line parameters.
     /// </summary>
-    public string GenericCommandId { get; set; } = "PrintText";
+    public string ParametrizeGenericCommandId { get; set; } = "";
 }

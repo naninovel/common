@@ -11,7 +11,6 @@ public static class Identifiers
     public const string ExpressionClose = "}";
     public const string InlinedOpen = "[";
     public const string InlinedClose = "]";
-    public const string GenericParamsFlag = "<";
     public const string ParameterAssign = ":";
     public const string ListDelimiter = ",";
     public const string NamedDelimiter = ".";
