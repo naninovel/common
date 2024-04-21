@@ -87,6 +87,7 @@ public class ScriptSerializer
     {
         if (line.Prefix != null)
             AppendGenericPrefix(line.Prefix);
+
         for (var i = 0; i < line.Content.Count; i++)
             if (line.Content[i] is MixedValue text) AppendMixed(text, false, i == 0);
             else AppendInlinedCommand((InlinedCommand)line.Content[i]);

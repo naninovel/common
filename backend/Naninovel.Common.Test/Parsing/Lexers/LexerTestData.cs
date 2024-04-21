@@ -591,13 +591,6 @@ public static class LexerTestData
         ),
         T(
             """
-            []
-            """,
-            InlinedOpen(0, 1), MissingCommandId(0, 1),
-            InlinedClose(1, 1), Inlined(0, 2)
-        ),
-        T(
-            """
             [c x
             """,
             InlinedOpen(0, 1), CommandId(1, 1),
@@ -618,6 +611,12 @@ public static class LexerTestData
             """,
             InlinedOpen(0, 1), MissingCommandId(0, 3), CommandBody(1, 2),
             InlinedClose(3, 1), Inlined(0, 4)
+        ),
+        T(
+            """
+            []
+            """,
+            InlinedOpen(0, 1), InlinedClose(1, 1), Inlined(0, 2)
         ),
         T(
             """

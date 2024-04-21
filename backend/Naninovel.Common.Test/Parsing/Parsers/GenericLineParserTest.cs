@@ -9,7 +9,7 @@ public class GenericLineParserTest
     [Fact]
     public void WhenMissingInlinedCommandIdErrorIsAdded ()
     {
-        parser.Parse("[]");
+        parser.Parse("[ ]");
         Assert.True(parser.HasError(MissingCommandId));
     }
 
@@ -20,6 +20,16 @@ public class GenericLineParserTest
         Assert.IsType<InlinedCommand>(parser.Parse("[]").Content[0]);
         Assert.IsType<InlinedCommand>(parser.Parse("x[").Content[1]);
         Assert.IsType<InlinedCommand>(parser.Parse("x[]x").Content[1]);
+    }
+
+    [Fact]
+    public void EmptyInlinedCommandsAllowDelimitingWhiteSpace ()
+    {
+        var line = parser.Parse("    [] \t x \t []");
+        Assert.Empty(parser.Errors);
+        Assert.Equal(1, line.Indent);
+        Assert.Equal(3, line.Content.Count);
+        Assert.Equal(" \t x \t ", (line.Content[1] as MixedValue)![0] as PlainText);
     }
 
     [Fact]

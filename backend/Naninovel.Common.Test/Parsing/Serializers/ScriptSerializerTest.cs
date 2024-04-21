@@ -232,4 +232,27 @@ public class ScriptSerializerTest
         Assert.Equal("@baz", serializer.Serialize(command));
         Assert.Equal("        x: nya", serializer.Serialize(generic));
     }
+
+    [Fact]
+    public void EmptyInlinedSerializedCorrectly ()
+    {
+        Assert.Equal("[] x\t[]", serializer.Serialize(new GenericLine(null,
+            new IGenericContent[] {
+                new InlinedCommand(new Command("")),
+                new MixedValue(new[] { new PlainText(" x\t") }),
+                new InlinedCommand(new Command(""))
+            })));
+        Assert.Equal("    [] x\t[]", serializer.Serialize(new GenericLine(null,
+            new IGenericContent[] {
+                new InlinedCommand(new Command("")),
+                new MixedValue(new[] { new PlainText(" x\t") }),
+                new InlinedCommand(new Command(""))
+            }, 1)));
+        Assert.Equal("    x: [] x\t[]", serializer.Serialize(new GenericLine(new GenericPrefix("x"),
+            new IGenericContent[] {
+                new InlinedCommand(new Command("")),
+                new MixedValue(new[] { new PlainText(" x\t") }),
+                new InlinedCommand(new Command(""))
+            }, 1)));
+    }
 }

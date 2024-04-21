@@ -54,7 +54,8 @@ public class GenericLineParser (ParseHandlers handlers)
                 valueParser.AddTextIdToken(token);
                 return true;
             case InlinedOpen:
-                ParseInlined();
+                if (IsEmptyInlined(token)) ParseEmptyInlined();
+                else ParseInlined();
                 return true;
             case Inlined:
                 AssociateInlined(token);
@@ -93,9 +94,22 @@ public class GenericLineParser (ParseHandlers handlers)
         walker.Identify(text);
     }
 
+    private bool IsEmptyInlined (Token openInlinedToken)
+    {
+        return walker.TryGetCharAt(openInlinedToken.EndIndex + 1, out var next) &&
+               next == Identifiers.InlinedClose[0];
+    }
+
     private void ParseInlined ()
     {
         var command = commandParser.Parse(walker);
+        var inlined = new InlinedCommand(command);
+        content.Add(inlined);
+    }
+
+    private void ParseEmptyInlined ()
+    {
+        var command = new Command("");
         var inlined = new InlinedCommand(command);
         content.Add(inlined);
     }

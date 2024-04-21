@@ -80,7 +80,8 @@ internal class GenericLineLexer (ExpressionLexer expressionLexer,
         AddPrecedingText();
         var startIndex = state.Index;
         AddOpen();
-        commandLexer.AddCommandBody(state, true);
+        if (!state.IsUnescaped(InlinedClose[0]))
+            commandLexer.AddCommandBody(state, true);
         AddClose();
         state.AddToken(TokenType.Inlined, startIndex, state.Index - startIndex);
         lastTextStart = state.Index;
