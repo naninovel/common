@@ -11,6 +11,7 @@ public class MetadataProvider
     public IReadOnlyCollection<Resource> Resources => resources;
     public IReadOnlyCollection<string> Variables => variables;
     public IReadOnlyCollection<string> Functions => functions;
+    public Preferences Preferences { get; private set; } = new();
 
     private readonly List<Actor> actors = [];
     private readonly List<Command> commands = [];
@@ -30,6 +31,7 @@ public class MetadataProvider
     public void Update (Project meta)
     {
         Reset();
+        Preferences = CopyPreferences(meta.Preferences);
         actors.AddRange(meta.Actors);
         commands.AddRange(meta.Commands);
         constants.AddRange(meta.Constants);
@@ -88,4 +90,8 @@ public class MetadataProvider
         if (!string.IsNullOrEmpty(command.Alias))
             commandByAlias[command.Alias!] = command;
     }
+
+    private Preferences CopyPreferences (Preferences prefs) => new Preferences {
+        ParametrizeGenericCommandId = prefs.ParametrizeGenericCommandId
+    };
 }

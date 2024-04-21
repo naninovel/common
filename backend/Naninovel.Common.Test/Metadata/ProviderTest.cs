@@ -102,4 +102,12 @@ public class ProviderTest
         Assert.Equal("foo", provider.Variables.First());
         Assert.Equal("bar", provider.Functions.First());
     }
+
+    [Fact]
+    public void PreferencesAreCopied ()
+    {
+        var prefs = new Preferences();
+        var provider = new MetadataProvider(new Project { Preferences = prefs });
+        Assert.NotSame(prefs, provider.Preferences);
+    }
 }
