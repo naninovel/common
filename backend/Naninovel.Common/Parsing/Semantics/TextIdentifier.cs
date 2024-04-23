@@ -14,9 +14,9 @@ public class TextIdentifier (PlainText body) : ILineComponent
 
     public override string ToString ()
     {
-        var builder = new StringBuilder(Identifiers.TextIdOpen);
+        var builder = new StringBuilder(Identifiers.Default.TextIdOpen);
         builder.Append(Body);
-        builder.Append(Identifiers.TextIdClose);
+        builder.Append(Identifiers.Default.TextIdClose);
         return builder.ToString();
     }
 }

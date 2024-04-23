@@ -1,16 +1,14 @@
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
-internal class TextIdentifierLexer
+internal class TextIdentifierLexer (Identifiers ids)
 {
     private LexState state = null!;
     private int startIndex;
     private bool hasBody;
 
-    public static bool IsOpening (LexState state)
+    public static bool IsOpening (LexState state, Identifiers ids)
     {
-        return state.IsUnescaped(TextIdOpen[0]) && state.IsNext(TextIdOpen[1]);
+        return state.IsUnescaped(ids.TextIdOpen[0]) && state.IsNext(ids.TextIdOpen[1]);
     }
 
     public void AddIdentifier (LexState state)
@@ -73,5 +71,5 @@ internal class TextIdentifierLexer
         state.AddError(ErrorType.MissingTextIdBody, startIndex, length);
     }
 
-    private bool IsClosing () => state.Is(TextIdClose[0]);
+    private bool IsClosing () => state.Is(ids.TextIdClose[0]);
 }

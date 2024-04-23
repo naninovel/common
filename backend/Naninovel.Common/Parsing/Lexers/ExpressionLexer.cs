@@ -1,16 +1,14 @@
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
-internal class ExpressionLexer
+internal class ExpressionLexer (Identifiers ids)
 {
     private LexState state = null!;
     private int startIndex;
     private bool hasBody;
 
-    public static bool IsOpening (LexState state)
+    public static bool IsOpening (LexState state, Identifiers ids)
     {
-        return state.IsUnescaped(ExpressionOpen[0]);
+        return state.IsUnescaped(ids.ExpressionOpen[0]);
     }
 
     public void AddExpression (LexState state)
@@ -53,7 +51,7 @@ internal class ExpressionLexer
         }
     }
 
-    private bool IsClosing () => state.IsUnescaped(ExpressionClose[0]);
+    private bool IsClosing () => state.IsUnescaped(ids.ExpressionClose[0]);
 
     private void AddClosing ()
     {

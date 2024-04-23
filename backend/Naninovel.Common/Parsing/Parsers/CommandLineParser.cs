@@ -3,11 +3,11 @@ using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommandLineParser (ParseHandlers handlers)
+public class CommandLineParser (ParseOptions options)
 {
     private static readonly Command emptyBody = new(PlainText.Empty, Array.Empty<Parameter>());
-    private readonly CommandParser commandParser = new();
-    private readonly LineWalker walker = new(handlers);
+    private readonly CommandParser commandParser = new(options.Identifiers);
+    private readonly LineWalker walker = new(options.Handlers);
     private Command command = emptyBody;
 
     public CommandLine Parse (string lineText, IReadOnlyList<Token> tokens)

@@ -1,20 +1,27 @@
 namespace Naninovel.Parsing;
 
-public static class Identifiers
+/// <summary>
+/// Control symbols identifying NaniScript lexical artifacts.
+/// </summary>
+public class Identifiers
 {
-    public const string CommentLine = ";";
-    public const string LabelLine = "#";
-    public const string CommandLine = "@";
-    public const string AuthorAssign = ": ";
-    public const string AuthorAppearance = ".";
-    public const string ExpressionOpen = "{";
-    public const string ExpressionClose = "}";
-    public const string InlinedOpen = "[";
-    public const string InlinedClose = "]";
-    public const string ParameterAssign = ":";
-    public const string ListDelimiter = ",";
-    public const string NamedDelimiter = ".";
-    public const string TextIdOpen = "|#";
-    public const string TextIdClose = "|";
-    public const string BooleanFlag = "!";
+    public static readonly Identifiers Default = new();
+
+    public string CommentLine { get; set; } = ";";
+    public string LabelLine { get; set; } = "#";
+    public string CommandLine { get; set; } = "@";
+    public string AuthorAssign { get; set; } = ": ";
+    public string AuthorAppearance { get; set; } = ".";
+    public string ExpressionOpen { get; set; } = "{";
+    public string ExpressionClose { get; set; } = "}";
+    public string InlinedOpen { get; set; } = "[";
+    public string InlinedClose { get; set; } = "]";
+    public string ParameterAssign { get; set; } = ":";
+    public string ListDelimiter { get; set; } = ",";
+    public string NamedDelimiter { get; set; } = ".";
+    public string TextIdOpen { get; set; } = "|#";
+    public string TextIdClose { get; set; } = "|";
+    public string BooleanFlag { get; set; } = "!";
+    public string True { get; set; } = "true";
+    public string False { get; set; } = "false";
 }

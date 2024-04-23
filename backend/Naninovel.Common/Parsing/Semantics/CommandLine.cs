@@ -11,5 +11,5 @@ public class CommandLine (Command command, int indent = 0) : IScriptLine
     public Command Command { get; } = command;
     public int Indent { get; } = indent;
 
-    public override string ToString () => $"{Identifiers.CommandLine}{Command}";
+    public override string ToString () => $"{Identifiers.Default.CommandLine}{Command}";
 }

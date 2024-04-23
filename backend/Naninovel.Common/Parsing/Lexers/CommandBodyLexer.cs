@@ -1,27 +1,25 @@
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
-internal class CommandBodyLexer (CommandParameterLexer parameterLexer)
+internal class CommandBodyLexer (CommandParameterLexer parameterLexer, Identifiers ids)
 {
     private LexState state = null!;
     private int bodyStartIndex;
     private bool inlined;
 
-    public static bool IsInlinedOpening (LexState state)
+    public static bool IsInlinedOpening (LexState state, Identifiers ids)
     {
-        return state.IsUnescaped(InlinedOpen[0]);
+        return state.IsUnescaped(ids.InlinedOpen[0]);
     }
 
-    public static bool IsEndReached (LexState state, bool inlined)
+    public static bool IsEndReached (LexState state, bool inlined, Identifiers ids)
     {
-        if (inlined && state.IsUnescaped(InlinedClose[0])) return true;
+        if (inlined && state.IsUnescaped(ids.InlinedClose[0])) return true;
         return state.EndReached;
     }
 
-    public static bool IsLast (LexState state, bool inlined)
+    public static bool IsLast (LexState state, bool inlined, Identifiers ids)
     {
-        if (inlined && state.IsNextUnescaped(InlinedClose[0])) return true;
+        if (inlined && state.IsNextUnescaped(ids.InlinedClose[0])) return true;
         return state.IsLast;
     }
 
@@ -49,7 +47,7 @@ internal class CommandBodyLexer (CommandParameterLexer parameterLexer)
         if (length <= 0) AddMissingId();
         else state.AddToken(TokenType.CommandId, startIndex, length);
 
-        bool ShouldMove () => state.IsNotSpace && !IsEndReached(state, inlined);
+        bool ShouldMove () => state.IsNotSpace && !IsEndReached(state, inlined, ids);
 
         void AddMissingId ()
         {
@@ -62,7 +60,7 @@ internal class CommandBodyLexer (CommandParameterLexer parameterLexer)
     private void AddParameters ()
     {
         state.SkipSpace();
-        if (IsEndReached(state, inlined)) return;
+        if (IsEndReached(state, inlined, ids)) return;
         parameterLexer.AddParameters(state, inlined);
     }
 

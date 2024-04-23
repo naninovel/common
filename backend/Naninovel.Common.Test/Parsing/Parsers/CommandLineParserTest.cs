@@ -30,7 +30,7 @@ public class CommandLineParserTest
     public void WhenCommandTokensMissingErrorIsAdded ()
     {
         var errors = new ErrorCollector();
-        var parser = new CommandLineParser(new() { ErrorHandler = errors });
+        var parser = new CommandLineParser(new() { Handlers = new() { ErrorHandler = errors } });
         parser.Parse("@", new[] { new Token(LineId, 0, 1) });
         Assert.Contains(MissingCommandTokens, errors.Select(e => e.Message));
     }

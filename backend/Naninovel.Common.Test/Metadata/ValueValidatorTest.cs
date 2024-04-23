@@ -1,8 +1,10 @@
-﻿namespace Naninovel.Metadata.Test;
+﻿using Naninovel.Parsing;
+
+namespace Naninovel.Metadata.Test;
 
 public class ValueValidatorTest
 {
-    private readonly ValueValidator validator = new();
+    private readonly ValueValidator validator = new(Identifiers.Default);
 
     [Theory]
     [InlineData(null, ValueContainerType.Single, ValueType.String, true)]

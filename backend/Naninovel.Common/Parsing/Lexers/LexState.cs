@@ -1,6 +1,6 @@
 namespace Naninovel.Parsing;
 
-internal class LexState
+internal class LexState (Identifiers ids)
 {
     public int Index { get; private set; }
     public int Length => text.Length;
@@ -12,6 +12,7 @@ internal class LexState
     public bool IsPreviousSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index - 1));
     public bool IsNextSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index + 1));
 
+    private readonly Utilities utils = new(ids);
     private string text = "";
     private int startIndentIndex = -1;
     private ICollection<Token> tokens = Array.Empty<Token>();
@@ -81,12 +82,12 @@ internal class LexState
 
     public bool IsUnescaped (char @char)
     {
-        return Is(@char) && !Utilities.IsEscaped(text, Index);
+        return Is(@char) && !utils.IsEscaped(text, Index);
     }
 
     public bool IsNextUnescaped (char @char)
     {
-        return IsNext(@char) && !Utilities.IsEscaped(text, Index + 1);
+        return IsNext(@char) && !utils.IsEscaped(text, Index + 1);
     }
 
     private bool IsIndexValid (int index)

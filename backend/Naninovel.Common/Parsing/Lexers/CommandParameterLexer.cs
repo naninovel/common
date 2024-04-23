@@ -1,9 +1,7 @@
-using static Naninovel.Parsing.CommandBodyLexer;
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
-internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdentifierLexer textIdLexer)
+internal class CommandParameterLexer (ExpressionLexer expressionLexer,
+    TextIdentifierLexer textIdLexer, Identifiers ids)
 {
     private LexState state = null!;
     private int startIndex;
@@ -17,7 +15,7 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
     public void AddParameters (LexState state, bool inlined)
     {
         Reset(state, inlined);
-        while (!IsEndReached(state, inlined))
+        while (!CommandBodyLexer.IsEndReached(state, inlined, ids))
             if (!TryAddBoolFlag() && !TryToggleQuoted() && !TryAddExpression() &&
                 !TryAddTextId() && !TryAddIdentifier() && !TryAddValue())
                 state.Move();
@@ -43,10 +41,10 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
 
     private bool TryAddBoolFlag ()
     {
-        if (!state.Is(BooleanFlag[0]) || quoted || WasIdentifierAdded()) return false;
-        if (!state.IsPreviousSpace && !state.IsNextSpace && !IsLast(state, inlined)) return false;
-        if (state.IsPreviousSpace && (state.IsNextSpace || IsLast(state, inlined))) return false;
-        if (state.IsPrevious(BooleanFlag[0]) || state.IsNext(BooleanFlag[0])) return false;
+        if (!state.Is(ids.BooleanFlag[0]) || quoted || WasIdentifierAdded()) return false;
+        if (!state.IsPreviousSpace && !state.IsNextSpace && !CommandBodyLexer.IsLast(state, inlined, ids)) return false;
+        if (state.IsPreviousSpace && (state.IsNextSpace || CommandBodyLexer.IsLast(state, inlined, ids))) return false;
+        if (state.IsPrevious(ids.BooleanFlag[0]) || state.IsNext(ids.BooleanFlag[0])) return false;
         if (WasBoolFlagAdded()) multipleBoolFlags = true;
         lastBoolFlagIndex = state.Index;
         state.Move();
@@ -63,21 +61,21 @@ internal class CommandParameterLexer (ExpressionLexer expressionLexer, TextIdent
 
     private bool TryAddExpression ()
     {
-        if (!ExpressionLexer.IsOpening(state)) return false;
+        if (!ExpressionLexer.IsOpening(state, ids)) return false;
         expressionLexer.AddExpression(state);
         return true;
     }
 
     private bool TryAddTextId ()
     {
-        if (!TextIdentifierLexer.IsOpening(state)) return false;
+        if (!TextIdentifierLexer.IsOpening(state, ids)) return false;
         textIdLexer.AddIdentifier(state);
         return true;
     }
 
     private bool TryAddIdentifier ()
     {
-        if (quoted || !state.IsUnescaped(ParameterAssign[0])) return false;
+        if (quoted || !state.IsUnescaped(ids.ParameterAssign[0])) return false;
         var idLength = state.Index - startIndex;
         if (idLength == 0) state.AddError(ErrorType.MissingParamId, state.Index, 1);
         else state.AddToken(TokenType.ParamId, startIndex, idLength);

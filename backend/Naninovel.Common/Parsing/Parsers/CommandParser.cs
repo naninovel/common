@@ -4,11 +4,11 @@ using static Naninovel.Parsing.ParsingErrors;
 
 namespace Naninovel.Parsing;
 
-internal class CommandParser
+internal class CommandParser (Identifiers ids)
 {
     private static readonly Command emptyBody = new(PlainText.Empty);
     private static readonly MixedValue emptyValue = new(Array.Empty<IValueComponent>());
-    private readonly MixedValueParser valueParser = new(true);
+    private readonly MixedValueParser valueParser = new(true, ids);
     private readonly List<Parameter> parameters = [];
     private LineWalker walker = null!;
     private Command commandBody = emptyBody;
@@ -104,7 +104,7 @@ internal class CommandParser
 
     private void ParseBoolFlag (Token flagToken)
     {
-        var value = flagToken.EndIndex > paramIdToken.EndIndex ? "true" : "false";
+        var value = flagToken.EndIndex > paramIdToken.EndIndex ? ids.True : ids.False;
         paramValue = new MixedValue(new[] { new PlainText(value) });
         walker.Associate(paramValue, flagToken);
     }

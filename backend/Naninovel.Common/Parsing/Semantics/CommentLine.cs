@@ -11,5 +11,5 @@ public class CommentLine (PlainText comment, int indent = 0) : IScriptLine
     public PlainText Comment { get; } = comment;
     public int Indent { get; } = indent;
 
-    public override string ToString () => $"{Identifiers.CommentLine} {Comment}";
+    public override string ToString () => $"{Identifiers.Default.CommentLine} {Comment}";
 }

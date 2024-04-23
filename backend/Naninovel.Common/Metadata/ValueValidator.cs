@@ -6,10 +6,10 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Allows checking if parameter values fit associated metadata.
 /// </summary>
-public class ValueValidator
+public class ValueValidator (Identifiers ids)
 {
-    private readonly ListValueParser listParser = new();
-    private readonly NamedValueParser namedParser = new();
+    private readonly ListValueParser listParser = new(ids);
+    private readonly NamedValueParser namedParser = new(ids);
     private string value = null!;
     private ValueType type;
 

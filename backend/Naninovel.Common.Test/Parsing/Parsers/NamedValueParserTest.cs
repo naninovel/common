@@ -2,7 +2,7 @@
 
 public class NamedValueParserTest
 {
-    private readonly NamedValueParser parser = new();
+    private readonly NamedValueParser parser = new(Identifiers.Default);
 
     [Fact]
     public void WhenSplitNamedValueIsNullOrEmptyNameAndValueAreNull ()

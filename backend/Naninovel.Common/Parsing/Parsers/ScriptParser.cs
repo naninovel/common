@@ -7,9 +7,7 @@ namespace Naninovel.Parsing;
 /// </summary>
 public class ScriptParser
 {
-    private static readonly ParseHandlers nullHandlers = new();
-
-    private readonly Lexer lexer = new();
+    private readonly Lexer lexer;
     private readonly List<Token> tokens = [];
     private readonly CommandLineParser commandParser;
     private readonly CommentLineParser commentParser;
@@ -19,14 +17,15 @@ public class ScriptParser
     /// <summary>
     /// Creates a new parser instance.
     /// </summary>
-    /// <param name="handlers">Optional parse handlers (hooks).</param>
-    public ScriptParser (ParseHandlers? handlers = null)
+    /// <param name="options">Configuration of the parser instance.</param>
+    public ScriptParser (ParseOptions? options = null)
     {
-        handlers ??= nullHandlers;
-        commandParser = new(handlers);
-        commentParser = new(handlers);
-        genericParser = new(handlers);
-        labelParser = new(handlers);
+        options ??= new ParseOptions();
+        lexer = new Lexer(options.Identifiers);
+        commandParser = new(options);
+        commentParser = new(options);
+        genericParser = new(options);
+        labelParser = new(options);
     }
 
     /// <summary>

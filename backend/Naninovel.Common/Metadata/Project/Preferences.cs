@@ -1,3 +1,5 @@
+using Naninovel.Parsing;
+
 namespace Naninovel.Metadata;
 
 /// <summary>
@@ -9,4 +11,8 @@ public class Preferences
     /// Identifier of the command feeding the generic text line parameters.
     /// </summary>
     public string ParametrizeGenericCommandId { get; set; } = "";
+    /// <summary>
+    /// Control symbols identifying NaniScript lexical artifacts.
+    /// </summary>
+    public Identifiers Identifiers { get; set; } = new();
 }

@@ -12,7 +12,7 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
     private readonly Func<string, IReadOnlyList<Token>, TLine> parse;
     private readonly Lexer lexer = new();
 
-    public ParseTestHelper (Func<ParseHandlers, Func<string, IReadOnlyList<Token>, TLine>> ctor)
+    public ParseTestHelper (Func<ParseOptions, Func<string, IReadOnlyList<Token>, TLine>> ctor)
     {
         var errorHandler = new Mock<IErrorHandler>();
         errorHandler.Setup(h => h.HandleError(Capture.In(Errors)));
@@ -25,7 +25,11 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
             RangeAssociator = associator.Object,
             TextIdentifier = identifier.Object
         };
-        parse = ctor(handlers);
+        var options = new ParseOptions {
+            Identifiers = Identifiers.Default,
+            Handlers = handlers
+        };
+        parse = ctor(options);
     }
 
     public TLine Parse (string lineText)

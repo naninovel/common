@@ -7,7 +7,11 @@ public class ScriptParserTest
 
     public ScriptParserTest ()
     {
-        parser = new(new ParseHandlers { ErrorHandler = errors });
+        var options = new ParseOptions {
+            Identifiers = Identifiers.Default,
+            Handlers = new ParseHandlers { ErrorHandler = errors }
+        };
+        parser = new(options);
     }
 
     [Fact]
@@ -45,6 +49,41 @@ public class ScriptParserTest
         Assert.IsType<CommandLine>(lines[2]);
         Assert.IsType<GenericLine>(lines[3]);
         Assert.IsType<LabelLine>(lines[4]);
+    }
+
+    [Fact]
+    public void CanOverrideDefaultIdentifiers ()
+    {
+        var parser = new ScriptParser(new ParseOptions {
+            Identifiers = new() {
+                CommentLine = "/",
+                CommandLine = ":",
+                LabelLine = "%",
+                ParameterAssign = "=",
+                InlinedOpen = "(",
+                InlinedClose = ")",
+                True = "да",
+                False = "нет"
+            }
+        });
+        var lines = parser.ParseText(
+            """
+
+            / Comment line
+            :commandLine p=v p! !p
+            Generic \(text\) line (cmd)
+            % LabelLine
+            """);
+        Assert.IsType<GenericLine>(lines[0]);
+        Assert.Equal("Comment line", ((CommentLine)lines[1]).Comment);
+        Assert.Equal("commandLine", ((CommandLine)lines[2]).Command.Identifier);
+        Assert.Equal("p", ((CommandLine)lines[2]).Command.Parameters[0].Identifier);
+        Assert.Equal("v", (PlainText)((CommandLine)lines[2]).Command.Parameters[0].Value[0]);
+        Assert.Equal("да", (PlainText)((CommandLine)lines[2]).Command.Parameters[1].Value[0]);
+        Assert.Equal("нет", (PlainText)((CommandLine)lines[2]).Command.Parameters[2].Value[0]);
+        Assert.Equal("Generic (text) line ", (PlainText)((MixedValue)((GenericLine)lines[3]).Content[0])[0]);
+        Assert.Equal("cmd", ((InlinedCommand)((GenericLine)lines[3]).Content[1]).Command.Identifier);
+        Assert.Equal("LabelLine", ((LabelLine)lines[4]).Label);
     }
 
     [Fact]

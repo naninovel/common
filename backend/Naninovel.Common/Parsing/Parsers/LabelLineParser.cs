@@ -4,9 +4,9 @@ using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class LabelLineParser (ParseHandlers handlers)
+public class LabelLineParser (ParseOptions options)
 {
-    private readonly LineWalker walker = new(handlers);
+    private readonly LineWalker walker = new(options.Handlers);
     private PlainText label = PlainText.Empty;
 
     public LabelLine Parse (string lineText, IReadOnlyList<Token> tokens)

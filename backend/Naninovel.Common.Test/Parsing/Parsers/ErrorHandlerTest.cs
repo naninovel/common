@@ -5,7 +5,7 @@ namespace Naninovel.Parsing.Test;
 public class ErrorHandlerTest
 {
     private readonly Lexer lexer = new();
-    private readonly List<Token> tokens = new();
+    private readonly List<Token> tokens = [];
 
     [Fact]
     public void WhenHandlerNotAssignedErrorIsNotHandled ()
@@ -22,10 +22,10 @@ public class ErrorHandlerTest
     {
         var handler = new Mock<IErrorHandler>();
         lexer.TokenizeLine("foo", tokens);
-        new LabelLineParser(new() { ErrorHandler = handler.Object }).Parse("foo", tokens);
+        new LabelLineParser(new() { Handlers = new() { ErrorHandler = handler.Object } }).Parse("foo", tokens);
         tokens.Clear();
         lexer.TokenizeLine("# foo bar", tokens);
-        new LabelLineParser(new() { ErrorHandler = handler.Object }).Parse("# foo bar", tokens);
+        new LabelLineParser(new() { Handlers = new() { ErrorHandler = handler.Object } }).Parse("# foo bar", tokens);
         handler.Verify(h => h.HandleError(It.IsAny<ParseError>()), Times.Exactly(2));
     }
 }

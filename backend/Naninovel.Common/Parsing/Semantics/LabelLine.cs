@@ -11,5 +11,5 @@ public class LabelLine (PlainText label, int indent = 0) : IScriptLine
     public PlainText Label { get; } = label;
     public int Indent { get; } = indent;
 
-    public override string ToString () => $"{Identifiers.LabelLine} {Label}";
+    public override string ToString () => $"{Identifiers.Default.LabelLine} {Label}";
 }

@@ -7,8 +7,6 @@ namespace Naninovel.Metadata;
 /// </summary>
 public class EndpointResolver (MetadataProvider provider)
 {
-    private readonly NamedValueParser namedParser = new();
-
     /// <summary>
     /// When specified command has a parameter with navigation context (script name and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
@@ -37,6 +35,7 @@ public class EndpointResolver (MetadataProvider provider)
     {
         if (HasEndpointContext(commandAliasOrId, parameter.Identifier))
         {
+            var namedParser = new NamedValueParser(provider.Preferences.Identifiers);
             var (script, label) = namedParser.Parse(parameter.Value.ToString());
             endpoint = new Endpoint(script, label);
             return true;

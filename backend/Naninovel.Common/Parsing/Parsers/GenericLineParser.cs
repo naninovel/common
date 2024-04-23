@@ -2,12 +2,13 @@
 
 namespace Naninovel.Parsing;
 
-public class GenericLineParser (ParseHandlers handlers)
+public class GenericLineParser (ParseOptions options)
 {
-    private readonly CommandParser commandParser = new();
-    private readonly MixedValueParser valueParser = new(false);
+    private readonly CommandParser commandParser = new(options.Identifiers);
+    private readonly MixedValueParser valueParser = new(false, options.Identifiers);
     private readonly List<IGenericContent> content = [];
-    private readonly LineWalker walker = new(handlers);
+    private readonly LineWalker walker = new(options.Handlers);
+    private readonly Identifiers ids = options.Identifiers;
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
 
@@ -97,7 +98,7 @@ public class GenericLineParser (ParseHandlers handlers)
     private bool IsEmptyInlined (Token openInlinedToken)
     {
         return walker.TryGetCharAt(openInlinedToken.EndIndex + 1, out var next) &&
-               next == Identifiers.InlinedClose[0];
+               next == ids.InlinedClose[0];
     }
 
     private void ParseInlined ()

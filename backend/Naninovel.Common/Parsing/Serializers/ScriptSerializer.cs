@@ -1,13 +1,13 @@
 using System.Text;
-using static Naninovel.Parsing.Utilities;
 
 namespace Naninovel.Parsing;
 
 /// <summary>
 /// Allows transforming parsed script line semantic models back to text form.
 /// </summary>
-public class ScriptSerializer
+public class ScriptSerializer (Identifiers ids)
 {
+    private readonly Utilities utils = new(ids);
     private readonly StringBuilder builder = new();
     private readonly StringBuilder mixedBuilder = new();
     private readonly List<(int, int)> ignoreRanges = [];
@@ -65,21 +65,21 @@ public class ScriptSerializer
 
     private void AppendCommentLine (CommentLine commentLine)
     {
-        builder.Append(Identifiers.CommentLine[0]);
+        builder.Append(ids.CommentLine[0]);
         builder.Append(' ');
         builder.Append(commentLine.Comment);
     }
 
     private void AppendLabelLine (LabelLine labelLine)
     {
-        builder.Append(Identifiers.LabelLine[0]);
+        builder.Append(ids.LabelLine[0]);
         builder.Append(' ');
         builder.Append(labelLine.Label);
     }
 
     private void AppendCommandLine (CommandLine commandLine)
     {
-        builder.Append(Identifiers.CommandLine[0]);
+        builder.Append(ids.CommandLine[0]);
         AppendCommand(commandLine.Command);
     }
 
@@ -111,7 +111,7 @@ public class ScriptSerializer
         if (!parameter.Nameless)
         {
             builder.Append(parameter.Identifier!);
-            builder.Append(Identifiers.ParameterAssign[0]);
+            builder.Append(ids.ParameterAssign[0]);
         }
 
         AppendMixed(parameter.Value, true, false);
@@ -120,14 +120,15 @@ public class ScriptSerializer
     private void AppendBooleanParameter (Parameter parameter)
     {
         builder.Append(' ');
-        if (parameter.Value.FirstOrDefault() is PlainText text && text == "true")
+        if (parameter.Value.FirstOrDefault() is PlainText text &&
+            text.Text.Equals(ids.True, StringComparison.OrdinalIgnoreCase))
         {
             builder.Append(parameter.Identifier!);
-            builder.Append(Identifiers.BooleanFlag);
+            builder.Append(ids.BooleanFlag);
         }
         else
         {
-            builder.Append(Identifiers.BooleanFlag);
+            builder.Append(ids.BooleanFlag);
             builder.Append(parameter.Identifier!);
         }
     }
@@ -137,17 +138,17 @@ public class ScriptSerializer
         builder.Append(prefix.Author);
         if (prefix.Appearance != null)
         {
-            builder.Append(Identifiers.AuthorAppearance[0]);
+            builder.Append(ids.AuthorAppearance[0]);
             builder.Append(prefix.Appearance);
         }
-        builder.Append(Identifiers.AuthorAssign);
+        builder.Append(ids.AuthorAssign);
     }
 
     private void AppendInlinedCommand (InlinedCommand inlined)
     {
-        builder.Append(Identifiers.InlinedOpen[0]);
+        builder.Append(ids.InlinedOpen[0]);
         AppendCommand(inlined.Command);
-        builder.Append(Identifiers.InlinedClose[0]);
+        builder.Append(ids.InlinedClose[0]);
     }
 
     private void AppendMixed (IEnumerable<IValueComponent> mixed, bool wrap, bool escapeAuthor)
@@ -171,9 +172,9 @@ public class ScriptSerializer
     private void AppendExpression (Expression expression)
     {
         var startIndex = mixedBuilder.Length;
-        mixedBuilder.Append(Identifiers.ExpressionOpen);
+        mixedBuilder.Append(ids.ExpressionOpen);
         mixedBuilder.Append(expression.Body);
-        mixedBuilder.Append(Identifiers.ExpressionClose);
+        mixedBuilder.Append(ids.ExpressionClose);
         ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
     }
 
@@ -181,9 +182,9 @@ public class ScriptSerializer
     {
         mixedBuilder.Append(identifiedText.Text);
         var startIndex = mixedBuilder.Length;
-        mixedBuilder.Append(Identifiers.TextIdOpen);
+        mixedBuilder.Append(ids.TextIdOpen);
         mixedBuilder.Append(identifiedText.Id.Body);
-        mixedBuilder.Append(Identifiers.TextIdClose);
+        mixedBuilder.Append(ids.TextIdClose);
         ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
     }
 
@@ -202,7 +203,7 @@ public class ScriptSerializer
             for (int i = 0; i < value.Length; i++)
                 if (IsIgnored(ignoreRanges, i)) continue;
                 else if (char.IsWhiteSpace(value[i])) return true;
-                else if (value[i] == '"' && !IsEscaped(value, i)) wrapping = !wrapping;
+                else if (value[i] == '"' && !utils.IsEscaped(value, i)) wrapping = !wrapping;
             return wrapping;
         }
 
@@ -210,7 +211,7 @@ public class ScriptSerializer
         {
             if (IsIgnored(ignoreRanges, i)) return false;
             if (wrap && value[i] == '"') return true;
-            return IsPlainTextControlChar(value[i], value.ElementAtOrDefault(i + 1));
+            return utils.IsPlainTextControlChar(value[i], value.ElementAtOrDefault(i + 1));
         }
 
         static bool IsIgnored (IEnumerable<(int start, int length)> ignoredRanges, int i)
@@ -224,7 +225,7 @@ public class ScriptSerializer
 
     private string EscapeAuthor (string value)
     {
-        var targetIndex = value.IndexOf(Identifiers.AuthorAssign[0]);
+        var targetIndex = value.IndexOf(ids.AuthorAssign[0]);
         if (targetIndex < 1) return value;
         for (int i = 0; i < targetIndex; i++)
             if (char.IsWhiteSpace(value[i]))
@@ -244,9 +245,10 @@ public class ScriptSerializer
         return builder;
     }
 
-    private static bool IsBooleanParameter (Parameter parameter)
+    private bool IsBooleanParameter (Parameter parameter)
     {
-        return parameter.Value.FirstOrDefault() is PlainText text
-               && (text == "true" || text == "false");
+        return parameter.Value.FirstOrDefault() is PlainText plain
+               && (plain.Text.Equals(ids.True, StringComparison.OrdinalIgnoreCase) ||
+                   plain.Text.Equals(ids.False, StringComparison.OrdinalIgnoreCase));
     }
 }

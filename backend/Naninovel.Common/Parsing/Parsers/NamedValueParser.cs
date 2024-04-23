@@ -1,13 +1,12 @@
-using static Naninovel.Parsing.Utilities;
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
 /// <summary>
 /// Allows parsing named values where name and value components are delimited by a dot.
 /// </summary>
-public class NamedValueParser
+public class NamedValueParser (Identifiers ids)
 {
+    private readonly Utilities utils = new(ids);
+
     /// <summary>
     /// Splits decoded named value into name and value components.
     /// </summary>
@@ -24,12 +23,12 @@ public class NamedValueParser
         return (name is null ? null : Unescape(name), namedValue);
     }
 
-    private static string Unescape (string value) => UnescapeCharacter(value, NamedDelimiter);
+    private string Unescape (string value) => utils.UnescapeCharacter(value, ids.NamedDelimiter);
 
-    private static int FindDelimiterIndex (string value)
+    private int FindDelimiterIndex (string value)
     {
         for (int i = 0; i < value.Length; i++)
-            if (value[i] == NamedDelimiter[0] && !IsEscaped(value, i))
+            if (value[i] == ids.NamedDelimiter[0] && !utils.IsEscaped(value, i))
                 return i;
         return -1;
     }

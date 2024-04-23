@@ -1,9 +1,8 @@
-using static Naninovel.Parsing.Utilities;
-
 namespace Naninovel.Parsing;
 
-internal class MixedValueParser (bool unwrap)
+internal class MixedValueParser (bool unwrap, Identifiers ids)
 {
+    private readonly Utilities utils = new(ids);
     private readonly List<IValueComponent> value = [];
     private readonly Queue<Token> expressions = new();
     private readonly Queue<Token> textIds = new();
@@ -126,7 +125,7 @@ internal class MixedValueParser (bool unwrap)
         }
     }
 
-    private static string UnescapePlain (string value, bool unescapeQuotes)
+    private string UnescapePlain (string value, bool unescapeQuotes)
     {
         for (int i = value.Length - 2; i >= 0; i--)
             if (ShouldRemove(i))
@@ -135,16 +134,16 @@ internal class MixedValueParser (bool unwrap)
 
         bool ShouldRemove (int i)
         {
-            if (value[i] != '\\' || IsEscaped(value, i)) return false;
+            if (value[i] != '\\' || utils.IsEscaped(value, i)) return false;
             var prev = value[i + 1];
             if (unescapeQuotes && prev == '"') return true;
-            return IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
+            return utils.IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
         }
     }
 
-    private static string UnescapeAuthor (string value)
+    private string UnescapeAuthor (string value)
     {
-        const string target = $"\\{Identifiers.AuthorAssign}";
+        var target = $"\\{ids.AuthorAssign}";
         var targetIndex = value.IndexOf(target, StringComparison.Ordinal);
         if (targetIndex < 1) return value;
         for (int i = 0; i < targetIndex; i++)
