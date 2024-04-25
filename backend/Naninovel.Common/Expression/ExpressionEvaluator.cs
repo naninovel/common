@@ -7,16 +7,15 @@ public class ExpressionEvaluator (EvaluateOptions options)
 {
     private readonly ExpressionParser parser = new(options.ParseOptions);
 
-    public static bool TryEvaluate<TResult> (string text, out TResult result)
+    public static bool TryEvaluate<TResult> (Expression expression, out TResult result)
     {
         result = default!;
-        var obj = Evaluate(text, typeof(TResult));
-        if (obj is not TResult specific) return false;
-        result = specific;
+        try { result = (TResult)Evaluate(expression, typeof(TResult)); }
+        catch { return false; }
         return true;
     }
 
-    public static object Evaluate (string text, Type resultType)
+    public static object Evaluate (Expression expression, Type resultType)
     {
         throw new ExpressionError("");
     }

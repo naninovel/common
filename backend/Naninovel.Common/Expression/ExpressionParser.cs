@@ -1,11 +1,11 @@
 namespace Naninovel.Expression;
 
 /// <summary>
-/// Parses expression text.
+/// Parses expression text into <see cref="Expression"/> that can be evaluated.
 /// </summary>
 public class ExpressionParser (ParseOptions options)
 {
-    public object Parse (string text)
+    public Expression Parse (string text)
     {
         return null!;
     }
