@@ -7,6 +7,6 @@ namespace Naninovel.Expression;
 /// </summary>
 public class ParseOptions
 {
-    public Action<ExpressionDiagnostic>? HandleDiagnostic { get; set; }
+    public Action<ParseDiagnostic>? HandleDiagnostic { get; set; }
     public Identifiers Identifiers { get; set; } = Identifiers.Default;
 }

@@ -14,7 +14,7 @@ public class ExpressionEvaluator (EvaluateOptions options)
     /// <param name="result">Result of the evaluated expression, when successful.</param>
     /// <typeparam name="TResult">Expected type of the result.</typeparam>
     /// <returns>Whether expression was evaluated successfully and result is of the specified type.</returns>
-    public bool TryEvaluate<TResult> (Expression exp, out TResult result)
+    public bool TryEvaluate<TResult> (IExpression exp, out TResult result)
     {
         result = default!;
         if (!TryEvaluate(exp, typeof(TResult), out var obj)) return false;
@@ -24,7 +24,7 @@ public class ExpressionEvaluator (EvaluateOptions options)
 
     /// <inheritdoc cref="TryEvaluate{TResult}"/>
     /// <param name="resultType">Expected type of the result.</param>
-    public bool TryEvaluate (Expression exp, Type resultType, out object result)
+    public bool TryEvaluate (IExpression exp, Type resultType, out object result)
     {
         throw new NotImplementedException();
     }
