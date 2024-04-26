@@ -7,16 +7,25 @@ public class ExpressionEvaluator (EvaluateOptions options)
 {
     private readonly ExpressionParser parser = new(options.ParseOptions);
 
-    public static bool TryEvaluate<TResult> (Expression expression, out TResult result)
+    /// <summary>
+    /// Attempts to evaluate result of the specified expression and result type.
+    /// </summary>
+    /// <param name="exp">Expression to evaluate.</param>
+    /// <param name="result">Result of the evaluated expression, when successful.</param>
+    /// <typeparam name="TResult">Expected type of the result.</typeparam>
+    /// <returns>Whether expression was evaluated successfully and result is of the specified type.</returns>
+    public bool TryEvaluate<TResult> (Expression exp, out TResult result)
     {
         result = default!;
-        try { result = (TResult)Evaluate(expression, typeof(TResult)); }
-        catch { return false; }
+        if (!TryEvaluate(exp, typeof(TResult), out var obj)) return false;
+        result = (TResult)obj;
         return true;
     }
 
-    public static object Evaluate (Expression expression, Type resultType)
+    /// <inheritdoc cref="TryEvaluate{TResult}"/>
+    /// <param name="resultType">Expected type of the result.</param>
+    public bool TryEvaluate (Expression exp, Type resultType, out object result)
     {
-        throw new ExpressionError("");
+        throw new NotImplementedException();
     }
 }

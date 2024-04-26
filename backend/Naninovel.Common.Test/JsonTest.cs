@@ -5,7 +5,7 @@ using Naninovel.Metadata;
 
 namespace Naninovel.Bridging.Test;
 
-public partial class SerializerTest
+public partial class JsonTest
 {
     [JsonSerializable(typeof(Message))]
     internal partial class AdditionalContext : JsonSerializerContext;

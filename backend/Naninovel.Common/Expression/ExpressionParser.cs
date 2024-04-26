@@ -5,8 +5,26 @@ namespace Naninovel.Expression;
 /// </summary>
 public class ExpressionParser (ParseOptions options)
 {
-    public Expression Parse (string text)
+    /// <summary>
+    /// Attempts to parse specified text as expression.
+    /// </summary>
+    /// <param name="text">Expression text to parse.</param>
+    /// <param name="exp">Parsed expression, when successful.</param>
+    /// <returns>Whether the text was parsed successfully.</returns>
+    public bool TryParse (string text, out Expression exp)
     {
-        return null!;
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Attempts to parse specified text as expression assigned to a variable.
+    /// </summary>
+    /// <param name="text">Expression assignment text to parse.</param>
+    /// <param name="exp">Assigned expression, when successful.</param>
+    /// <param name="var">Variable name to assign, when successful.</param>
+    /// <returns>Whether the text was parsed successfully.</returns>
+    public bool TryParseAssigned (string text, out Expression exp, out string var)
+    {
+        throw new NotImplementedException();
     }
 }
