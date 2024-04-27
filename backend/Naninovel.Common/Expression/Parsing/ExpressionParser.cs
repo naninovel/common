@@ -9,14 +9,15 @@ public class ExpressionParser
 {
     private readonly ParseOptions options;
     private readonly ParseContext ctx = new();
-    private readonly OperatorParser ops = new();
     private readonly StringBuilder str = new();
     private readonly IdentifierParser ids;
+    private readonly OperatorParser ops;
 
     public ExpressionParser (ParseOptions options)
     {
         this.options = options;
-        ids = new IdentifierParser(ctx, options.Identifiers);
+        ids = new IdentifierParser(ctx, options);
+        ops = new OperatorParser(ctx);
     }
 
     /// <summary>
@@ -28,10 +29,19 @@ public class ExpressionParser
     public bool TryParse (string text, out IExpression exp)
     {
         Reset(text);
+        exp = default!;
 
         try
         {
-            exp = ParseNext();
+            while (!ctx.EndReached)
+            {
+                if (ops.TryUnary() is { } unary)
+                    exp = ConsumeUnary(unary);
+                if (exp != null && ops.TryBinary() is { } binary)
+                    exp = ConsumeBinary(exp, binary);
+                ctx.Move();
+            }
+
             return true;
         }
         catch (Error err)
@@ -61,37 +71,40 @@ public class ExpressionParser
         str.Clear();
     }
 
-    private IExpression ParseNext ()
+    private UnaryOperation ConsumeUnary (IUnaryOperator op)
     {
-        while (!ctx.EndReached)
-            if (!ids.TryParse() && !TryClosure() && !TryString())
-                ctx.Move();
+
     }
 
-    private bool TryClosure ()
+    private UnaryOperation ConsumeBinary (IExpression lhs, IBinaryOperator op)
     {
-        if (!IsOpen()) return false;
+
+    }
+
+    private IExpression? TryClosure ()
+    {
+        if (!IsOpen()) return null;
 
         while (!IsClose())
             str.Append(ctx.Consume());
-        var closure = str.ToString();
+        if (!new ExpressionParser(options).TryParse(str.ToString(), out var closure))
+            throw new Error("Failed to parse closure.");
 
         str.Clear();
-        return true;
+        return closure;
 
         bool IsOpen () => ctx.Is('(') && ctx.IsTopAndUnquoted;
         bool IsClose () => ctx.Is(')') && ctx.IsTopAndUnquoted;
     }
 
-    private bool TryString ()
+    private IExpression? TryString ()
     {
-        if (!ctx.IsQuoted) return false;
+        if (!ctx.IsQuoted) return null;
 
         while (ctx.IsQuoted)
             str.Append(ctx.Consume());
-        var @string = new String(str.ToString());
 
         str.Clear();
-        return true;
+        return new String(str.ToString());
     }
 }

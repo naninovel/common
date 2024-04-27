@@ -7,10 +7,6 @@ internal class ParseContext
     public int EndIndex => text.Length - 1;
     public char Char => text[Index];
     public bool EndReached => Index > EndIndex;
-    public bool IsSpace => IsIndexValid(Index) && char.IsWhiteSpace(text[Index]);
-    public bool IsNotSpace => IsIndexValid(Index) && !char.IsWhiteSpace(text[Index]);
-    public bool IsPreviousSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index - 1));
-    public bool IsNextSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index + 1));
     public bool IsQuoted { get; private set; }
     public int Level { get; private set; }
     public bool IsTopAndUnquoted => Level == 0 && !IsQuoted;
