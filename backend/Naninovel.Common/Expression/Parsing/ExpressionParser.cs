@@ -7,6 +7,7 @@ namespace Naninovel.Expression;
 /// </summary>
 public class ExpressionParser
 {
+    private readonly ParseOptions options;
     private readonly ParseContext ctx = new();
     private readonly OperatorParser ops = new();
     private readonly StringBuilder str = new();
@@ -14,6 +15,7 @@ public class ExpressionParser
 
     public ExpressionParser (ParseOptions options)
     {
+        this.options = options;
         ids = new IdentifierParser(ctx, options.Identifiers);
     }
 
@@ -27,11 +29,18 @@ public class ExpressionParser
     {
         Reset(text);
 
-        while (!ctx.EndReached)
-            if (!ids.TryParse() && !TryClosure() && !TryString())
-                ctx.Move();
-
-        throw new NotImplementedException();
+        try
+        {
+            exp = ParseNext();
+            return true;
+        }
+        catch (Error err)
+        {
+            exp = default!;
+            var length = text.Length - ctx.Index;
+            options.HandleDiagnostic?.Invoke(new(ctx.Index, length, err.Message));
+            return false;
+        }
     }
 
     /// <summary>
@@ -50,6 +59,13 @@ public class ExpressionParser
     {
         ctx.Reset(text);
         str.Clear();
+    }
+
+    private IExpression ParseNext ()
+    {
+        while (!ctx.EndReached)
+            if (!ids.TryParse() && !TryClosure() && !TryString())
+                ctx.Move();
     }
 
     private bool TryClosure ()
