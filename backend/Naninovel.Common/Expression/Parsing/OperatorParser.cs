@@ -13,6 +13,11 @@ internal class OperatorParser
         ["||"] = new Or(),
         ["="] = new Equal(),
         ["=="] = new Equal(),
+        ["!="] = new NotEqual(),
+        [">"] = new Greater(),
+        ["<"] = new Less(),
+        [">="] = new GreaterOrEqual(),
+        ["<="] = new LessOrEqual(),
     };
 
     private readonly Dictionary<string, IUnaryOperator> unary = new() {
