@@ -4,7 +4,7 @@ namespace Naninovel.Expression;
 /// Artifact to be evaluated by <see cref="ExpressionEvaluator"/>.
 /// </summary>
 /// <remarks>
-/// Can be either <see cref="BinaryOperation"/>, <see cref="Function"/>,
-/// <see cref="Variable"/> or one of the <see cref="IOperand"/> specs.
+/// Can be either <see cref="BinaryOperation"/>, <see cref="UnaryOperation"/>,
+/// <see cref="Function"/>, <see cref="Variable"/> or an <see cref="IOperand"/>.
 /// </remarks>
 public interface IExpression;

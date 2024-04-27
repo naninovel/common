@@ -3,9 +3,16 @@ namespace Naninovel.Expression;
 /// <summary>
 /// Parses expression text into <see cref="Expression"/> that can be evaluated.
 /// </summary>
-public class ExpressionParser (ParseOptions options)
+public class ExpressionParser
 {
-    private readonly OperatorParser operatorParser = new();
+    private readonly ParseContext ctx = new();
+    private readonly OperatorParser ops = new();
+    private readonly IdentifierParser ids;
+
+    public ExpressionParser (ParseOptions options)
+    {
+        ids = new IdentifierParser(ctx, options.Identifiers);
+    }
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -15,6 +22,12 @@ public class ExpressionParser (ParseOptions options)
     /// <returns>Whether the text was parsed successfully.</returns>
     public bool TryParse (string text, out IExpression exp)
     {
+        Reset(text);
+
+        while (!ctx.EndReached)
+            if (!ids.TryParse())
+                ctx.Move();
+
         throw new NotImplementedException();
     }
 
@@ -28,5 +41,10 @@ public class ExpressionParser (ParseOptions options)
     public bool TryParseAssigned (string text, out IExpression exp, out string var)
     {
         throw new NotImplementedException();
+    }
+
+    private void Reset (string text)
+    {
+        ctx.Reset(text);
     }
 }
