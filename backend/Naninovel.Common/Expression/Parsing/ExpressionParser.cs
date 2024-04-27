@@ -56,7 +56,7 @@ public class ExpressionParser
     {
         if (!IsOpen()) return false;
 
-        while (ctx.IsQuoted)
+        while (!IsClose())
             str.Append(ctx.Consume());
         var closure = str.ToString();
 
