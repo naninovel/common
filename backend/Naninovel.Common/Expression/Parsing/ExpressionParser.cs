@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Naninovel.Expression;
 
 /// <summary>
@@ -7,6 +9,7 @@ public class ExpressionParser
 {
     private readonly ParseContext ctx = new();
     private readonly OperatorParser ops = new();
+    private readonly StringBuilder str = new();
     private readonly IdentifierParser ids;
 
     public ExpressionParser (ParseOptions options)
@@ -25,7 +28,7 @@ public class ExpressionParser
         Reset(text);
 
         while (!ctx.EndReached)
-            if (!ids.TryParse())
+            if (!ids.TryParse() && !TryClosure() && !TryString())
                 ctx.Move();
 
         throw new NotImplementedException();
@@ -46,5 +49,33 @@ public class ExpressionParser
     private void Reset (string text)
     {
         ctx.Reset(text);
+        str.Clear();
+    }
+
+    private bool TryClosure ()
+    {
+        if (!IsOpen()) return false;
+
+        while (ctx.IsQuoted)
+            str.Append(ctx.Consume());
+        var closure = str.ToString();
+
+        str.Clear();
+        return true;
+
+        bool IsOpen () => ctx.Is('(') && ctx.IsTopAndUnquoted;
+        bool IsClose () => ctx.Is(')') && ctx.IsTopAndUnquoted;
+    }
+
+    private bool TryString ()
+    {
+        if (!ctx.IsQuoted) return false;
+
+        while (ctx.IsQuoted)
+            str.Append(ctx.Consume());
+        var @string = new String(str.ToString());
+
+        str.Clear();
+        return true;
     }
 }
