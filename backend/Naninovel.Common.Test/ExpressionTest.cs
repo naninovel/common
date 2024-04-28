@@ -2,8 +2,8 @@ namespace Naninovel.Expression.Test;
 
 public class ExpressionTest
 {
-    private readonly ExpressionParser parser = new(new());
-    private readonly ExpressionEvaluator evaluator = new(new());
+    private readonly Parser parser = new(new());
+    private readonly Evaluator evaluator = new();
 
     [
         Theory,
@@ -84,31 +84,31 @@ public class ExpressionTest
         Assert.Equal(expected, actual);
     }
 
-    // [
-    //     Theory,
-    //     InlineData("\"foo\"", "foo"),
-    //     InlineData("foo", "foo"),
-    //     InlineData("bar", "bar"),
-    //     InlineData("true ? \"foo\" : \"bar\"", "foo"),
-    //     InlineData("negative ? foo : bar", "bar"),
-    // ]
-    // public void CanEvaluateStringExpressions (string text, string expected)
-    // {
-    //     Assert.True(parser.TryParse(text, out var expression));
-    //     Assert.True(evaluator.TryEvaluate<string>(expression, out var actual));
-    //     Assert.Equal(expected, actual);
-    // }
-    //
-    // [
-    //     Theory,
-    //     InlineData("1", 1),
-    //     InlineData("\"1\"", "1"),
-    //     InlineData("\"true\"", true),
-    // ]
-    // public void CanEvaluateDynamicExpressions (string text, object expected)
-    // {
-    //     Assert.True(parser.TryParse(text, out var expression));
-    //     Assert.True(evaluator.TryEvaluate(expression, expected.GetType(), out var actual));
-    //     Assert.Equal(expected, actual);
-    // }
+    [
+        Theory,
+        InlineData("\"foo\"", "foo"),
+        InlineData("foo", "foo"),
+        InlineData("bar", "bar"),
+        InlineData("true ? \"foo\" : \"bar\"", "foo"),
+        InlineData("negative ? foo : bar", "bar"),
+    ]
+    public void CanEvaluateStringExpressions (string text, string expected)
+    {
+        Assert.True(parser.TryParse(text, out var expression));
+        Assert.True(evaluator.TryEvaluate<string>(expression, out var actual));
+        Assert.Equal(expected, actual);
+    }
+
+    [
+        Theory,
+        InlineData("1", 1),
+        InlineData("\"1\"", "1"),
+        InlineData("\"true\"", true),
+    ]
+    public void CanEvaluateDynamicExpressions (string text, object expected)
+    {
+        Assert.True(parser.TryParse(text, out var expression));
+        Assert.True(evaluator.TryEvaluate(expression, expected.GetType(), out var actual));
+        Assert.Equal(expected, actual);
+    }
 }

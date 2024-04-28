@@ -3,7 +3,7 @@ using Naninovel.Parsing;
 namespace Naninovel.Expression;
 
 /// <summary>
-/// Configures <see cref="ExpressionParser"/> instance.
+/// Configures <see cref="Parser"/> instance.
 /// </summary>
 public class ParseOptions
 {

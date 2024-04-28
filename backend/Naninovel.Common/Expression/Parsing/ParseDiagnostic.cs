@@ -1,7 +1,7 @@
 namespace Naninovel.Expression;
 
 /// <summary>
-/// An diagnostic message associated with parsing a subset of expression text.
+/// A diagnostic message associated with parsing a subset of expression text.
 /// </summary>
 public readonly struct ParseDiagnostic (int index, int length, string message)
 {

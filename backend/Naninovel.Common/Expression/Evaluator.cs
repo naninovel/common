@@ -1,12 +1,10 @@
 namespace Naninovel.Expression;
 
 /// <summary>
-/// Allows evaluating expression text into result.
+/// Evaluates <see cref="IExpression"/> into result.
 /// </summary>
-public class ExpressionEvaluator (EvaluateOptions options)
+public class Evaluator
 {
-    private readonly ExpressionParser parser = new(options.ParseOptions);
-
     /// <summary>
     /// Attempts to evaluate result of the specified expression and result type.
     /// </summary>
