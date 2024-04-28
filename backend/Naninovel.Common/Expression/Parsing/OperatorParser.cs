@@ -29,9 +29,9 @@ internal class OperatorParser (ParseContext ctx)
         ["-"] = new NegateNumeric()
     };
 
-    public IBinaryOperator? TryBinary ()
+    public bool TryBinary ()
     {
-        if (!IsBinary()) return null;
+        if (!IsBinary()) return false;
 
         Reset();
 
@@ -42,12 +42,13 @@ internal class OperatorParser (ParseContext ctx)
         if (!binary.TryGetValue(key, out var op))
             throw new Error($"Unknown binary operator: {key}");
 
-        return op;
+        ctx.AddParsed(op);
+        return true;
     }
 
-    public IUnaryOperator? TryUnary ()
+    public bool TryUnary ()
     {
-        if (!IsUnary()) return null;
+        if (!IsUnary()) return false;
 
         Reset();
 
@@ -58,7 +59,8 @@ internal class OperatorParser (ParseContext ctx)
         if (!unary.TryGetValue(key, out var op))
             throw new Error($"Unknown unary operator: {key}");
 
-        return op;
+        ctx.AddParsed(op);
+        return true;
     }
 
     private void Reset ()

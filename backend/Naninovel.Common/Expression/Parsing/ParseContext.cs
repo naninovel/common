@@ -10,7 +10,9 @@ internal class ParseContext
     public bool IsQuoted { get; private set; }
     public int Level { get; private set; }
     public bool IsTopAndUnquoted => Level == 0 && !IsQuoted;
+    public IReadOnlyList<object> Parsed => parsed;
 
+    private readonly List<object> parsed = [];
     private string text = "";
 
     public void Reset (string text)
@@ -19,6 +21,7 @@ internal class ParseContext
         Index = 0;
         Level = 0;
         IsQuoted = false;
+        parsed.Clear();
     }
 
     public int Move ()
@@ -30,6 +33,11 @@ internal class ParseContext
     }
 
     public char Consume () => text[Move() - 1];
+
+    public void AddParsed (object parsed)
+    {
+        this.parsed.Add(parsed);
+    }
 
     public bool Is (char @char)
     {

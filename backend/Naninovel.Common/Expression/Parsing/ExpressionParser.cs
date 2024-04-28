@@ -8,6 +8,7 @@ namespace Naninovel.Expression;
 public class ExpressionParser
 {
     private readonly ParseOptions options;
+    private readonly ExpressionBuilder builder = new();
     private readonly ParseContext ctx = new();
     private readonly StringBuilder str = new();
     private readonly IdentifierParser ids;
@@ -29,26 +30,20 @@ public class ExpressionParser
     public bool TryParse (string text, out IExpression exp)
     {
         Reset(text);
-        exp = default!;
 
         try
         {
             while (!ctx.EndReached)
-            {
-                if (ops.TryUnary() is { } unary)
-                    exp = ConsumeUnary(unary);
-                if (exp != null && ops.TryBinary() is { } binary)
-                    exp = ConsumeBinary(exp, binary);
-                ctx.Move();
-            }
-
+                if (!ids.TryParse() && !ops.TryUnary() && !ops.TryBinary() &&
+                    !TryClosure() && !TryString() && !TryNumber())
+                    ctx.Move();
+            exp = builder.Build(ctx.Parsed);
             return true;
         }
         catch (Error err)
         {
             exp = default!;
-            var length = text.Length - ctx.Index;
-            options.HandleDiagnostic?.Invoke(new(ctx.Index, length, err.Message));
+            options.HandleDiagnostic?.Invoke(new(0, text.Length, err.Message));
             return false;
         }
     }
@@ -71,40 +66,47 @@ public class ExpressionParser
         str.Clear();
     }
 
-    private UnaryOperation ConsumeUnary (IUnaryOperator op)
+    private bool TryClosure ()
     {
-
-    }
-
-    private UnaryOperation ConsumeBinary (IExpression lhs, IBinaryOperator op)
-    {
-
-    }
-
-    private IExpression? TryClosure ()
-    {
-        if (!IsOpen()) return null;
+        if (!IsOpen()) return false;
 
         while (!IsClose())
             str.Append(ctx.Consume());
+
         if (!new ExpressionParser(options).TryParse(str.ToString(), out var closure))
             throw new Error("Failed to parse closure.");
 
+        ctx.AddParsed(closure);
         str.Clear();
-        return closure;
+        return true;
 
         bool IsOpen () => ctx.Is('(') && ctx.IsTopAndUnquoted;
         bool IsClose () => ctx.Is(')') && ctx.IsTopAndUnquoted;
     }
 
-    private IExpression? TryString ()
+    private bool TryString ()
     {
-        if (!ctx.IsQuoted) return null;
+        if (!ctx.IsQuoted) return false;
 
         while (ctx.IsQuoted)
             str.Append(ctx.Consume());
 
+        ctx.AddParsed(new String(str.ToString()));
         str.Clear();
-        return new String(str.ToString());
+        return true;
+    }
+
+    private bool TryNumber ()
+    {
+        while (ctx.Is(char.IsNumber))
+            str.Append(ctx.Consume());
+
+        var text = str.ToString();
+        if (!double.TryParse(text, out var num))
+            throw new Error($"Failed to parse '{text}' as number.");
+
+        ctx.AddParsed(new Numeric(num));
+        str.Clear();
+        return true;
     }
 }

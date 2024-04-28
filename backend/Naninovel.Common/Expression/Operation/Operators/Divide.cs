@@ -1,6 +1,6 @@
 namespace Naninovel.Expression;
 
-internal class Divide : IBinaryOperator
+internal class Divide : IAssociativeBinaryOperator
 {
     public IOperand Operate (IOperand lhs, IOperand rhs)
     {

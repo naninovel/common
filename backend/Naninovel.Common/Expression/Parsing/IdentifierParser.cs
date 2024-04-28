@@ -8,17 +8,20 @@ internal class IdentifierParser (ParseContext ctx, ParseOptions options)
     private readonly StringBuilder str = new();
     private readonly Identifiers ids = options.Identifiers;
 
-    public IExpression? TryParse ()
+    public bool TryParse ()
     {
-        if (!IsIdentifierStart()) return null;
+        if (!IsIdentifierStart()) return false;
 
         Reset();
 
         while (IsIdentifierContent())
             str.Append(ctx.Consume());
-        var id = str.ToString();
 
-        return TryFunction(id) ?? TryBoolean(id) ?? new Variable(id);
+        var id = str.ToString();
+        var exp = TryFunction(id) ?? TryBoolean(id) ?? new Variable(id);
+        ctx.AddParsed(exp);
+
+        return true;
 
         bool IsIdentifierStart () => ctx.Is(char.IsLetter) && ctx.IsTopAndUnquoted;
         bool IsIdentifierContent () => ctx.Is(char.IsLetterOrDigit) || ctx.Is('_');
@@ -43,14 +46,28 @@ internal class IdentifierParser (ParseContext ctx, ParseOptions options)
 
         ctx.Move();
 
-        while (!IsFunctionClose())
-            str.Append(ctx.Consume());
-        if (!new ExpressionParser(options).TryParse(str.ToString(), out var fn))
-            throw new Error("Failed to parse function parameters.");
+        var @params = new List<IExpression>();
 
-        return fn;
+        while (!IsFunctionClose())
+            if (IsParamSeparator())
+            {
+                @params.Add(ParseParameter(str.ToString()));
+                str.Clear();
+                ctx.Move();
+            }
+            else str.Append(ctx.Consume());
+
+        return new Function(id, @params);
 
         bool IsFunctionOpen () => ctx.Is('(') && ctx.IsTopAndUnquoted;
         bool IsFunctionClose () => ctx.Is(')') && ctx.IsTopAndUnquoted;
+        bool IsParamSeparator () => ctx.Is(',') && ctx.IsTopAndUnquoted;
+    }
+
+    private IExpression ParseParameter (string text)
+    {
+        if (!new ExpressionParser(options).TryParse(text, out var exp))
+            throw new Error($"Failed to parse '{text}' as function parameter.");
+        return exp;
     }
 }

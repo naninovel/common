@@ -1,6 +1,6 @@
 namespace Naninovel.Expression;
 
-internal class Multiply : IBinaryOperator
+internal class Multiply : IAssociativeBinaryOperator
 {
     public IOperand Operate (IOperand lhs, IOperand rhs)
     {
