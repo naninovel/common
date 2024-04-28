@@ -132,7 +132,7 @@ internal class Lexer
         while (true)
         {
             var c = Consume();
-            if (c == default) throw new Error("Unclosed string.");
+            if (c == default) throw new Error("Unclosed string.", index);
 
             if (escape)
             {
