@@ -6,11 +6,16 @@ public static class OperandExtensions
     /// Returns underlying value of the operand, casted into specified type.
     /// </summary>
     /// <exception cref="Error">Thrown when cast to expected type is not possible.</exception>
-    public static T GetValue<T> (this IOperand op)
+    public static T GetValue<T> (this IOperand op) => (T)GetValue(op, typeof(T));
+
+    /// <summary>
+    /// Returns underlying value of the operand, casted into specified type.
+    /// </summary>
+    /// <exception cref="Error">Thrown when cast to expected type is not possible.</exception>
+    public static object GetValue (this IOperand op, Type type)
     {
         var raw = op.GetValue();
-        if (raw is not T expected)
-            throw new Error($"Unexpected operand type: {raw.GetType().Name} (expected {typeof(T).Name})");
-        return expected;
+        try { return Convert.ChangeType(raw, type); }
+        catch { throw new Error($"Unexpected operand type: {raw.GetType().Name} (expected {type.Name})"); }
     }
 }

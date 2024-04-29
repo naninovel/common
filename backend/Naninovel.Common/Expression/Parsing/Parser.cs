@@ -272,6 +272,12 @@ public class Parser (ParseOptions options)
             Expect(")");
             return new Function(name, @params);
         }
+
+        if (name.Equals(options.Identifiers.True, StringComparison.OrdinalIgnoreCase))
+            return new Boolean(true);
+        if (name.Equals(options.Identifiers.False, StringComparison.OrdinalIgnoreCase))
+            return new Boolean(false);
+
         return new Variable(name);
     }
 

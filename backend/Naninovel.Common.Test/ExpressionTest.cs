@@ -47,6 +47,7 @@ public class ExpressionTest
         InlineData("false = false", true),
         InlineData("false != false", false),
         InlineData("\"foo\" = \"foo\"", true),
+        InlineData("\"foo\" == \"foo\"", true),
         InlineData("\"foo\" != \"foo\"", false),
         InlineData("\"foo\" = \"bar\"", false),
         InlineData("\"foo\" != \"bar\"", true),
@@ -62,11 +63,11 @@ public class ExpressionTest
         InlineData("(1+2) < (3+4)", true),
         InlineData("(1+2) > (3+4)", false),
         InlineData("(3+4) > (1+2)", true),
-        InlineData("(3+4) < (1+2)", true),
+        InlineData("(3+4) < (1+2)", false),
         InlineData("(1+2) <= (3+4)", true),
-        InlineData("(3+4) >= (1+2)", false),
-        InlineData("(1+2) >= (3+4)", true),
         InlineData("(3+4) <= (1+2)", false),
+        InlineData("(1+2) >= (3+4)", false),
+        InlineData("(3+4) >= (1+2)", true),
         InlineData("(1+2) == (3+4)", false),
         InlineData("(1+2) == (2+1)", true),
         InlineData("(1+2) >= (2+1)", true),
@@ -106,6 +107,6 @@ public class ExpressionTest
     public void CanEvaluateDynamicExpressions (string text, object expected)
     {
         Assert.True(parser.TryParse(text, out var expression));
-        Assert.Equal(expected, evaluator.Evaluate(expression));
+        Assert.Equal(expected, evaluator.Evaluate(expression).GetValue(expected.GetType()));
     }
 }
