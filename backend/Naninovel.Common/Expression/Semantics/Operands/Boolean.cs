@@ -1,6 +1,7 @@
 namespace Naninovel.Expression;
 
-internal class Boolean (bool value) : IOperand
+public class Boolean (bool value) : IOperand
 {
     public bool Value { get; } = value;
+    public object GetValue () => Value;
 }

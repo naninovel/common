@@ -5,7 +5,7 @@ internal class BinaryOperation (IBinaryOperator op, IExpression lhs, IExpression
     /// <summary>
     /// Operator to apply over the operands.
     /// </summary>
-    public IBinaryOperator BinaryOperator { get; } = op;
+    public IBinaryOperator Operator { get; } = op;
     /// <summary>
     /// Left-hand side operand.
     /// </summary>

@@ -3,7 +3,7 @@ namespace Naninovel.Expression.Test;
 public class ExpressionTest
 {
     private readonly Parser parser = new(new());
-    private readonly Evaluator evaluator = new();
+    private readonly Evaluator evaluator = new(new());
 
     [
         Theory,
@@ -24,8 +24,7 @@ public class ExpressionTest
     public void CanEvaluateNumericExpressions (string text, double expected)
     {
         Assert.True(parser.TryParse(text, out var expression));
-        Assert.True(evaluator.TryEvaluate<double>(expression, out var actual));
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected, evaluator.Evaluate<double>(expression));
     }
 
     [
@@ -80,8 +79,7 @@ public class ExpressionTest
     public void CanEvaluateBooleanExpressions (string text, bool expected)
     {
         Assert.True(parser.TryParse(text, out var expression));
-        Assert.True(evaluator.TryEvaluate<bool>(expression, out var actual));
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected, evaluator.Evaluate<bool>(expression));
     }
 
     [
@@ -95,8 +93,7 @@ public class ExpressionTest
     public void CanEvaluateStringExpressions (string text, string expected)
     {
         Assert.True(parser.TryParse(text, out var expression));
-        Assert.True(evaluator.TryEvaluate<string>(expression, out var actual));
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected, evaluator.Evaluate<string>(expression));
     }
 
     [
@@ -108,7 +105,6 @@ public class ExpressionTest
     public void CanEvaluateDynamicExpressions (string text, object expected)
     {
         Assert.True(parser.TryParse(text, out var expression));
-        Assert.True(evaluator.TryEvaluate(expression, expected.GetType(), out var actual));
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected, evaluator.Evaluate(expression));
     }
 }
