@@ -29,22 +29,22 @@ internal class Lexer
 
             if (IsDelimiter(c2))
             {
-                tokens.Add(new(TokenType.DELIMITER, c2));
+                tokens.Add(new(TokenType.Delimiter, c2));
                 Consume();
                 Consume();
             }
             else if (IsDelimiter(c.ToString()))
             {
-                tokens.Add(new(TokenType.DELIMITER, c.ToString()));
+                tokens.Add(new(TokenType.Delimiter, c.ToString()));
                 Consume();
             }
-            else if (IsDigit(c)) tokens.Add(new(TokenType.NUMBER, ReadNumber()));
-            else if (IsQuote(c)) tokens.Add(new(TokenType.STRING, ReadString()));
-            else if (IsIdentifier(c)) tokens.Add(new(TokenType.SYMBOL, ReadIdentifier()));
+            else if (IsDigit(c)) tokens.Add(new(TokenType.Number, ReadNumber()));
+            else if (IsQuote(c)) tokens.Add(new(TokenType.String, ReadString()));
+            else if (IsIdentifier(c)) tokens.Add(new(TokenType.Symbol, ReadIdentifier()));
             else throw new Error($"Unexpected character: {c}", index);
         }
 
-        tokens.Add(new Token(TokenType.EOF));
+        tokens.Add(new Token(TokenType.Eof));
 
         return tokens.ToArray();
     }

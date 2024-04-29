@@ -2,9 +2,9 @@ namespace Naninovel.Expression;
 
 internal enum TokenType
 {
-    EOF,
-    DELIMITER,
-    NUMBER,
-    STRING,
-    SYMBOL
+    Eof,
+    Delimiter,
+    Number,
+    String,
+    Symbol
 }
