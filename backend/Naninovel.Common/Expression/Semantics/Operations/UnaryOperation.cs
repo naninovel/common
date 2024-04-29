@@ -1,7 +1,7 @@
 namespace Naninovel.Expression;
 
-internal class UnaryOperation (IExpression operand, IBinaryOperator op) : IExpression
+internal class UnaryOperation (IUnaryOperator op, IExpression operand) : IExpression
 {
+    public IUnaryOperator BinaryOperator { get; } = op;
     public IExpression Operand { get; } = operand;
-    public IBinaryOperator BinaryOperator { get; } = op;
 }
