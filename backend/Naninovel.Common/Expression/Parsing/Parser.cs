@@ -157,29 +157,23 @@ public class Parser (ParseOptions options)
     private IExpression? TrySymbol ()
     {
         if (token.Type == TokenType.Identifier)
-        {
-            var symbol = Consume();
-            var node = TryFunction(symbol.Content);
-            return node;
-        }
+            return TryFunction(Consume().Content);
         return TryString();
     }
 
     private IExpression TryFunction (string name)
     {
-        if (Is("("))
+        if (!Is("(")) return TryBoolean(name);
+
+        Consume();
+        var args = new List<IExpression>();
+        while (!Is(")") && !IsEnd())
         {
-            Consume();
-            var args = new List<IExpression>();
-            while (!Is(")") && !IsEnd())
-            {
-                args.Add(TryExpression() ?? throw Err("Missing function parameter."));
-                if (Is(",")) Consume();
-            }
-            Expect(")");
-            return new Function(name, args);
+            args.Add(TryExpression() ?? throw Err("Missing function parameter."));
+            if (Is(",")) Consume();
         }
-        return TryBoolean(name);
+        Expect(")");
+        return new Function(name, args);
     }
 
     private IExpression TryBoolean (string name)
