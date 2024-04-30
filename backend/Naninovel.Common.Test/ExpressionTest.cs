@@ -185,7 +185,8 @@ public class ExpressionTest
         Assert.False(parser.TryParse("~", out _));
         Assert.Equal(new ParseDiagnostic(0, 1, "Unexpected character: ~"), diagnostics.Pop());
 
-        // Assert.False(parser.TryParse("f(", out _));
+        Assert.False(parser.TryParse("f(", out _));
+        Assert.Equal(new ParseDiagnostic(1, 1, "Missing content: )"), diagnostics.Pop());
     }
 
     [Fact]

@@ -8,6 +8,7 @@ public class Parser (ParseOptions options)
     private Token token => IsEnd() ? default : tokens.Peek();
     private readonly Lexer lexer = new();
     private readonly Stack<Token> tokens = [];
+    private int lastIndex;
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -47,6 +48,7 @@ public class Parser (ParseOptions options)
 
     private void Reset (string text)
     {
+        lastIndex = 0;
         tokens.Clear();
         var lexed = lexer.Lex(text);
         for (var i = lexed.Length - 1; i >= 0; i--)
@@ -214,15 +216,21 @@ public class Parser (ParseOptions options)
         return null;
     }
 
-    private bool Is (string content) => token.Content == content;
-    private bool IsOperator () => token.Type == TokenType.Operator;
-    private bool IsEnd () => tokens.Count == 0;
-    private Token Consume () => tokens.Pop();
+    private Token Consume ()
+    {
+        var popped = tokens.Pop();
+        lastIndex = popped.Index;
+        return popped;
+    }
 
     private void Expect (string content)
     {
         if (!Is(content))
-            throw new Error($"Unexpected content: {content}");
+            throw new Error($"Missing content: {content}", lastIndex);
         Consume();
     }
+
+    private bool Is (string content) => token.Content == content;
+    private bool IsOperator () => token.Type == TokenType.Operator;
+    private bool IsEnd () => tokens.Count == 0;
 }

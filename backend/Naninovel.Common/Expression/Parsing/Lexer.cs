@@ -23,18 +23,18 @@ internal class Lexer
 
             if (Operators.IsOperator(c, Peek(1), out var op2))
             {
-                tokens.Add(new(TokenType.Operator, op2));
+                tokens.Add(new(TokenType.Operator, index, op2));
                 Consume();
                 Consume();
             }
             else if (Operators.IsOperator(c, null, out var op1))
             {
-                tokens.Add(new(TokenType.Operator, op1));
+                tokens.Add(new(TokenType.Operator, index, op1));
                 Consume();
             }
-            else if (IsNumber(c)) tokens.Add(new(TokenType.Number, ReadNumber()));
-            else if (IsQuote(c)) tokens.Add(new(TokenType.String, ReadString()));
-            else if (IsIdentifier(c)) tokens.Add(new(TokenType.Identifier, ReadIdentifier()));
+            else if (IsNumber(c)) tokens.Add(new(TokenType.Number, index, ReadNumber()));
+            else if (IsQuote(c)) tokens.Add(new(TokenType.String, index, ReadString()));
+            else if (IsIdentifier(c)) tokens.Add(new(TokenType.Identifier, index, ReadIdentifier()));
             else throw new Error($"Unexpected character: {c}", index);
         }
 
