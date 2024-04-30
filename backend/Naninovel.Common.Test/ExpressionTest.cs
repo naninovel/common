@@ -180,7 +180,7 @@ public class ExpressionTest
 
     [
         Theory,
-        InlineData("\"f", 1, 1, "Unclosed string."),
+        InlineData("\"", 0, 1, "Unclosed string."),
         InlineData("~", 0, 1, "Unexpected character: ~"),
         InlineData("f(", 1, 1, "Missing content: )"),
         InlineData("(", 0, 1, "Missing content: )"),
