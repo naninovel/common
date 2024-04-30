@@ -15,6 +15,7 @@ public class ExpressionTest
         InlineData("+1", 1.0),
         InlineData("- 1.0", -1.0),
         InlineData("1+2", 1.0 + 2.0),
+        InlineData("5%2", 5.0 % 2.0),
         InlineData("1+2+3", 1.0 + 2.0 + 3.0),
         InlineData("1+2*3", 1.0 + 2.0 * 3.0),
         InlineData("(1+2)*-3", (1.0 + 2.0) * -3.0),
@@ -24,13 +25,14 @@ public class ExpressionTest
         InlineData("-((1+2) / (3+4))", -((1.0 + 2.0) / (3.0 + 4.0))),
         InlineData("-(-(1+2) * (3+4))", -(-(1.0 + 2.0) * (3.0 + 4.0))),
         InlineData("-(-(1+2) / -(3+4))", -(-(1.0 + 2.0) / -(3.0 + 4.0))),
+        InlineData("2 * (2*(2*(2+1)))", 2.0 * (2.0 * (2.0 * (2.0 + 1.0)))),
         InlineData("1 /2-1+2*-(3-1.5)/ 2+-1", 1.0 / 2.0 - 1.0 + 2.0 * -(3.0 - 1.5) / 2.0 + -1.0),
         InlineData("num_10+num_2-2", 10.0),
     ]
-    public void CanEvaluateNumericExpressions (string text, double expected)
+    public void CanEvaluateNumericExpressions (string text, double result)
     {
-        Assert.True(parser.TryParse(text, out var expression));
-        Assert.Equal(expected, evaluator.Evaluate<double>(expression));
+        Assert.True(parser.TryParse(text, out var exp));
+        Assert.Equal(result, evaluator.Evaluate<double>(exp));
     }
 
     [
@@ -82,11 +84,14 @@ public class ExpressionTest
         InlineData("!positive", false),
         InlineData("!negative", true),
         InlineData("positive & negative", false),
+        InlineData("num_10 > 5 & num_2 < 5 && foo = \"foo\"", true),
+        InlineData("num_10 >= 5 & num_2 <= 5 && foo = \"bar\" | bar != \"bar\" || foo == \"foo\"", true),
+        InlineData("num_10 >= 5 & num_2 <= 5 && foo = \"bar\" | bar != \"bar\" || foo == \"bar\"", false),
     ]
-    public void CanEvaluateBooleanExpressions (string text, bool expected)
+    public void CanEvaluateBooleanExpressions (string text, bool result)
     {
-        Assert.True(parser.TryParse(text, out var expression));
-        Assert.Equal(expected, evaluator.Evaluate<bool>(expression));
+        Assert.True(parser.TryParse(text, out var exp));
+        Assert.Equal(result, evaluator.Evaluate<bool>(exp));
     }
 
     [
@@ -95,16 +100,17 @@ public class ExpressionTest
         InlineData("foo", "foo"),
         InlineData("bar", "bar"),
         InlineData("true ? \"foo\" : \"bar\"", "foo"),
+        InlineData("false?\"\":(false?\"\":\"foo\")", "foo"),
         InlineData("!negative?foo:bar", "foo"),
         InlineData("join( \",\", \"foo\" , bar )", "foo,bar"),
         InlineData("num_10 <= num_2 ? \"\" : join(\"!\", positive ? join(\":\",foo,bar,\"nya\") : join(\"\"), \"\")", "foo:bar:nya!"),
         InlineData("фу", "фу"),
         InlineData("join(\" и \", эхо(фу), эхо(\"бар\"), \"ня\")", "фу и бар и ня"),
     ]
-    public void CanEvaluateStringExpressions (string text, string expected)
+    public void CanEvaluateStringExpressions (string text, string result)
     {
-        Assert.True(parser.TryParse(text, out var expression));
-        Assert.Equal(expected, evaluator.Evaluate<string>(expression));
+        Assert.True(parser.TryParse(text, out var exp));
+        Assert.Equal(result, evaluator.Evaluate<string>(exp));
     }
 
     [
@@ -115,10 +121,10 @@ public class ExpressionTest
         InlineData("\"1\"", "1"),
         InlineData("true", true),
     ]
-    public void CanEvaluateDynamicExpressions (string text, object expected)
+    public void CanEvaluateDynamicExpressions (string text, object result)
     {
-        Assert.True(parser.TryParse(text, out var expression));
-        Assert.Equal(expected, evaluator.Evaluate(expression).GetValue(expected.GetType()));
+        Assert.True(parser.TryParse(text, out var exp));
+        Assert.Equal(result, evaluator.Evaluate(exp).GetValue(result.GetType()));
     }
 
     #pragma warning disable CS8509 // Ignore missing default arm.
