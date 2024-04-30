@@ -4,11 +4,6 @@ namespace Naninovel.Expression;
 
 internal class Lexer
 {
-    private readonly HashSet<string> operators = [
-        ",", "(", ")", ":", "?",
-        ..Operators.Binary.Keys,
-        ..Operators.Unary.Keys
-    ];
     private readonly List<Token> tokens = [];
     private readonly StringBuilder str = new();
     private string text = "";
@@ -25,17 +20,16 @@ internal class Lexer
             if (index >= text.Length) break;
 
             var c = Peek();
-            var c2 = $"{c}{Peek(1)}";
 
-            if (IsOperator(c2))
+            if (Operators.IsOperator(c, Peek(1), out var op2))
             {
-                tokens.Add(new(TokenType.Operator, c2));
+                tokens.Add(new(TokenType.Operator, op2));
                 Consume();
                 Consume();
             }
-            else if (IsOperator(c.ToString()))
+            else if (Operators.IsOperator(c, null, out var op1))
             {
-                tokens.Add(new(TokenType.Operator, c.ToString()));
+                tokens.Add(new(TokenType.Operator, op1));
                 Consume();
             }
             else if (IsNumber(c)) tokens.Add(new(TokenType.Number, ReadNumber()));
@@ -113,7 +107,6 @@ internal class Lexer
 
     private bool IsNumber (char c) => char.IsDigit(c);
     private bool IsIdentifier (char c) => char.IsLetter(c) || c == '_';
-    private bool IsOperator (string str) => operators.Contains(str);
     private bool IsQuote (char c) => c == '"';
     private bool IsEnd () => index > text.Length;
 }

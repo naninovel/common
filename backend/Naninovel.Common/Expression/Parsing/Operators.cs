@@ -29,4 +29,46 @@ internal static class Operators
             ["-"] = new NegateNumeric(),
             ["+"] = new AddUnary()
         };
+
+    public static readonly IReadOnlyDictionary<string, bool> Control =
+        new Dictionary<string, bool> {
+            [","] = default,
+            ["("] = default,
+            [")"] = default,
+            [":"] = default,
+            ["?"] = default
+        };
+
+    public static bool IsOperator (char c1, char? c2, out string op)
+    {
+        foreach (var key in Binary.Keys)
+            if (CompareKey(c1, c2, key))
+            {
+                op = key;
+                return true;
+            }
+
+        foreach (var key in Unary.Keys)
+            if (CompareKey(c1, c2, key))
+            {
+                op = key;
+                return true;
+            }
+
+        foreach (var key in Control.Keys)
+            if (CompareKey(c1, c2, key))
+            {
+                op = key;
+                return true;
+            }
+
+        op = null!;
+        return false;
+    }
+
+    private static bool CompareKey (char c1, char? c2, string key)
+    {
+        if (!c2.HasValue) return key.Length == 1 && key[0] == c1;
+        return key.Length == 2 && key[0] == c1 && key[1] == c2;
+    }
 }
