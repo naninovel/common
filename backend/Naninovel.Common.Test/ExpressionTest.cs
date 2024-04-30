@@ -187,6 +187,21 @@ public class ExpressionTest
 
         Assert.False(parser.TryParse("f(", out _));
         Assert.Equal(new ParseDiagnostic(1, 1, "Missing content: )"), diagnostics.Pop());
+
+        Assert.False(parser.TryParse(" ?1:2", out _));
+        Assert.Equal(new ParseDiagnostic(0, 5, "Missing ternary predicate."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("true?:2", out _));
+        Assert.Equal(new ParseDiagnostic(4, 3, "Missing truthy ternary branch."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("true?1:", out _));
+        Assert.Equal(new ParseDiagnostic(6, 1, "Missing falsy ternary branch."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("|true", out _));
+        Assert.Equal(new ParseDiagnostic(0, 5, "Missing left logical 'or' operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("true|", out _));
+        Assert.Equal(new ParseDiagnostic(4, 1, "Missing right logical 'or' operand."), diagnostics.Pop());
     }
 
     [Fact]

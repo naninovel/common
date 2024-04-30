@@ -1,14 +1,14 @@
 namespace Naninovel.Expression;
 
 /// <summary>
-/// Parses expression text into <see cref="Expression"/> that can be evaluated.
+/// Parses expression text into <see cref="TryExpression"/> that can be evaluated.
 /// </summary>
 public class Parser (ParseOptions options)
 {
     private Token token => IsEnd() ? default : tokens.Peek();
     private readonly Lexer lexer = new();
     private readonly Stack<Token> tokens = [];
-    private int lastIndex;
+    private int lastIdx;
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -21,7 +21,7 @@ public class Parser (ParseOptions options)
         try
         {
             Reset(text);
-            return (exp = Ternary()!) != null;
+            return (exp = TryExpression()!) != null;
         }
         catch (Error err)
         {
@@ -48,168 +48,176 @@ public class Parser (ParseOptions options)
 
     private void Reset (string text)
     {
-        lastIndex = 0;
+        lastIdx = 0;
         tokens.Clear();
         var lexed = lexer.Lex(text);
         for (var i = lexed.Length - 1; i >= 0; i--)
             tokens.Push(lexed[i]);
     }
 
-    private IExpression? Ternary ()
+    // Begins parsing known expression morphemes, collapsing in order of associativity.
+    private IExpression? TryExpression () => TryTernary();
+
+    private IExpression? TryTernary ()
     {
-        var predicate = LogicalOr();
-        if (IsOperator() && Is("?"))
-        {
-            Consume();
-            var truthy = Ternary();
-            Expect(":");
-            var falsy = Ternary();
-            return new TernaryOperation(predicate, truthy, falsy);
-        }
-        return predicate;
+        var predicate = TryLogicalOr();
+        if (!(IsOperator() && Is("?"))) return predicate;
+
+        if (predicate is null) throw Err("Missing ternary predicate.");
+        Consume();
+        var truthy = TryExpression() ?? throw Err("Missing truthy ternary branch.");
+        Expect(":");
+        var falsy = TryExpression() ?? throw Err("Missing falsy ternary branch.");
+        return new TernaryOperation(predicate, truthy, falsy);
     }
 
-    private IExpression? LogicalOr ()
+    private IExpression? TryLogicalOr ()
     {
-        var left = LogicalAnd();
-        if (IsOperator() && (Is("||") || Is("|")))
-        {
-            var op = Consume();
-            var right = LogicalOr();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
+        var left = TryLogicalAnd();
+        if (!(IsOperator() && (Is("||") || Is("|")))) return left;
+
+        if (left is null) throw Err("Missing left logical 'or' operand.");
+        var op = Consume();
+        var right = TryLogicalOr() ?? throw Err("Missing right logical 'or' operand.");
+        return new BinaryOperation(Operators.Binary[op.Content], left, right);
     }
 
-    private IExpression? LogicalAnd ()
+    private IExpression? TryLogicalAnd ()
     {
-        var left = Relational();
+        var left = TryRelational();
         if (IsOperator() && (Is("&&") || Is("&")))
         {
             var op = Consume();
-            var right = LogicalAnd();
+            var right = TryLogicalAnd();
             return new BinaryOperation(Operators.Binary[op.Content], left, right);
         }
         return left;
     }
 
-    private IExpression? Relational ()
+    private IExpression? TryRelational ()
     {
-        var left = Additive();
+        var left = TryAdditive();
         if (IsOperator() && (Is("=") || Is("==") || Is("!=") || Is(">=") || Is("<=") || Is(">") || Is("<")))
         {
             var op = Consume();
-            var right = Additive();
+            var right = TryAdditive();
             return new BinaryOperation(Operators.Binary[op.Content], left, right);
         }
         return left;
     }
 
-    private IExpression? Additive ()
+    private IExpression? TryAdditive ()
     {
-        var left = Multiplicative();
+        var left = TryMultiplicative();
         while (IsOperator() && (Is("+") || Is("-")))
         {
             var op = Consume();
-            left = new BinaryOperation(Operators.Binary[op.Content], left, Multiplicative());
+            left = new BinaryOperation(Operators.Binary[op.Content], left, TryMultiplicative());
         }
         return left;
     }
 
-    private IExpression? Multiplicative ()
+    private IExpression? TryMultiplicative ()
     {
-        var left = Unary();
+        var left = TryUnary();
         while (IsOperator() && (Is("*") || Is("/") || Is("%")))
         {
             var op = Consume();
-            left = new BinaryOperation(Operators.Binary[op.Content], left, Unary());
+            left = new BinaryOperation(Operators.Binary[op.Content], left, TryUnary());
         }
         return left;
     }
 
-    private IExpression? Unary ()
+    private IExpression? TryUnary ()
     {
         if (IsOperator() && (Is("-") || Is("+") || Is("!")))
         {
             var op = Consume();
-            var right = Unary();
+            var right = TryUnary();
             return new UnaryOperation(Operators.Unary[op.Content], right);
         }
-        return Pow();
+        return TryPow();
     }
 
-    private IExpression? Pow ()
+    private IExpression? TryPow ()
     {
-        var left = Symbol();
+        var left = TrySymbol();
         if (IsOperator() && Is("^"))
         {
             var op = Consume();
-            var right = Unary();
+            var right = TryUnary();
             return new BinaryOperation(Operators.Binary[op.Content], left, right);
         }
         return left;
     }
 
-    private IExpression? Symbol ()
+    private IExpression? TrySymbol ()
     {
         if (token.Type == TokenType.Identifier)
         {
             var symbol = Consume();
-            var node = FunctionCall(symbol);
+            var node = TryFunction(symbol.Content);
             return node;
         }
-        return String();
+        return TryString();
     }
 
-    private IExpression FunctionCall (Token symbolToken)
+    private IExpression TryFunction (string name)
     {
-        var name = symbolToken.Content;
         if (Is("("))
         {
             Consume();
             var @params = new List<IExpression>();
             while (!Is(")") && !IsEnd())
             {
-                @params.Add(Ternary());
+                @params.Add(TryExpression());
                 if (Is(",")) Consume();
             }
             Expect(")");
             return new Function(name, @params);
         }
+        return TryBoolean(name);
+    }
 
+    private IExpression TryBoolean (string name)
+    {
         if (name.Equals(options.Identifiers.True, StringComparison.OrdinalIgnoreCase))
             return new Boolean(true);
         if (name.Equals(options.Identifiers.False, StringComparison.OrdinalIgnoreCase))
             return new Boolean(false);
+        return DoVariable(name);
+    }
 
+    private IExpression DoVariable (string name)
+    {
         return new Variable(name);
     }
 
-    private IExpression? String ()
+    private IExpression? TryString ()
     {
         if (token.Type == TokenType.String)
             return new String(Consume().Content);
-        return Number();
+        return TryNumeric();
     }
 
-    private IExpression? Number ()
+    private IExpression? TryNumeric ()
     {
         if (token.Type == TokenType.Number)
         {
             var text = Consume().Content;
             if (!double.TryParse(text, out var num))
-                throw new Error($"Failed to parse '{text}' as number");
+                throw Err($"Failed to parse '{text}' as number");
             return new Numeric(num);
         }
-        return Parentheses();
+        return TryClosure();
     }
 
-    private IExpression? Parentheses ()
+    private IExpression? TryClosure ()
     {
         if (Is("("))
         {
             Consume();
-            var left = Ternary();
+            var left = TryExpression();
             Expect(")");
             return left;
         }
@@ -219,17 +227,18 @@ public class Parser (ParseOptions options)
     private Token Consume ()
     {
         var popped = tokens.Pop();
-        lastIndex = popped.Index;
+        lastIdx = popped.Index;
         return popped;
     }
 
     private void Expect (string content)
     {
         if (!Is(content))
-            throw new Error($"Missing content: {content}", lastIndex);
+            throw Err($"Missing content: {content}");
         Consume();
     }
 
+    private Error Err (string message) => new(message, lastIdx);
     private bool Is (string content) => token.Content == content;
     private bool IsOperator () => token.Type == TokenType.Operator;
     private bool IsEnd () => tokens.Count == 0;
