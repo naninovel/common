@@ -5,6 +5,7 @@ namespace Naninovel.Expression;
 /// </summary>
 public class Parser (ParseOptions options)
 {
+    private Token current => tokens.ElementAtOrDefault(0);
     private readonly Lexer lexer = new();
     private Token[] tokens = [];
 
@@ -44,18 +45,14 @@ public class Parser (ParseOptions options)
         return false;
     }
 
-    private Token Current () => tokens.ElementAtOrDefault(0);
-
-    private Token Next () => tokens.ElementAtOrDefault(1);
-
-    private bool Peek (params string[] arguments)
+    private bool Is (string content)
     {
-        if (tokens.Length == 0) return false;
-        var first = tokens[0];
-        for (var i = 0; i < arguments.Length; i++)
-            if (first.Content == arguments[i])
-                return true;
-        return false;
+        return current.Content == content;
+    }
+
+    private bool IsOperator ()
+    {
+        return current.Type == TokenType.Operator;
     }
 
     private Token Consume ()
@@ -67,11 +64,11 @@ public class Parser (ParseOptions options)
         return first;
     }
 
-    private Token Expect (string content)
+    private void Expect (string content)
     {
-        if (!Peek(content))
+        if (!Is(content))
             throw new Error($"Unexpected content: {content}");
-        return Consume();
+        Consume();
     }
 
     private bool IsEnd ()
@@ -82,7 +79,7 @@ public class Parser (ParseOptions options)
     private IExpression? Ternary ()
     {
         var predicate = LogicalOr();
-        if (Peek("?") && Current().Type == TokenType.Operator)
+        if (IsOperator() && Is("?"))
         {
             Consume();
             var truthy = Ternary();
@@ -95,8 +92,8 @@ public class Parser (ParseOptions options)
 
     private IExpression? LogicalOr ()
     {
-        var left = LogicalXor();
-        if (Peek("||") && Current().Type == TokenType.Operator)
+        var left = LogicalAnd();
+        if (IsOperator() && (Is("||") || Is("|")))
         {
             var op = Consume();
             var right = LogicalOr();
@@ -105,22 +102,10 @@ public class Parser (ParseOptions options)
         return left;
     }
 
-    private IExpression? LogicalXor ()
-    {
-        var left = LogicalAnd();
-        if (Current().Content == "xor" && Current().Type == TokenType.Operator)
-        {
-            var op = Consume();
-            var right = LogicalXor();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
-    }
-
     private IExpression? LogicalAnd ()
     {
-        var left = BitwiseOr();
-        if (Peek("&&") && Current().Type == TokenType.Operator)
+        var left = Relational();
+        if (IsOperator() && (Is("&&") || Is("&")))
         {
             var op = Consume();
             var right = LogicalAnd();
@@ -129,61 +114,13 @@ public class Parser (ParseOptions options)
         return left;
     }
 
-    private IExpression? BitwiseOr ()
-    {
-        var left = BitwiseXor();
-        if (Peek("|") && Current().Type == TokenType.Operator)
-        {
-            var op = Consume();
-            var right = BitwiseOr();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
-    }
-
-    private IExpression? BitwiseXor ()
-    {
-        var left = BitwiseAnd();
-        if (Peek("^|") && Current().Type == TokenType.Operator)
-        {
-            var op = Consume();
-            var right = BitwiseXor();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
-    }
-
-    private IExpression? BitwiseAnd ()
-    {
-        var left = Relational();
-        if (Peek("&") && Current().Type == TokenType.Operator)
-        {
-            var op = Consume();
-            var right = BitwiseAnd();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
-    }
-
     private IExpression? Relational ()
     {
-        var left = Shift();
-        if (Peek("=", "==", "!=", ">=", "<=", ">", "<") && Current().Type == TokenType.Operator)
-        {
-            var op = Consume();
-            var right = Shift();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
-    }
-
-    private IExpression? Shift ()
-    {
         var left = Additive();
-        if (Peek(">>", "<<", ">>>") && Current().Type == TokenType.Operator)
+        if (IsOperator() && (Is("=") || Is("==") || Is("!=") || Is(">=") || Is("<=") || Is(">") || Is("<")))
         {
             var op = Consume();
-            var right = Shift();
+            var right = Additive();
             return new BinaryOperation(Operators.Binary[op.Content], left, right);
         }
         return left;
@@ -192,7 +129,7 @@ public class Parser (ParseOptions options)
     private IExpression? Additive ()
     {
         var left = Multiplicative();
-        while (Peek("+", "-") && Current().Type == TokenType.Operator)
+        while (IsOperator() && (Is("+") || Is("-")))
         {
             var op = Consume();
             left = new BinaryOperation(Operators.Binary[op.Content], left, Multiplicative());
@@ -203,7 +140,7 @@ public class Parser (ParseOptions options)
     private IExpression? Multiplicative ()
     {
         var left = Unary();
-        while (Peek("*", "/", "%") && Current().Type == TokenType.Operator)
+        while (IsOperator() && (Is("*") || Is("/") || Is("%")))
         {
             var op = Consume();
             left = new BinaryOperation(Operators.Binary[op.Content], left, Unary());
@@ -213,7 +150,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? Unary ()
     {
-        if (Peek("-", "+", "!") && Current().Type == TokenType.Operator)
+        if (IsOperator() && (Is("-") || Is("+") || Is("!")))
         {
             var op = Consume();
             var right = Unary();
@@ -224,8 +161,8 @@ public class Parser (ParseOptions options)
 
     private IExpression? Pow ()
     {
-        var left = Factorial();
-        if (Peek("^", "**") && Current().Type == TokenType.Operator)
+        var left = Symbol();
+        if (IsOperator() && Is("^"))
         {
             var op = Consume();
             var right = Unary();
@@ -234,21 +171,9 @@ public class Parser (ParseOptions options)
         return left;
     }
 
-    private IExpression? Factorial ()
-    {
-        var left = Symbol();
-        if (Peek("!") && Current().Type == TokenType.Operator)
-        {
-            var op = Consume();
-            return new UnaryOperation(Operators.Unary[op.Content], left);
-        }
-        return left;
-    }
-
     private IExpression? Symbol ()
     {
-        var cur = Current();
-        if (cur.Type == TokenType.Identifier)
+        if (current.Type == TokenType.Identifier)
         {
             var symbol = Consume();
             var node = FunctionCall(symbol);
@@ -260,14 +185,14 @@ public class Parser (ParseOptions options)
     private IExpression? FunctionCall (Token symbolToken)
     {
         var name = symbolToken.Content;
-        if (Peek("("))
+        if (Is("("))
         {
             Consume();
             var @params = new List<IExpression>();
-            while (!Peek(")") && !IsEnd())
+            while (!Is(")") && !IsEnd())
             {
                 @params.Add(Ternary());
-                if (Peek(",")) Consume();
+                if (Is(",")) Consume();
             }
             Expect(")");
             return new Function(name, @params);
@@ -283,15 +208,14 @@ public class Parser (ParseOptions options)
 
     private IExpression? String ()
     {
-        if (Current().Type == TokenType.String)
+        if (current.Type == TokenType.String)
             return new String(Consume().Content);
         return Number();
     }
 
     private IExpression? Number ()
     {
-        var token = Current();
-        if (token.Type == TokenType.Number)
+        if (current.Type == TokenType.Number)
         {
             var text = Consume().Content;
             if (!double.TryParse(text, out var num))
@@ -303,8 +227,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? Parentheses ()
     {
-        var token = Current();
-        if (token.Content == "(")
+        if (Is("("))
         {
             Consume();
             var left = Ternary();
