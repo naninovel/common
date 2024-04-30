@@ -95,7 +95,9 @@ public class ExpressionTest
         InlineData("foo", "foo"),
         InlineData("bar", "bar"),
         InlineData("true ? \"foo\" : \"bar\"", "foo"),
-        InlineData("negative ? foo : bar", "bar"),
+        InlineData("!negative?foo:bar", "foo"),
+        InlineData("join( \",\", \"foo\" , bar )", "foo,bar"),
+        InlineData("num_10 <= num_2 ? \"\" : join(\"!\", positive ? join(\":\",foo,bar,\"nya\") : join(\"\"), \"\")", "foo:bar:nya!")
     ]
     public void CanEvaluateStringExpressions (string text, string expected)
     {
@@ -106,8 +108,10 @@ public class ExpressionTest
     [
         Theory,
         InlineData("1", 1),
+        InlineData("1", 1.0),
+        InlineData("1.0", 1),
         InlineData("\"1\"", "1"),
-        InlineData("\"true\"", true),
+        InlineData("true", true),
     ]
     public void CanEvaluateDynamicExpressions (string text, object expected)
     {
@@ -115,18 +119,17 @@ public class ExpressionTest
         Assert.Equal(expected, evaluator.Evaluate(expression).GetValue(expected.GetType()));
     }
 
+    #pragma warning disable CS8509 // Ignore missing default arm.
     private static IOperand ResolveVariable (string name) => name switch {
         "foo" => new String("foo"),
         "bar" => new String("bar"),
         "num_10" => new Numeric(10),
         "num_2" => new Numeric(2),
         "positive" => new Boolean(true),
-        "negative" => new Boolean(false),
-        _ => null!
+        "negative" => new Boolean(false)
     };
-
-    private static IOperand ResolveFunction (string name, IReadOnlyList<IOperand> parameters)
-    {
-        throw new NotImplementedException();
-    }
+    private static IOperand ResolveFunction (string name, IReadOnlyList<IOperand> args) => name switch {
+        "join" => new String(string.Join(args[0].GetValue<string>(), args.Skip(1).Select(a => a.GetValue<string>())))
+    };
+    #pragma warning restore CS8509
 }
