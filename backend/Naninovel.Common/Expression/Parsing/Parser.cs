@@ -8,6 +8,7 @@ public class Parser (ParseOptions options)
     private Token token => IsEnd() ? default : tokens.Peek();
     private readonly Lexer lexer = new();
     private readonly Stack<Token> tokens = [];
+    private readonly AssignmentParser assParser = new();
     private int lastIdx;
 
     /// <summary>
@@ -38,11 +39,14 @@ public class Parser (ParseOptions options)
     /// or multiple such statements separated with ";".
     /// </summary>
     /// <param name="text">Assignment statement(s) text to parse.</param>
-    /// <param name="assignments">Parsed statements.</param>
-    /// <returns>Whether the text was parsed successfully.</returns>
-    public bool TryParseAssignments (string text, out IReadOnlyList<Assignment> assignments)
+    /// <param name="assignments">Collection to store parsed assignments.</param>
+    /// <returns>Whether all the assignments were parsed successfully.</returns>
+    public bool TryParseAssignments (string text, IList<Assignment> assignments)
     {
-        assignments = [];
+        foreach (var ass in assParser.Parse(text))
+            if (TryParse(ass.text, out var exp))
+                assignments.Add(new(ass.var, exp));
+            else return false;
         return false;
     }
 
@@ -55,7 +59,7 @@ public class Parser (ParseOptions options)
             tokens.Push(lexed[i]);
     }
 
-    // Begins parsing known expression morphemes, collapsing in order of associativity.
+    // Begin walking known expression morphemes, collapsing in order of associativity.
     private IExpression? TryExpression () => TryTernary();
 
     private IExpression? TryTernary ()
@@ -73,81 +77,81 @@ public class Parser (ParseOptions options)
 
     private IExpression? TryLogicalOr ()
     {
-        var left = TryLogicalAnd();
-        if (!IsOp() || !(Is("||") || Is("|"))) return left;
+        var lhs = TryLogicalAnd();
+        if (!IsOp() || !(Is("||") || Is("|"))) return lhs;
 
-        if (left is null) throw Err("Missing left logical 'or' operand.");
+        if (lhs is null) throw Err("Missing left logical 'or' operand.");
         var op = Consume();
-        var right = TryLogicalOr() ?? throw Err("Missing right logical 'or' operand.");
-        return new BinaryOperation(Operators.Binary[op.Content], left, right);
+        var rhs = TryLogicalOr() ?? throw Err("Missing right logical 'or' operand.");
+        return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
     private IExpression? TryLogicalAnd ()
     {
-        var left = TryRelational();
-        if (!IsOp() || !(Is("&&") || Is("&"))) return left;
+        var lhs = TryRelational();
+        if (!IsOp() || !(Is("&&") || Is("&"))) return lhs;
 
-        if (left is null) throw Err("Missing left logical 'and' operand.");
+        if (lhs is null) throw Err("Missing left logical 'and' operand.");
         var op = Consume();
-        var right = TryLogicalAnd() ?? throw Err("Missing right logical 'and' operand.");
-        return new BinaryOperation(Operators.Binary[op.Content], left, right);
+        var rhs = TryLogicalAnd() ?? throw Err("Missing right logical 'and' operand.");
+        return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
     private IExpression? TryRelational ()
     {
-        var left = TryAdditive();
-        if (IsOp() && (Is("=") || Is("==") || Is("!=") || Is(">=") || Is("<=") || Is(">") || Is("<")))
-        {
-            var op = Consume();
-            var right = TryAdditive();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
+        var lhs = TryAdditive();
+        if (!IsOp() || !(Is("=") || Is("==") || Is("!=") || Is(">=") ||
+                         Is("<=") || Is(">") || Is("<"))) return lhs;
+
+        if (lhs is null) throw Err("Missing left relational operand.");
+        var op = Consume();
+        var rhs = TryAdditive() ?? throw Err("Missing right relational operand.");
+        return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
     private IExpression? TryAdditive ()
     {
-        var left = TryMultiplicative();
+        var lhs = TryMultiplicative();
         while (IsOp() && (Is("+") || Is("-")))
         {
             var op = Consume();
-            left = new BinaryOperation(Operators.Binary[op.Content], left, TryMultiplicative());
+            var rhs = TryMultiplicative() ?? throw Err("Missing right additive operand.");
+            lhs = new BinaryOperation(Operators.Binary[op.Content], lhs!, rhs);
         }
-        return left;
+        return lhs;
     }
 
     private IExpression? TryMultiplicative ()
     {
-        var left = TryUnary();
+        var lhs = TryUnary();
         while (IsOp() && (Is("*") || Is("/") || Is("%")))
         {
+            if (lhs is null) throw Err("Missing left multiplicative operand.");
             var op = Consume();
-            left = new BinaryOperation(Operators.Binary[op.Content], left, TryUnary());
+            var rhs = TryUnary() ?? throw Err("Missing right multiplicative operand.");
+            lhs = new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
         }
-        return left;
+        return lhs;
     }
 
     private IExpression? TryUnary ()
     {
-        if (IsOp() && (Is("-") || Is("+") || Is("!")))
-        {
-            var op = Consume();
-            var right = TryUnary();
-            return new UnaryOperation(Operators.Unary[op.Content], right);
-        }
-        return TryPow();
+        if (!IsOp() || !(Is("-") || Is("+") || Is("!"))) return TryPow();
+
+        var op = Consume();
+        var operand = TryUnary() ?? throw Err("Missing unary operand.");
+        return new UnaryOperation(Operators.Unary[op.Content], operand);
     }
 
     private IExpression? TryPow ()
     {
-        var left = TrySymbol();
-        if (IsOp() && Is("^"))
-        {
-            var op = Consume();
-            var right = TryUnary();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
+        var lhs = TrySymbol();
+        if (!IsOp() || !Is("^")) return lhs;
+
+        if (lhs is null) throw Err("Missing left pow operand.");
+        var op = Consume();
+        var rhs = TryUnary() ?? throw Err("Missing right pow operand.");
+        return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
     private IExpression? TrySymbol ()
@@ -166,14 +170,14 @@ public class Parser (ParseOptions options)
         if (Is("("))
         {
             Consume();
-            var @params = new List<IExpression>();
+            var args = new List<IExpression>();
             while (!Is(")") && !IsEnd())
             {
-                @params.Add(TryExpression());
+                args.Add(TryExpression() ?? throw Err("Missing function parameter."));
                 if (Is(",")) Consume();
             }
             Expect(")");
-            return new Function(name, @params);
+            return new Function(name, args);
         }
         return TryBoolean(name);
     }
@@ -202,25 +206,18 @@ public class Parser (ParseOptions options)
     private IExpression? TryNumeric ()
     {
         if (token.Type == TokenType.Number)
-        {
-            var text = Consume().Content;
-            if (!double.TryParse(text, out var num))
-                throw Err($"Failed to parse '{text}' as number");
-            return new Numeric(num);
-        }
+            return new Numeric(double.Parse(Consume().Content));
         return TryClosure();
     }
 
     private IExpression? TryClosure ()
     {
-        if (Is("("))
-        {
-            Consume();
-            var left = TryExpression();
-            Expect(")");
-            return left;
-        }
-        return null;
+        if (!Is("(")) return null; // Walked all supported morphemes.
+
+        Consume();
+        var exp = TryExpression();
+        Expect(")");
+        return exp;
     }
 
     private Token Consume ()

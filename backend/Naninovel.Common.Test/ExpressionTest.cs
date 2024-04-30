@@ -146,6 +146,8 @@ public class ExpressionTest
         Theory,
         InlineData("true + false"),
         InlineData("+true"),
+        InlineData("+\"\""),
+        InlineData("-false"),
         InlineData("1&2"),
         InlineData("\"foo\"&\"bar\""),
         InlineData("\"foo\"&1"),
@@ -187,21 +189,49 @@ public class ExpressionTest
 
         Assert.False(parser.TryParse("f(", out _));
         Assert.Equal(new ParseDiagnostic(1, 1, "Missing content: )"), diagnostics.Pop());
+        Assert.False(parser.TryParse("(", out _));
+        Assert.Equal(new ParseDiagnostic(0, 1, "Missing content: )"), diagnostics.Pop());
 
-        Assert.False(parser.TryParse(" ?1:2", out _));
-        Assert.Equal(new ParseDiagnostic(0, 5, "Missing ternary predicate."), diagnostics.Pop());
-
+        Assert.False(parser.TryParse("?1:2", out _));
+        Assert.Equal(new ParseDiagnostic(0, 4, "Missing ternary predicate."), diagnostics.Pop());
         Assert.False(parser.TryParse("true?:2", out _));
         Assert.Equal(new ParseDiagnostic(4, 3, "Missing truthy ternary branch."), diagnostics.Pop());
-
         Assert.False(parser.TryParse("true?1:", out _));
         Assert.Equal(new ParseDiagnostic(6, 1, "Missing falsy ternary branch."), diagnostics.Pop());
 
         Assert.False(parser.TryParse("|true", out _));
         Assert.Equal(new ParseDiagnostic(0, 5, "Missing left logical 'or' operand."), diagnostics.Pop());
-
         Assert.False(parser.TryParse("true|", out _));
         Assert.Equal(new ParseDiagnostic(4, 1, "Missing right logical 'or' operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("&true", out _));
+        Assert.Equal(new ParseDiagnostic(0, 5, "Missing left logical 'and' operand."), diagnostics.Pop());
+        Assert.False(parser.TryParse("true&", out _));
+        Assert.Equal(new ParseDiagnostic(4, 1, "Missing right logical 'and' operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("=1", out _));
+        Assert.Equal(new ParseDiagnostic(0, 2, "Missing left relational operand."), diagnostics.Pop());
+        Assert.False(parser.TryParse("1=", out _));
+        Assert.Equal(new ParseDiagnostic(1, 1, "Missing right relational operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("1+", out _));
+        Assert.Equal(new ParseDiagnostic(1, 1, "Missing right additive operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("*1", out _));
+        Assert.Equal(new ParseDiagnostic(0, 2, "Missing left multiplicative operand."), diagnostics.Pop());
+        Assert.False(parser.TryParse("1*", out _));
+        Assert.Equal(new ParseDiagnostic(1, 1, "Missing right multiplicative operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("!", out _));
+        Assert.Equal(new ParseDiagnostic(0, 1, "Missing unary operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("^1", out _));
+        Assert.Equal(new ParseDiagnostic(0, 2, "Missing left pow operand."), diagnostics.Pop());
+        Assert.False(parser.TryParse("1^", out _));
+        Assert.Equal(new ParseDiagnostic(1, 1, "Missing right pow operand."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("fn(,)", out _));
+        Assert.Equal(new ParseDiagnostic(2, 3, "Missing function parameter."), diagnostics.Pop());
     }
 
     [Fact]
