@@ -22,7 +22,6 @@ internal static class Operators
             [">="] = new GreaterOrEqual(),
             ["<="] = new LessOrEqual()
         };
-
     public static readonly IReadOnlyDictionary<string, IUnaryOperator> Unary =
         new Dictionary<string, IUnaryOperator> {
             ["!"] = new NegateBoolean(),
@@ -30,45 +29,34 @@ internal static class Operators
             ["+"] = new AddUnary()
         };
 
-    public static readonly IReadOnlyDictionary<string, bool> Control =
-        new Dictionary<string, bool> {
-            [","] = default,
-            ["("] = default,
-            [")"] = default,
-            [":"] = default,
-            ["?"] = default
-        };
+    private static readonly IReadOnlyDictionary<char, string> singleChar =
+        BuildSingleChars(Binary.Keys, Unary.Keys, [",", "(", ")", ":", "?"]);
+    private static readonly IReadOnlyDictionary<(char c1, char c2), string> doubleChar =
+        BuildDoubleChars(Binary.Keys, Unary.Keys);
 
     public static bool IsOperator (char c1, char? c2, out string op)
     {
-        foreach (var key in Binary.Keys)
-            if (CompareKey(c1, c2, key))
-            {
-                op = key;
-                return true;
-            }
-
-        foreach (var key in Unary.Keys)
-            if (CompareKey(c1, c2, key))
-            {
-                op = key;
-                return true;
-            }
-
-        foreach (var key in Control.Keys)
-            if (CompareKey(c1, c2, key))
-            {
-                op = key;
-                return true;
-            }
-
-        op = null!;
-        return false;
+        if (c2 == null) return (op = singleChar.TryGetValue(c1, out var op1) ? op1 : null!) != null;
+        return (op = doubleChar.TryGetValue((c1, c2.Value), out var op2) ? op2 : null!) != null;
     }
 
-    private static bool CompareKey (char c1, char? c2, string key)
+    private static Dictionary<char, string> BuildSingleChars (params IEnumerable<string>[] collections)
     {
-        if (!c2.HasValue) return key.Length == 1 && key[0] == c1;
-        return key.Length == 2 && key[0] == c1 && key[1] == c2;
+        var map = new Dictionary<char, string>();
+        foreach (var collection in collections)
+        foreach (var str in collection)
+            if (str.Length == 1)
+                map[str[0]] = str;
+        return map;
+    }
+
+    private static Dictionary<(char c1, char c2), string> BuildDoubleChars (params IEnumerable<string>[] collections)
+    {
+        var map = new Dictionary<(char c1, char c2), string>();
+        foreach (var collection in collections)
+        foreach (var str in collection)
+            if (str.Length == 2)
+                map[(str[0], str[1])] = str;
+        return map;
     }
 }
