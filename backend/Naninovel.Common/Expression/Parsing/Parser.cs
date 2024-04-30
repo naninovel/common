@@ -5,7 +5,7 @@ namespace Naninovel.Expression;
 /// </summary>
 public class Parser (ParseOptions options)
 {
-    private Token token => tokens.ElementAtOrDefault(0);
+    private Token token => IsEnd() ? default : tokens.Peek();
     private readonly Lexer lexer = new();
     private readonly Stack<Token> tokens = [];
 
