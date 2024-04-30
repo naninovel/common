@@ -61,7 +61,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryTernary ()
     {
         var predicate = TryLogicalOr();
-        if (!(IsOperator() && Is("?"))) return predicate;
+        if (!(IsOp() && Is("?"))) return predicate;
 
         if (predicate is null) throw Err("Missing ternary predicate.");
         Consume();
@@ -74,7 +74,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryLogicalOr ()
     {
         var left = TryLogicalAnd();
-        if (!(IsOperator() && (Is("||") || Is("|")))) return left;
+        if (!(IsOp() && (Is("||") || Is("|")))) return left;
 
         if (left is null) throw Err("Missing left logical 'or' operand.");
         var op = Consume();
@@ -85,7 +85,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryLogicalAnd ()
     {
         var left = TryRelational();
-        if (IsOperator() && (Is("&&") || Is("&")))
+        if (IsOp() && (Is("&&") || Is("&")))
         {
             var op = Consume();
             var right = TryLogicalAnd();
@@ -97,7 +97,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryRelational ()
     {
         var left = TryAdditive();
-        if (IsOperator() && (Is("=") || Is("==") || Is("!=") || Is(">=") || Is("<=") || Is(">") || Is("<")))
+        if (IsOp() && (Is("=") || Is("==") || Is("!=") || Is(">=") || Is("<=") || Is(">") || Is("<")))
         {
             var op = Consume();
             var right = TryAdditive();
@@ -109,7 +109,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryAdditive ()
     {
         var left = TryMultiplicative();
-        while (IsOperator() && (Is("+") || Is("-")))
+        while (IsOp() && (Is("+") || Is("-")))
         {
             var op = Consume();
             left = new BinaryOperation(Operators.Binary[op.Content], left, TryMultiplicative());
@@ -120,7 +120,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryMultiplicative ()
     {
         var left = TryUnary();
-        while (IsOperator() && (Is("*") || Is("/") || Is("%")))
+        while (IsOp() && (Is("*") || Is("/") || Is("%")))
         {
             var op = Consume();
             left = new BinaryOperation(Operators.Binary[op.Content], left, TryUnary());
@@ -130,7 +130,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? TryUnary ()
     {
-        if (IsOperator() && (Is("-") || Is("+") || Is("!")))
+        if (IsOp() && (Is("-") || Is("+") || Is("!")))
         {
             var op = Consume();
             var right = TryUnary();
@@ -142,7 +142,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryPow ()
     {
         var left = TrySymbol();
-        if (IsOperator() && Is("^"))
+        if (IsOp() && Is("^"))
         {
             var op = Consume();
             var right = TryUnary();
@@ -240,6 +240,6 @@ public class Parser (ParseOptions options)
 
     private Error Err (string message) => new(message, lastIdx);
     private bool Is (string content) => token.Content == content;
-    private bool IsOperator () => token.Type == TokenType.Operator;
+    private bool IsOp () => token.Type == TokenType.Operator;
     private bool IsEnd () => tokens.Count == 0;
 }
