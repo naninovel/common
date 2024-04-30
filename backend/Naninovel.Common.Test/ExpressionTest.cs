@@ -3,17 +3,22 @@ namespace Naninovel.Expression.Test;
 public class ExpressionTest
 {
     private readonly Parser parser = new(new());
-    private readonly Evaluator evaluator = new(new());
+    private readonly Evaluator evaluator = new(new() {
+        ResolveVariable = ResolveVariable,
+        ResolveFunction = ResolveFunction
+    });
 
     [
         Theory,
+        InlineData("1", 1.0),
+        InlineData("-1", -1.0),
+        InlineData("+1", 1.0),
+        InlineData("- 1.0", -1.0),
         InlineData("1+2", 1.0 + 2.0),
         InlineData("1+2+3", 1.0 + 2.0 + 3.0),
         InlineData("1+2*3", 1.0 + 2.0 * 3.0),
         InlineData("(1+2)*-3", (1.0 + 2.0) * -3.0),
         InlineData("(1+2)*(3+4)", (1.0 + 2.0) * (3.0 + 4.0)),
-        InlineData("-1", -1.0),
-        InlineData("- 1.0", -1.0),
         InlineData("-(1+2) * -(3+4)", -(1.0 + 2.0) * -(3.0 + 4.0)),
         InlineData(" - ( 1 + 2 ) * - ( 3 + 4 ) ", -(1.0 + 2.0) * -(3.0 + 4.0)),
         InlineData("-((1+2) / (3+4))", -((1.0 + 2.0) / (3.0 + 4.0))),
@@ -108,5 +113,20 @@ public class ExpressionTest
     {
         Assert.True(parser.TryParse(text, out var expression));
         Assert.Equal(expected, evaluator.Evaluate(expression).GetValue(expected.GetType()));
+    }
+
+    private static IOperand ResolveVariable (string name) => name switch {
+        "foo" => new String("foo"),
+        "bar" => new String("bar"),
+        "num_10" => new Numeric(10),
+        "num_2" => new Numeric(2),
+        "positive" => new Boolean(true),
+        "negative" => new Boolean(false),
+        _ => null!
+    };
+
+    private static IOperand ResolveFunction (string name, IReadOnlyList<IOperand> parameters)
+    {
+        throw new NotImplementedException();
     }
 }

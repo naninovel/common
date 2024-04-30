@@ -168,7 +168,7 @@ public class Parser (ParseOptions options)
     private IExpression? Relational ()
     {
         var left = Shift();
-        if (Peek("==", "==", "!=", "!==", ">=", "<=", ">", "<"))
+        if (Peek("=", "==", "!=", ">=", "<=", ">", "<"))
         {
             var op = Consume();
             var right = Shift();
@@ -213,7 +213,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? Unary ()
     {
-        if (Peek("-", "+", "~"))
+        if (Peek("-", "+"))
         {
             var op = Consume();
             var right = Unary();
