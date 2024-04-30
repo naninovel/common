@@ -97,7 +97,9 @@ public class ExpressionTest
         InlineData("true ? \"foo\" : \"bar\"", "foo"),
         InlineData("!negative?foo:bar", "foo"),
         InlineData("join( \",\", \"foo\" , bar )", "foo,bar"),
-        InlineData("num_10 <= num_2 ? \"\" : join(\"!\", positive ? join(\":\",foo,bar,\"nya\") : join(\"\"), \"\")", "foo:bar:nya!")
+        InlineData("num_10 <= num_2 ? \"\" : join(\"!\", positive ? join(\":\",foo,bar,\"nya\") : join(\"\"), \"\")", "foo:bar:nya!"),
+        InlineData("фу", "фу"),
+        InlineData("join(\" и \", эхо(фу), эхо(\"бар\"), \"ня\")", "фу и бар и ня"),
     ]
     public void CanEvaluateStringExpressions (string text, string expected)
     {
@@ -123,13 +125,15 @@ public class ExpressionTest
     private static IOperand ResolveVariable (string name) => name switch {
         "foo" => new String("foo"),
         "bar" => new String("bar"),
+        "фу" => new String("фу"),
         "num_10" => new Numeric(10),
         "num_2" => new Numeric(2),
         "positive" => new Boolean(true),
         "negative" => new Boolean(false)
     };
     private static IOperand ResolveFunction (string name, IReadOnlyList<IOperand> args) => name switch {
-        "join" => new String(string.Join(args[0].GetValue<string>(), args.Skip(1).Select(a => a.GetValue<string>())))
+        "join" => new String(string.Join(args[0].GetValue<string>(), args.Skip(1).Select(a => a.GetValue<string>()))),
+        "эхо" => new String(args[0].GetValue<string>())
     };
     #pragma warning restore CS8509
 }
