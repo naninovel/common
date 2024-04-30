@@ -61,7 +61,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryTernary ()
     {
         var predicate = TryLogicalOr();
-        if (!(IsOp() && Is("?"))) return predicate;
+        if (!IsOp() || !Is("?")) return predicate;
 
         if (predicate is null) throw Err("Missing ternary predicate.");
         Consume();
@@ -74,7 +74,7 @@ public class Parser (ParseOptions options)
     private IExpression? TryLogicalOr ()
     {
         var left = TryLogicalAnd();
-        if (!(IsOp() && (Is("||") || Is("|")))) return left;
+        if (!IsOp() || !(Is("||") || Is("|"))) return left;
 
         if (left is null) throw Err("Missing left logical 'or' operand.");
         var op = Consume();
@@ -85,13 +85,12 @@ public class Parser (ParseOptions options)
     private IExpression? TryLogicalAnd ()
     {
         var left = TryRelational();
-        if (IsOp() && (Is("&&") || Is("&")))
-        {
-            var op = Consume();
-            var right = TryLogicalAnd();
-            return new BinaryOperation(Operators.Binary[op.Content], left, right);
-        }
-        return left;
+        if (!IsOp() || !(Is("&&") || Is("&"))) return left;
+
+        if (left is null) throw Err("Missing left logical 'and' operand.");
+        var op = Consume();
+        var right = TryLogicalAnd() ?? throw Err("Missing right logical 'and' operand.");
+        return new BinaryOperation(Operators.Binary[op.Content], left, right);
     }
 
     private IExpression? TryRelational ()

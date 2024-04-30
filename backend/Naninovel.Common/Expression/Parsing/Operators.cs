@@ -34,10 +34,10 @@ internal static class Operators
     private static readonly IReadOnlyDictionary<(char c1, char c2), string> doubleChar =
         BuildDoubleChars(Binary.Keys, Unary.Keys);
 
-    public static bool IsOperator (char c1, char? c2, out string op)
+    public static bool IsOperator (char c1, char c2, out string op)
     {
-        if (c2 == null) return (op = singleChar.TryGetValue(c1, out var op1) ? op1 : null!) != null;
-        return (op = doubleChar.TryGetValue((c1, c2.Value), out var op2) ? op2 : null!) != null;
+        return ((op = doubleChar.TryGetValue((c1, c2), out var op2) ? op2 : null!) ??
+                (op = singleChar.TryGetValue(c1, out var op1) ? op1 : null!)) != null;
     }
 
     private static Dictionary<char, string> BuildSingleChars (params IEnumerable<string>[] collections)
