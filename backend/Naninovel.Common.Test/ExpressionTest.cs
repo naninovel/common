@@ -4,11 +4,20 @@ public class ExpressionTest
 {
     private class UnsupportedExpression : IExpression;
 
-    private readonly Parser parser = new(new());
-    private readonly Evaluator evaluator = new(new() {
-        ResolveVariable = ResolveVariable,
-        ResolveFunction = ResolveFunction
-    });
+    private readonly Stack<ParseDiagnostic> diagnostics = [];
+    private readonly Parser parser;
+    private readonly Evaluator evaluator;
+
+    public ExpressionTest ()
+    {
+        parser = new Parser(new() {
+            HandleDiagnostic = diagnostics.Push
+        });
+        evaluator = new(new() {
+            ResolveVariable = ResolveVariable,
+            ResolveFunction = ResolveFunction
+        });
+    }
 
     [
         Theory,
@@ -100,10 +109,11 @@ public class ExpressionTest
     [
         Theory,
         InlineData("\"foo\"", "foo"),
+        InlineData("\"foo\\\"bar\\\"\"", "foo\"bar\""),
         InlineData("foo", "foo"),
         InlineData("bar", "bar"),
         InlineData("foo+bar", "foobar"),
-        InlineData("\"foo\"+ \" \" + \"bar\"", "foo bar"),
+        InlineData("\"foo\"+ \"\\\"\" + \"bar\"", "foo\"bar"),
         InlineData("true ? \"foo\" : \"bar\"", "foo"),
         InlineData("false?\"\":(false?\"\":\"foo\")", "foo"),
         InlineData("!negative?foo:bar", "foo"),
@@ -167,6 +177,16 @@ public class ExpressionTest
     }
 
     [Fact]
+    public void DiagnosesSyntaxErrors ()
+    {
+        Assert.False(parser.TryParse("\"f", out _));
+        Assert.Equal(new ParseDiagnostic(1, 1, "Unclosed string."), diagnostics.Pop());
+
+        Assert.False(parser.TryParse("~", out _));
+        Assert.Equal(new ParseDiagnostic(0, 1, "Unexpected character: ~"), diagnostics.Pop());
+    }
+
+    [Fact]
     public void ErrsWhenUnknownExpression ()
     {
         Assert.Contains("Unknown expression",
@@ -190,7 +210,7 @@ public class ExpressionTest
     }
 
     #pragma warning disable CS8509 // Ignore missing default arm.
-    private static IOperand ResolveVariable (string name) => name switch {
+    private IOperand ResolveVariable (string name) => name switch {
         "foo" => new String("foo"),
         "bar" => new String("bar"),
         "фу" => new String("фу"),
@@ -199,7 +219,7 @@ public class ExpressionTest
         "positive" => new Boolean(true),
         "negative" => new Boolean(false)
     };
-    private static IOperand ResolveFunction (string name, IReadOnlyList<IOperand> args) => name switch {
+    private IOperand ResolveFunction (string name, IReadOnlyList<IOperand> args) => name switch {
         "join" => new String(string.Join(args[0].GetValue<string>(), args.Skip(1).Select(a => a.GetValue<string>()))),
         "эхо" => new String(args[0].GetValue<string>())
     };

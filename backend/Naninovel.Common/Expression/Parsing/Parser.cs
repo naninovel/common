@@ -74,15 +74,15 @@ public class Parser (ParseOptions options)
         return Consume();
     }
 
-    private bool IsEof ()
+    private bool IsEnd ()
     {
-        return Current().Type == TokenType.Eof;
+        return tokens.Length == 0;
     }
 
     private IExpression? Ternary ()
     {
         var predicate = LogicalOr();
-        if (Peek("?") && Current().Type == TokenType.Delimiter)
+        if (Peek("?") && Current().Type == TokenType.Operator)
         {
             Consume();
             var truthy = Ternary();
@@ -96,7 +96,7 @@ public class Parser (ParseOptions options)
     private IExpression? LogicalOr ()
     {
         var left = LogicalXor();
-        if (Peek("||") && Current().Type == TokenType.Delimiter)
+        if (Peek("||") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = LogicalOr();
@@ -108,7 +108,7 @@ public class Parser (ParseOptions options)
     private IExpression? LogicalXor ()
     {
         var left = LogicalAnd();
-        if (Current().Content == "xor" && Current().Type == TokenType.Delimiter)
+        if (Current().Content == "xor" && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = LogicalXor();
@@ -120,7 +120,7 @@ public class Parser (ParseOptions options)
     private IExpression? LogicalAnd ()
     {
         var left = BitwiseOr();
-        if (Peek("&&") && Current().Type == TokenType.Delimiter)
+        if (Peek("&&") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = LogicalAnd();
@@ -132,7 +132,7 @@ public class Parser (ParseOptions options)
     private IExpression? BitwiseOr ()
     {
         var left = BitwiseXor();
-        if (Peek("|") && Current().Type == TokenType.Delimiter)
+        if (Peek("|") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = BitwiseOr();
@@ -144,7 +144,7 @@ public class Parser (ParseOptions options)
     private IExpression? BitwiseXor ()
     {
         var left = BitwiseAnd();
-        if (Peek("^|") && Current().Type == TokenType.Delimiter)
+        if (Peek("^|") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = BitwiseXor();
@@ -156,7 +156,7 @@ public class Parser (ParseOptions options)
     private IExpression? BitwiseAnd ()
     {
         var left = Relational();
-        if (Peek("&") && Current().Type == TokenType.Delimiter)
+        if (Peek("&") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = BitwiseAnd();
@@ -168,7 +168,7 @@ public class Parser (ParseOptions options)
     private IExpression? Relational ()
     {
         var left = Shift();
-        if (Peek("=", "==", "!=", ">=", "<=", ">", "<") && Current().Type == TokenType.Delimiter)
+        if (Peek("=", "==", "!=", ">=", "<=", ">", "<") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = Shift();
@@ -180,7 +180,7 @@ public class Parser (ParseOptions options)
     private IExpression? Shift ()
     {
         var left = Additive();
-        if (Peek(">>", "<<", ">>>") && Current().Type == TokenType.Delimiter)
+        if (Peek(">>", "<<", ">>>") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = Shift();
@@ -192,7 +192,7 @@ public class Parser (ParseOptions options)
     private IExpression? Additive ()
     {
         var left = Multiplicative();
-        while (Peek("+", "-") && Current().Type == TokenType.Delimiter)
+        while (Peek("+", "-") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             left = new BinaryOperation(Operators.Binary[op.Content], left, Multiplicative());
@@ -203,7 +203,7 @@ public class Parser (ParseOptions options)
     private IExpression? Multiplicative ()
     {
         var left = Unary();
-        while (Peek("*", "/", "%") && Current().Type == TokenType.Delimiter)
+        while (Peek("*", "/", "%") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             left = new BinaryOperation(Operators.Binary[op.Content], left, Unary());
@@ -213,7 +213,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? Unary ()
     {
-        if (Peek("-", "+", "!") && Current().Type == TokenType.Delimiter)
+        if (Peek("-", "+", "!") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = Unary();
@@ -225,7 +225,7 @@ public class Parser (ParseOptions options)
     private IExpression? Pow ()
     {
         var left = Factorial();
-        if (Peek("^", "**") && Current().Type == TokenType.Delimiter)
+        if (Peek("^", "**") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             var right = Unary();
@@ -237,7 +237,7 @@ public class Parser (ParseOptions options)
     private IExpression? Factorial ()
     {
         var left = Symbol();
-        if (Peek("!") && Current().Type == TokenType.Delimiter)
+        if (Peek("!") && Current().Type == TokenType.Operator)
         {
             var op = Consume();
             return new UnaryOperation(Operators.Unary[op.Content], left);
@@ -248,7 +248,7 @@ public class Parser (ParseOptions options)
     private IExpression? Symbol ()
     {
         var cur = Current();
-        if (cur.Type == TokenType.Symbol)
+        if (cur.Type == TokenType.Identifier)
         {
             var symbol = Consume();
             var node = FunctionCall(symbol);
@@ -264,7 +264,7 @@ public class Parser (ParseOptions options)
         {
             Consume();
             var @params = new List<IExpression>();
-            while (!Peek(")") && !IsEof())
+            while (!Peek(")") && !IsEnd())
             {
                 @params.Add(Ternary());
                 if (Peek(",")) Consume();

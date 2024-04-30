@@ -4,8 +4,8 @@ namespace Naninovel.Expression;
 
 internal class Lexer
 {
-    private readonly HashSet<string> delimiters = [
-        ",", "(", ")", "[", "]", ":", "?",
+    private readonly HashSet<string> operators = [
+        ",", "(", ")", ":", "?",
         ..Operators.Binary.Keys,
         ..Operators.Unary.Keys
     ];
@@ -27,24 +27,22 @@ internal class Lexer
             var c = Peek();
             var c2 = $"{c}{Peek(1)}";
 
-            if (IsDelimiter(c2))
+            if (IsOperator(c2))
             {
-                tokens.Add(new(TokenType.Delimiter, c2));
+                tokens.Add(new(TokenType.Operator, c2));
                 Consume();
                 Consume();
             }
-            else if (IsDelimiter(c.ToString()))
+            else if (IsOperator(c.ToString()))
             {
-                tokens.Add(new(TokenType.Delimiter, c.ToString()));
+                tokens.Add(new(TokenType.Operator, c.ToString()));
                 Consume();
             }
-            else if (IsDigit(c)) tokens.Add(new(TokenType.Number, ReadNumber()));
+            else if (IsNumber(c)) tokens.Add(new(TokenType.Number, ReadNumber()));
             else if (IsQuote(c)) tokens.Add(new(TokenType.String, ReadString()));
-            else if (IsIdentifier(c)) tokens.Add(new(TokenType.Symbol, ReadIdentifier()));
+            else if (IsIdentifier(c)) tokens.Add(new(TokenType.Identifier, ReadIdentifier()));
             else throw new Error($"Unexpected character: {c}", index);
         }
-
-        tokens.Add(new Token(TokenType.Eof));
 
         return tokens.ToArray();
     }
@@ -55,26 +53,6 @@ internal class Lexer
         str.Clear();
         this.text = text;
         index = 0;
-    }
-
-    private bool IsDigit (char c)
-    {
-        return char.IsDigit(c);
-    }
-
-    private bool IsIdentifier (char c)
-    {
-        return char.IsLetter(c) || c == '_';
-    }
-
-    private bool IsDelimiter (string str)
-    {
-        return delimiters.Contains(str);
-    }
-
-    private bool IsQuote (char c)
-    {
-        return c == '"';
     }
 
     private char Peek (int? nth = null)
@@ -94,55 +72,49 @@ internal class Lexer
 
     private string ReadNumber ()
     {
-        var number = "";
-
+        str.Clear();
+        while (IsNumber(Peek()))
+            str.Append(Consume());
         if (Peek() == '.')
-        {
-            number += Consume();
-            if (!IsDigit(Peek()))
-                throw new Error("Number expected.", index);
-        }
-        else
-        {
-            while (IsDigit(Peek()))
-                number += Consume();
-            if (Peek() == '.')
-                number += Consume();
-        }
-
-        while (IsDigit(Peek()))
-            number += Consume();
-
-        return number;
+            str.Append(Consume());
+        while (IsNumber(Peek()))
+            str.Append(Consume());
+        return str.ToString();
     }
 
     private string ReadIdentifier ()
     {
-        var text = "";
-        while (IsIdentifier(Peek()) || IsDigit(Peek()))
-            text += Consume();
-        return text;
+        str.Clear();
+        while (IsIdentifier(Peek()) || IsNumber(Peek()))
+            str.Append(Consume());
+        return str.ToString();
     }
 
     private string ReadString ()
     {
-        var quote = Consume();
+        Consume();
         var str = "";
         var escape = false;
         while (true)
         {
             var c = Consume();
-            if (c == default) throw new Error("Unclosed string.", index);
+            if (IsEnd()) throw new Error("Unclosed string.", index - 2);
 
             if (escape)
             {
                 str += "\"";
                 escape = false;
             }
-            else if (c == quote) break;
+            else if (IsQuote(c)) break;
             else if (c == '\\') escape = true;
             else str += c;
         }
         return str;
     }
+
+    private bool IsNumber (char c) => char.IsDigit(c);
+    private bool IsIdentifier (char c) => char.IsLetter(c) || c == '_';
+    private bool IsOperator (string str) => operators.Contains(str);
+    private bool IsQuote (char c) => c == '"';
+    private bool IsEnd () => index > text.Length;
 }
