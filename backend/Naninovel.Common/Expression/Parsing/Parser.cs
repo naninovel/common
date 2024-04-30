@@ -213,7 +213,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? Unary ()
     {
-        if (Peek("-", "+"))
+        if (Peek("-", "+", "!"))
         {
             var op = Consume();
             var right = Unary();

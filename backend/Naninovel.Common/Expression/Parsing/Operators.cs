@@ -24,6 +24,7 @@ internal static class Operators
     public static readonly IReadOnlyDictionary<string, IUnaryOperator> Unary =
         new Dictionary<string, IUnaryOperator> {
             ["!"] = new NegateBoolean(),
-            ["-"] = new NegateNumeric()
+            ["-"] = new NegateNumeric(),
+            ["+"] = new AddUnary()
         };
 }

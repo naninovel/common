@@ -11,7 +11,7 @@ internal class NotEqual : IBinaryOperator
         if (lhs is Numeric ln && rhs is Numeric rn)
             return new Boolean(Math.Abs(ln.Value - rn.Value) > tolerance);
         if (lhs is String ls && rhs is String rs)
-            return new Boolean(ls != rs);
+            return new Boolean(ls.Value != rs.Value);
         throw new Error($"Can't check un-equality of '{lhs.GetType().Name}' and '{rhs.GetType().Name}'.");
     }
 }
