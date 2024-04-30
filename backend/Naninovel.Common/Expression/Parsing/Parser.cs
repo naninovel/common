@@ -159,7 +159,7 @@ public class Parser (ParseOptions options)
         return String();
     }
 
-    private IExpression? FunctionCall (Token symbolToken)
+    private IExpression FunctionCall (Token symbolToken)
     {
         var name = symbolToken.Content;
         if (Is("("))
