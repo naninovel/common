@@ -55,12 +55,11 @@ internal class Lexer
         index = 0;
     }
 
-    private char Peek (int? nth = null)
+    private char Peek (int nth = 0)
     {
-        nth ??= 0;
         if (index + nth >= text.Length)
             return default;
-        return text[index + nth.Value];
+        return text[index + nth];
     }
 
     private char Consume ()
@@ -93,7 +92,7 @@ internal class Lexer
     private string ReadString ()
     {
         Consume();
-        var str = "";
+        str.Clear();
         var escape = false;
         while (true)
         {
@@ -102,14 +101,14 @@ internal class Lexer
 
             if (escape)
             {
-                str += "\"";
+                str.Append('\"');
                 escape = false;
             }
             else if (IsQuote(c)) break;
             else if (c == '\\') escape = true;
-            else str += c;
+            else str.Append(c);
         }
-        return str;
+        return str.ToString();
     }
 
     private bool IsNumber (char c) => char.IsDigit(c);
