@@ -206,7 +206,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? TryClosure ()
     {
-        if (!Is("(")) return null; // Walked all supported morphemes.
+        if (!Is("(")) return null; // Walked all supported morphemes, none found.
 
         Consume();
         var exp = TryExpression();
