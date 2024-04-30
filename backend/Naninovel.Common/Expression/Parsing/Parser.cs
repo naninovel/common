@@ -5,9 +5,9 @@ namespace Naninovel.Expression;
 /// </summary>
 public class Parser (ParseOptions options)
 {
-    private Token current => tokens.ElementAtOrDefault(0);
+    private Token token => tokens.ElementAtOrDefault(0);
     private readonly Lexer lexer = new();
-    private Token[] tokens = [];
+    private readonly Stack<Token> tokens = [];
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -19,7 +19,7 @@ public class Parser (ParseOptions options)
     {
         try
         {
-            tokens = lexer.Lex(text);
+            Reset(text);
             return (exp = Ternary()!) != null;
         }
         catch (Error err)
@@ -45,35 +45,12 @@ public class Parser (ParseOptions options)
         return false;
     }
 
-    private bool Is (string content)
+    private void Reset (string text)
     {
-        return current.Content == content;
-    }
-
-    private bool IsOperator ()
-    {
-        return current.Type == TokenType.Operator;
-    }
-
-    private Token Consume ()
-    {
-        var first = tokens[0];
-        var copy = new Token[tokens.Length];
-        Array.Copy(tokens, 1, copy, 0, tokens.Length - 1);
-        tokens = copy;
-        return first;
-    }
-
-    private void Expect (string content)
-    {
-        if (!Is(content))
-            throw new Error($"Unexpected content: {content}");
-        Consume();
-    }
-
-    private bool IsEnd ()
-    {
-        return tokens.Length == 0;
+        tokens.Clear();
+        var lexed = lexer.Lex(text);
+        for (var i = lexed.Length - 1; i >= 0; i--)
+            tokens.Push(lexed[i]);
     }
 
     private IExpression? Ternary ()
@@ -173,7 +150,7 @@ public class Parser (ParseOptions options)
 
     private IExpression? Symbol ()
     {
-        if (current.Type == TokenType.Identifier)
+        if (token.Type == TokenType.Identifier)
         {
             var symbol = Consume();
             var node = FunctionCall(symbol);
@@ -208,14 +185,14 @@ public class Parser (ParseOptions options)
 
     private IExpression? String ()
     {
-        if (current.Type == TokenType.String)
+        if (token.Type == TokenType.String)
             return new String(Consume().Content);
         return Number();
     }
 
     private IExpression? Number ()
     {
-        if (current.Type == TokenType.Number)
+        if (token.Type == TokenType.Number)
         {
             var text = Consume().Content;
             if (!double.TryParse(text, out var num))
@@ -235,5 +212,17 @@ public class Parser (ParseOptions options)
             return left;
         }
         return null;
+    }
+
+    private bool Is (string content) => token.Content == content;
+    private bool IsOperator () => token.Type == TokenType.Operator;
+    private bool IsEnd () => tokens.Count == 0;
+    private Token Consume () => tokens.Pop();
+
+    private void Expect (string content)
+    {
+        if (!Is(content))
+            throw new Error($"Unexpected content: {content}");
+        Consume();
     }
 }
