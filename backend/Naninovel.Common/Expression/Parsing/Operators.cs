@@ -9,6 +9,7 @@ internal static class Operators
             ["*"] = new Multiply(),
             ["/"] = new Divide(),
             ["%"] = new Remainder(),
+            ["^"] = new Power(),
             ["&"] = new And(),
             ["&&"] = new And(),
             ["|"] = new Or(),

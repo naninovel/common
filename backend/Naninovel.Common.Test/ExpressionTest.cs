@@ -2,6 +2,8 @@ namespace Naninovel.Expression.Test;
 
 public class ExpressionTest
 {
+    private class UnsupportedExpression : IExpression;
+
     private readonly Parser parser = new(new());
     private readonly Evaluator evaluator = new(new() {
         ResolveVariable = ResolveVariable,
@@ -16,6 +18,7 @@ public class ExpressionTest
         InlineData("- 1.0", -1.0),
         InlineData("1+2", 1.0 + 2.0),
         InlineData("5%2", 5.0 % 2.0),
+        InlineData("2^3", 2 * 2 * 2),
         InlineData("1+2+3", 1.0 + 2.0 + 3.0),
         InlineData("1+2*3", 1.0 + 2.0 * 3.0),
         InlineData("(1+2)*-3", (1.0 + 2.0) * -3.0),
@@ -99,6 +102,8 @@ public class ExpressionTest
         InlineData("\"foo\"", "foo"),
         InlineData("foo", "foo"),
         InlineData("bar", "bar"),
+        InlineData("foo+bar", "foobar"),
+        InlineData("\"foo\"+ \" \" + \"bar\"", "foo bar"),
         InlineData("true ? \"foo\" : \"bar\"", "foo"),
         InlineData("false?\"\":(false?\"\":\"foo\")", "foo"),
         InlineData("!negative?foo:bar", "foo"),
@@ -125,6 +130,63 @@ public class ExpressionTest
     {
         Assert.True(parser.TryParse(text, out var exp));
         Assert.Equal(result, evaluator.Evaluate(exp).GetValue(result.GetType()));
+    }
+
+    [
+        Theory,
+        InlineData("true + false"),
+        InlineData("+true"),
+        InlineData("1&2"),
+        InlineData("\"foo\"&\"bar\""),
+        InlineData("\"foo\"&1"),
+        InlineData("true/false"),
+        InlineData("\"foo\"/\"bar\""),
+        InlineData("1=true"),
+        InlineData("\"foo\"==num_10"),
+        InlineData("1>false"),
+        InlineData("false>=\"bar\""),
+        InlineData("\"foo\"<\"bar\""),
+        InlineData("false<=true"),
+        InlineData("1*false"),
+        InlineData("!1"),
+        InlineData("!\"foo\""),
+        InlineData("!foo"),
+        InlineData("-bar"),
+        InlineData("-true"),
+        InlineData("1!=false"),
+        InlineData("true|2"),
+        InlineData("false||\"foo\""),
+        InlineData("true^0"),
+        InlineData("false%true"),
+        InlineData("1-false")
+    ]
+    public void ErrsWhenUnsupportedOperand (string text)
+    {
+        Assert.True(parser.TryParse(text, out var exp));
+        Assert.Throws<Error>(() => evaluator.Evaluate(exp));
+    }
+
+    [Fact]
+    public void ErrsWhenUnknownExpression ()
+    {
+        Assert.Contains("Unknown expression",
+            Assert.Throws<Error>(() => evaluator.Evaluate(new UnsupportedExpression())).Message);
+    }
+
+    [Fact]
+    public void CanCastOperandValue ()
+    {
+        Assert.Equal("foo", new String("foo").GetValue<string>());
+        Assert.Equal(1.0, new Numeric(1).GetValue<double>());
+        Assert.Equal(0.01f, new Numeric(0.01).GetValue<float>());
+        Assert.Equal(1, new Numeric(1.0).GetValue<int>());
+        Assert.True(new Boolean(true).GetValue<bool>());
+    }
+
+    [Fact]
+    public void ErrsWhenOperandValueCastFails ()
+    {
+        Assert.Throws<Error>(() => new String("foo").GetValue<double>());
     }
 
     #pragma warning disable CS8509 // Ignore missing default arm.
