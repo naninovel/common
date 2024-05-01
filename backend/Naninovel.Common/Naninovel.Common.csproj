@@ -15,4 +15,8 @@
         <NoWarn>1591,1573</NoWarn>
     </PropertyGroup>
 
+    <ItemGroup>
+        <Using Include="Naninovel.Utilities"/>
+    </ItemGroup>
+
 </Project>
