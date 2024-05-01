@@ -42,26 +42,29 @@ public class Parser (ParseOptions options)
     /// <returns>Whether all the assignments were parsed successfully.</returns>
     public bool TryParseAssignments (string text, IList<Assignment> assignments)
     {
-        errOffset = 0;
-        asses.Clear();
+        try
+        {
+            assParser.Parse(text, asses);
+            if (asses.Count == 0) return false;
 
-        try { assParser.Parse(text, asses); }
+            errOffset = text.IndexOf(asses[0].exp, StringComparison.Ordinal);
+
+            foreach (var (var, assExp) in asses)
+                if (TryParse(assExp, out var exp))
+                    assignments.Add(new(var, exp));
+                else return false;
+            return true;
+        }
         catch (Error err)
         {
             HandleError(text, err);
             return false;
         }
-        if (asses.Count == 0) return false;
-
-        errOffset = text.IndexOf(asses[0].exp, StringComparison.Ordinal);
-
-        foreach (var (var, assExp) in asses)
-            if (TryParse(assExp, out var exp))
-                assignments.Add(new(var, exp));
-            else return false;
-
-        errOffset = 0;
-        return true;
+        finally
+        {
+            errOffset = 0;
+            asses.Clear();
+        }
     }
 
     private void Reset (string text)
