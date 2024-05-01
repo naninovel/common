@@ -10,7 +10,7 @@ public class Parser (ParseOptions options)
     private readonly Stack<Token> tokens = [];
     private readonly AssignmentParser assParser = new();
     private readonly List<(string var, string exp)> asses = [];
-    private int lastIdx, errOffsetIdx;
+    private int lastIdx, errOffset;
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -42,7 +42,7 @@ public class Parser (ParseOptions options)
     /// <returns>Whether all the assignments were parsed successfully.</returns>
     public bool TryParseAssignments (string text, IList<Assignment> assignments)
     {
-        errOffsetIdx = 0;
+        errOffset = 0;
         asses.Clear();
 
         try { assParser.Parse(text, asses); }
@@ -53,14 +53,14 @@ public class Parser (ParseOptions options)
         }
         if (asses.Count == 0) return false;
 
-        errOffsetIdx = text.IndexOf(asses[0].exp, StringComparison.Ordinal);
+        errOffset = text.IndexOf(asses[0].exp, StringComparison.Ordinal);
 
         foreach (var (var, assExp) in asses)
             if (TryParse(assExp, out var exp))
                 assignments.Add(new(var, exp));
             else return false;
 
-        errOffsetIdx = 0;
+        errOffset = 0;
         return true;
     }
 
@@ -75,8 +75,8 @@ public class Parser (ParseOptions options)
 
     private void HandleError (string text, Error err)
     {
-        var index = errOffsetIdx + (err.Index ?? 0);
-        var length = (err.Length ?? text.Length - index) + errOffsetIdx;
+        var index = errOffset + (err.Index ?? 0);
+        var length = (err.Length ?? text.Length - index) + errOffset;
         options.HandleDiagnostic?.Invoke(new(index, length, err.Message));
     }
 
