@@ -1,4 +1,4 @@
-namespace Naninovel.Utilities;
+namespace Naninovel;
 
 /// <summary>
 /// Common text-related helpers and extensions.

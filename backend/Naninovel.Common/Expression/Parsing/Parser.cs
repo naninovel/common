@@ -9,7 +9,8 @@ public class Parser (ParseOptions options)
     private readonly Lexer lexer = new();
     private readonly Stack<Token> tokens = [];
     private readonly AssignmentParser assParser = new();
-    private int lastIdx;
+    private readonly List<(string var, string exp)> asses = [];
+    private int lastIdx, errOffsetIdx;
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -27,9 +28,7 @@ public class Parser (ParseOptions options)
         catch (Error err)
         {
             exp = null!;
-            var index = err.Index ?? 0;
-            var length = err.Length ?? text.Length - index;
-            options.HandleDiagnostic?.Invoke(new(index, length, err.Message));
+            HandleError(text, err);
             return false;
         }
     }
@@ -43,11 +42,26 @@ public class Parser (ParseOptions options)
     /// <returns>Whether all the assignments were parsed successfully.</returns>
     public bool TryParseAssignments (string text, IList<Assignment> assignments)
     {
-        foreach (var ass in assParser.Parse(text))
-            if (TryParse(ass.text, out var exp))
-                assignments.Add(new(ass.var, exp));
+        errOffsetIdx = 0;
+        asses.Clear();
+
+        try { assParser.Parse(text, asses); }
+        catch (Error err)
+        {
+            HandleError(text, err);
+            return false;
+        }
+        if (asses.Count == 0) return false;
+
+        errOffsetIdx = text.IndexOf(asses[0].exp, StringComparison.Ordinal);
+
+        foreach (var (var, assExp) in asses)
+            if (TryParse(assExp, out var exp))
+                assignments.Add(new(var, exp));
             else return false;
-        return false;
+
+        errOffsetIdx = 0;
+        return true;
     }
 
     private void Reset (string text)
@@ -57,6 +71,13 @@ public class Parser (ParseOptions options)
         var lexed = lexer.Lex(text);
         for (var i = lexed.Length - 1; i >= 0; i--)
             tokens.Push(lexed[i]);
+    }
+
+    private void HandleError (string text, Error err)
+    {
+        var index = errOffsetIdx + (err.Index ?? 0);
+        var length = (err.Length ?? text.Length - index) + errOffsetIdx;
+        options.HandleDiagnostic?.Invoke(new(index, length, err.Message));
     }
 
     // Begin walking known expression morphemes, collapsing in order of associativity.
@@ -209,7 +230,7 @@ public class Parser (ParseOptions options)
         if (!Is("(")) return null; // Walked all supported morphemes, none found.
 
         Consume();
-        var exp = TryExpression();
+        var exp = TryExpression() ?? throw Err("Empty closure.");
         Expect(")");
         return exp;
     }

@@ -182,8 +182,9 @@ public class ExpressionTest
         Theory,
         InlineData("\"", 0, 1, "Unclosed string."),
         InlineData("~", 0, 1, "Unexpected character: ~"),
+        InlineData("()", 0, 2, "Empty closure."),
+        InlineData("(", 0, 1, "Empty closure."),
         InlineData("f(", 1, 1, "Missing content: )"),
-        InlineData("(", 0, 1, "Missing content: )"),
         InlineData("?1:2", 0, 4, "Missing ternary predicate."),
         InlineData("true?:2", 4, 3, "Missing truthy ternary branch."),
         InlineData("true?1:", 6, 1, "Missing falsy ternary branch."),
@@ -205,6 +206,61 @@ public class ExpressionTest
     {
         Assert.False(parser.TryParse(text, out _));
         Assert.Equal(new ParseDiagnostic(idx, length, message), diagnostics.Pop());
+    }
+
+    [
+        Theory,
+        InlineData("num_2=1", "num_2", 1),
+        InlineData("num_2++", "num_2", 3),
+        InlineData("num_2--", "num_2", 1),
+        InlineData("num_2+=2", "num_2", 4),
+        InlineData("num_2-=2", "num_2", 0),
+        InlineData("num_2*=3", "num_2", 6),
+        InlineData("num_2/=2", "num_2", 1),
+        InlineData("positive=negative", "positive", false),
+        InlineData("\tpositive = negative == negative", "positive", true),
+        InlineData("positive=negative=negative", "positive", true)
+    ]
+    public void ParsesAssignments (string text, string var, object result)
+    {
+        var asses = new List<Assignment>();
+        Assert.True(parser.TryParseAssignments(text, asses));
+        Assert.Equal(var, asses[0].Variable);
+        Assert.Equal(result, evaluator.Evaluate(asses[0].Expression).GetValue(result.GetType()));
+    }
+
+    [Fact]
+    public void CanAssignMultipleVariables ()
+    {
+        var asses = new List<Assignment>();
+        Assert.True(parser.TryParseAssignments("foo=bar;bar=foo", asses));
+        Assert.Equal(2, asses.Count);
+        Assert.Equal("foo", asses[0].Variable);
+        Assert.Equal("bar", asses[1].Variable);
+        Assert.Equal("bar", evaluator.Evaluate(asses[0].Expression).GetValue<string>());
+        Assert.Equal("foo", evaluator.Evaluate(asses[1].Expression).GetValue<string>());
+    }
+
+    [
+        Theory,
+        InlineData("=1", 0, 2, "Missing assigned variable name."),
+        InlineData("x=", 0, 2, "Missing expression to assign."),
+        InlineData("foo=\"", 4, 1, "Unclosed string.")
+    ]
+    public void DiagnosesAssignmentErrors (string text, int idx, int length, string message)
+    {
+        var asses = new List<Assignment>();
+        Assert.False(parser.TryParseAssignments(text, asses));
+        Assert.Equal(new ParseDiagnostic(idx, length, message), diagnostics.Pop());
+    }
+
+    [Fact]
+    public void ReturnsFalseWhenEmptyExpression ()
+    {
+        Assert.False(parser.TryParse("", out _));
+        Assert.False(parser.TryParseAssignments("", []));
+        Assert.False(parser.TryParseAssignments(";", []));
+        Assert.Empty(diagnostics);
     }
 
     [Fact]

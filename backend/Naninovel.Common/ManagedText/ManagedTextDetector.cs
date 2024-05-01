@@ -1,5 +1,4 @@
-﻿using Naninovel.Utilities;
-using static Naninovel.ManagedText.ManagedTextConstants;
+﻿using static Naninovel.ManagedText.ManagedTextConstants;
 
 namespace Naninovel.ManagedText;
 
