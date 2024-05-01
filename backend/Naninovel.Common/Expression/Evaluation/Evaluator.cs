@@ -36,4 +36,16 @@ public class Evaluator (EvaluateOptions options)
             : Evaluate(ternary.Falsy),
         _ => throw new Error($"Unknown expression type: {exp.GetType().Name}")
     };
+
+    /// <summary>
+    /// Evaluates specified assignment expressions.
+    /// </summary>
+    /// <param name="assignments">Assignments to evaluate.</param>
+    /// <param name="result">Collection to store evaluated assignments.</param>
+    /// <exception cref="Error">Thrown when expression evaluation fails.</exception>
+    public void EvaluateAssignments (IReadOnlyList<Assignment> assignments, IList<EvaluatedAssignment> result)
+    {
+        foreach (var ass in assignments)
+            result.Add(new(ass.Variable, Evaluate(ass.Expression)));
+    }
 }

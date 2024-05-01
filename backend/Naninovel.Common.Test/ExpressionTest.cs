@@ -221,24 +221,29 @@ public class ExpressionTest
         InlineData("\tpositive = negative == negative", "positive", true),
         InlineData("positive=negative=negative", "positive", true)
     ]
-    public void ParsesAssignments (string text, string var, object result)
+    public void EvaluatesAssignments (string text, string var, object result)
     {
         var asses = new List<Assignment>();
+        var evals = new List<EvaluatedAssignment>();
         Assert.True(parser.TryParseAssignments(text, asses));
-        Assert.Equal(var, asses[0].Variable);
-        Assert.Equal(result, evaluator.Evaluate(asses[0].Expression).GetValue(result.GetType()));
+        evaluator.EvaluateAssignments(asses, evals);
+        Assert.Equal(var, evals[0].Variable);
+        Assert.Equal(result, evals[0].Result.GetValue(result.GetType()));
     }
 
     [Fact]
     public void CanAssignMultipleVariables ()
     {
         var asses = new List<Assignment>();
+        var evals = new List<EvaluatedAssignment>();
         Assert.True(parser.TryParseAssignments("foo=bar;bar=foo", asses));
-        Assert.Equal(2, asses.Count);
-        Assert.Equal("foo", asses[0].Variable);
-        Assert.Equal("bar", asses[1].Variable);
-        Assert.Equal("bar", evaluator.Evaluate(asses[0].Expression).GetValue<string>());
-        Assert.Equal("foo", evaluator.Evaluate(asses[1].Expression).GetValue<string>());
+        evaluator.EvaluateAssignments(asses, evals);
+
+        Assert.Equal(2, evals.Count);
+        Assert.Equal("foo", evals[0].Variable);
+        Assert.Equal("bar", evals[1].Variable);
+        Assert.Equal("bar", evals[0].Result.GetValue<string>());
+        Assert.Equal("foo", evals[1].Result.GetValue<string>());
     }
 
     [
