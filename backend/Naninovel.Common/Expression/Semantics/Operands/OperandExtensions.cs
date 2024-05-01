@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Naninovel.Expression;
 
 public static class OperandExtensions
@@ -15,7 +17,7 @@ public static class OperandExtensions
     public static object GetValue (this IOperand op, Type type)
     {
         var raw = op.GetValue();
-        try { return Convert.ChangeType(raw, type); }
+        try { return Convert.ChangeType(raw, type, CultureInfo.InvariantCulture); }
         catch { throw new Error($"Unexpected operand type: {raw.GetType().Name} (expected {type.Name})"); }
     }
 }
