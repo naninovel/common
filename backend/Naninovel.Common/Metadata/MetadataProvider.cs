@@ -1,3 +1,5 @@
+using Naninovel.Parsing;
+
 namespace Naninovel.Metadata;
 
 /// <summary>
@@ -91,7 +93,27 @@ public class MetadataProvider
             commandByAlias[command.Alias!] = command;
     }
 
-    private Preferences CopyPreferences (Preferences prefs) => new Preferences {
-        ParametrizeGenericCommandId = prefs.ParametrizeGenericCommandId
+    // TODO: Use records copy once Unity supports it.
+    private Preferences CopyPreferences (Preferences prefs) => new() {
+        ParametrizeGenericCommandId = prefs.ParametrizeGenericCommandId,
+        Identifiers = new Identifiers {
+            CommentLine = prefs.Identifiers.CommentLine,
+            LabelLine = prefs.Identifiers.LabelLine,
+            CommandLine = prefs.Identifiers.CommandLine,
+            AuthorAssign = prefs.Identifiers.AuthorAssign,
+            AuthorAppearance = prefs.Identifiers.AuthorAppearance,
+            ExpressionOpen = prefs.Identifiers.ExpressionOpen,
+            ExpressionClose = prefs.Identifiers.ExpressionClose,
+            InlinedOpen = prefs.Identifiers.InlinedOpen,
+            InlinedClose = prefs.Identifiers.InlinedClose,
+            ParameterAssign = prefs.Identifiers.ParameterAssign,
+            ListDelimiter = prefs.Identifiers.ListDelimiter,
+            NamedDelimiter = prefs.Identifiers.NamedDelimiter,
+            TextIdOpen = prefs.Identifiers.TextIdOpen,
+            TextIdClose = prefs.Identifiers.TextIdClose,
+            BooleanFlag = prefs.Identifiers.BooleanFlag,
+            True = prefs.Identifiers.True,
+            False = prefs.Identifiers.False
+        }
     };
 }

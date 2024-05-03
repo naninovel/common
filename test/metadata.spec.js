@@ -27,6 +27,11 @@ test("can merge with object", () => {
     expect(merged.object.bar).toEqual("bar");
 });
 
+test("overrides object on merge", () => {
+    const merged = merge({ object: { foo: "foo" } }, { object: { foo: "bar" } });
+    expect(merged.object.foo).toEqual("bar");
+});
+
 test("replaces overridden commands by alias", () => {
     const def = { commands: [{ id: "def", alias: "foo", parameters: [] }] };
     const custom = { commands: [{ id: "custom", alias: "foo", parameters: [] }] };
