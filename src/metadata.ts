@@ -27,6 +27,7 @@ function mergeKey(key: string, value: unknown, destination: Record<string, unkno
         destination[key] = value;
     else if (Array.isArray(value))
         if (key === "commands") destination[key] = mergeCommands(value, <Array<Metadata.Command>>destination[key]);
+        else if (key === "constants") destination[key] = mergeConstants(value, <Array<Metadata.Constant>>destination[key]);
         else destination[key] = (<unknown[]>destination[key]).concat(value);
     else if (typeof value === "object")
         mergeObject(<never>value, <never>destination[key]);
@@ -41,6 +42,16 @@ function mergeCommands(custom: Array<Metadata.Command>, builtins: Array<Metadata
         else commands.push(mergeOverriddenCommand(overridden!, builtin));
     }
     return commands.concat(custom.filter(c => !commands.includes(c)));
+}
+
+function mergeConstants(custom: Array<Metadata.Constant>, builtins: Array<Metadata.Constant>) {
+    const constants: Array<Metadata.Constant> = [];
+    for (const builtin of builtins) {
+        const overridden = custom.find(c => c.name === builtin.name);
+        if (overridden == null) constants.push(builtin);
+        else constants.push(overridden);
+    }
+    return constants;
 }
 
 function mergeOverriddenCommand(overridden: Metadata.Command, builtin: Metadata.Command) {
