@@ -27,25 +27,40 @@ function mergeKey(key: string, value: unknown, destination: Record<string, unkno
         destination[key] = value;
     else if (Array.isArray(value))
         if (key === "commands") destination[key] = mergeCommands(value, <Array<Metadata.Command>>destination[key]);
+        else if (key === "constants") destination[key] = mergeConstants(value, <Array<Metadata.Constant>>destination[key]);
         else destination[key] = (<unknown[]>destination[key]).concat(value);
     else if (typeof value === "object")
         mergeObject(<never>value, <never>destination[key]);
+    else destination[key] = value;
 }
 
-function mergeCommands(custom: Array<Metadata.Command>, builtin: Array<Metadata.Command>) {
+function mergeCommands(custom: Array<Metadata.Command>, builtins: Array<Metadata.Command>) {
     const commands: Array<Metadata.Command> = [];
-    for (const command of builtin) {
-        const overridden = custom.find(c => c.alias != null && c.alias === command.alias);
-        if (overridden == null) commands.push(command);
-        else commands.push(mergeOverriddenCommand(overridden!, command));
+    for (const builtin of builtins) {
+        const overridden = custom.find(c => c.id === builtin.id || c.alias != null && c.alias === builtin.alias);
+        if (overridden == null) commands.push(builtin);
+        else commands.push(mergeOverriddenCommand(overridden!, builtin));
     }
     return commands.concat(custom.filter(c => !commands.includes(c)));
 }
 
+function mergeConstants(custom: Array<Metadata.Constant>, builtins: Array<Metadata.Constant>) {
+    const constants: Array<Metadata.Constant> = [];
+    for (const builtin of builtins) {
+        const overridden = custom.find(c => c.name === builtin.name);
+        if (overridden == null) constants.push(builtin);
+        else constants.push(overridden);
+    }
+    return constants;
+}
+
 function mergeOverriddenCommand(overridden: Metadata.Command, builtin: Metadata.Command) {
-    overridden.summary ??= builtin.summary;
-    overridden.remarks ??= builtin.remarks;
-    overridden.examples ??= builtin.examples;
+    if (overridden.summary == null || overridden.summary.length === 0)
+        overridden.summary = builtin.summary;
+    if (overridden.remarks == null || overridden.remarks.length === 0)
+        overridden.remarks = builtin.remarks;
+    if (overridden.examples == null || overridden.examples.length === 0)
+        overridden.examples = builtin.examples;
     overridden.parameters = mergeOverriddenParams(overridden.parameters, builtin.parameters);
     return overridden;
 }
@@ -53,6 +68,7 @@ function mergeOverriddenCommand(overridden: Metadata.Command, builtin: Metadata.
 function mergeOverriddenParams(overridden: Array<Metadata.Parameter>, builtin: Array<Metadata.Parameter>) {
     const lengthDelta = overridden.length - builtin.length;
     for (let i = lengthDelta; i < overridden.length; i++)
-        overridden[i].summary = builtin[i - lengthDelta].summary;
+        if (overridden[i].summary == null || overridden[i].summary!.length === 0)
+            overridden[i].summary = builtin[i - lengthDelta].summary;
     return overridden;
 }

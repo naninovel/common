@@ -1,3 +1,5 @@
+using Naninovel.Parsing;
+
 namespace Naninovel.Metadata.Test;
 
 public class ProviderTest
@@ -106,8 +108,12 @@ public class ProviderTest
     [Fact]
     public void PreferencesAreCopied ()
     {
-        var prefs = new Preferences();
+        var prefs = new Preferences {
+            Identifiers = new Identifiers { True = "+" }
+        };
         var provider = new MetadataProvider(new Project { Preferences = prefs });
         Assert.NotSame(prefs, provider.Preferences);
+        Assert.NotSame(prefs.Identifiers, provider.Preferences.Identifiers);
+        Assert.Equal("+", provider.Preferences.Identifiers.True);
     }
 }

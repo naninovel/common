@@ -1,4 +1,8 @@
-namespace Naninovel.Utilities;
+namespace Naninovel.Utilities; // Don't remove Utilities sub-space
+// to prevent conflicts with common string utils in Unity runtime.
+// Don't use this utils in Unity runtime, as this version has breaking changes, such as
+// GetBefore/After returning empty string instead of null, which causes all sorts of shit.
+// This can be consolidated after moving to v2 of runtime.
 
 /// <summary>
 /// Common text-related helpers and extensions.

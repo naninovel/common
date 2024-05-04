@@ -39,4 +39,14 @@ public class ValueValidatorTest
     {
         Assert.Equal(expected, validator.Validate(value, container, type));
     }
+
+    [Fact]
+    public void RespectsLocalizedBoolean ()
+    {
+        var validator = new ValueValidator(new Identifiers { True = "+", False = "-" });
+        Assert.True(validator.Validate("+", ValueContainerType.Single, ValueType.Boolean));
+        Assert.True(validator.Validate("-", ValueContainerType.Single, ValueType.Boolean));
+        Assert.False(validator.Validate("true", ValueContainerType.Single, ValueType.Boolean));
+        Assert.False(validator.Validate("false", ValueContainerType.Single, ValueType.Boolean));
+    }
 }

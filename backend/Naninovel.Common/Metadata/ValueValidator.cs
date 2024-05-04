@@ -61,7 +61,9 @@ public class ValueValidator (Identifiers ids)
         if (string.IsNullOrWhiteSpace(value)) return type == ValueType.String;
         if (type == ValueType.Integer) return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _);
         if (type == ValueType.Decimal) return float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _);
-        if (type == ValueType.Boolean) return bool.TryParse(value, out _);
+        if (type == ValueType.Boolean)
+            return value.Equals(ids.True, StringComparison.OrdinalIgnoreCase) ||
+                   value.Equals(ids.False, StringComparison.OrdinalIgnoreCase);
         return true;
     }
 }
