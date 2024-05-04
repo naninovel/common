@@ -1,6 +1,6 @@
 {
     "name": "@naninovel/common",
-    "version": "1.2.23",
+    "version": "1.2.24",
     "description": "Systems used by multiple consumers: runtime, editor, language server, etc.",
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts",
