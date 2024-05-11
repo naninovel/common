@@ -5,7 +5,7 @@ namespace Naninovel.Parsing.Test;
 
 public class LexerTest (ITestOutputHelper output)
 {
-    private static readonly Lexer lexer = new();
+    private static readonly Lexer lexer = new(Syntax.Default);
 
     [Fact]
     public void NullLineThrowsException ()
@@ -43,7 +43,7 @@ public class LexerTest (ITestOutputHelper output)
     public void CanOverrideDefaultIdentifiers ()
     {
         var tokens = new List<Token>();
-        var lexer = new Lexer(new() { ParameterAssign = "=" });
+        var lexer = new Lexer(new Syntax { ParameterAssign = "=" });
         lexer.TokenizeCommandBody("x y=z", tokens);
         Assert.Equal(6, tokens.Count);
         Assert.Equal(new Token(TokenType.CommandId, 0, 1), tokens[0]);

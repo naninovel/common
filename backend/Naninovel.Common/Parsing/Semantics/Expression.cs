@@ -12,6 +12,6 @@ public class Expression (PlainText body) : ILineComponent, IValueComponent
 
     public override string ToString ()
     {
-        return $"{Identifiers.Default.ExpressionOpen}{Body}{Identifiers.Default.ExpressionClose}";
+        return $"{Syntax.Default.ExpressionOpen}{Body}{Syntax.Default.ExpressionClose}";
     }
 }

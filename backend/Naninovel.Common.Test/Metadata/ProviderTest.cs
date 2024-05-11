@@ -106,14 +106,11 @@ public class ProviderTest
     }
 
     [Fact]
-    public void PreferencesAreCopied ()
+    public void SyntaxIsCopied ()
     {
-        var prefs = new Preferences {
-            Identifiers = new Identifiers { True = "+" }
-        };
-        var provider = new MetadataProvider(new Project { Preferences = prefs });
-        Assert.NotSame(prefs, provider.Preferences);
-        Assert.NotSame(prefs.Identifiers, provider.Preferences.Identifiers);
-        Assert.Equal("+", provider.Preferences.Identifiers.True);
+        var syntax = new Syntax { True = "+" };
+        var provider = new MetadataProvider(new Project { Syntax = syntax });
+        Assert.NotSame(syntax, provider.Syntax);
+        Assert.Equal("+", provider.Syntax.True);
     }
 }

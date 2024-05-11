@@ -1,6 +1,6 @@
 namespace Naninovel.Parsing;
 
-internal class LexState (Identifiers ids)
+internal class LexState (ISyntax stx)
 {
     public int Index { get; private set; }
     public int Length => text.Length;
@@ -12,7 +12,7 @@ internal class LexState (Identifiers ids)
     public bool IsPreviousSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index - 1));
     public bool IsNextSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index + 1));
 
-    private readonly Utilities utils = new(ids);
+    private readonly Utilities utils = new(stx);
     private string text = "";
     private int startIndentIndex = -1;
     private ICollection<Token> tokens = Array.Empty<Token>();

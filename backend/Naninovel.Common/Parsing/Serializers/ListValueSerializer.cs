@@ -6,9 +6,9 @@ namespace Naninovel.Parsing;
 /// Allows transforming list values parsed via
 /// <see cref="ListValueParser"/> back to semantic model.
 /// </summary>
-public class ListValueSerializer (Identifiers ids)
+public class ListValueSerializer (ISyntax stx)
 {
-    private readonly Utilities utils = new(ids);
+    private readonly Utilities utils = new(stx);
     private readonly StringBuilder builder = new();
 
     public string Serialize (IReadOnlyList<string?> value)
@@ -22,14 +22,14 @@ public class ListValueSerializer (Identifiers ids)
     private void AppendElement (IReadOnlyList<string?> value, int index)
     {
         var element = value[index];
-        if (index > 0) builder.Append(ids.ListDelimiter[0]);
+        if (index > 0) builder.Append(stx.ListDelimiter[0]);
         if (element != null) builder.Append(EscapeElement(element));
     }
 
     private string EscapeElement (string element)
     {
         for (int i = element.Length - 1; i >= 0; i--)
-            if (element[i] == ids.ListDelimiter[0] && !utils.IsEscaped(element, i))
+            if (element[i] == stx.ListDelimiter[0] && !utils.IsEscaped(element, i))
                 element = element.Insert(i, "\\");
         return element;
     }

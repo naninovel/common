@@ -4,7 +4,7 @@ namespace Naninovel.Metadata.Test;
 
 public class ValueValidatorTest
 {
-    private readonly ValueValidator validator = new(Identifiers.Default);
+    private readonly ValueValidator validator = new(Syntax.Default);
 
     [Theory]
     [InlineData(null, ValueContainerType.Single, ValueType.String, true)]
@@ -43,7 +43,7 @@ public class ValueValidatorTest
     [Fact]
     public void RespectsLocalizedBoolean ()
     {
-        var validator = new ValueValidator(new Identifiers { True = "+", False = "-" });
+        var validator = new ValueValidator(new Syntax { True = "+", False = "-" });
         Assert.True(validator.Validate("+", ValueContainerType.Single, ValueType.Boolean));
         Assert.True(validator.Validate("-", ValueContainerType.Single, ValueType.Boolean));
         Assert.False(validator.Validate("true", ValueContainerType.Single, ValueType.Boolean));

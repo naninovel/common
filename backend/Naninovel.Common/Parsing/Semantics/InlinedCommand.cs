@@ -13,6 +13,6 @@ public class InlinedCommand (Command command) : ILineComponent, IGenericContent
 
     public override string ToString ()
     {
-        return $"{Identifiers.Default.InlinedOpen}{Command}{Identifiers.Default.InlinedClose}";
+        return $"{Syntax.Default.InlinedOpen}{Command}{Syntax.Default.InlinedClose}";
     }
 }

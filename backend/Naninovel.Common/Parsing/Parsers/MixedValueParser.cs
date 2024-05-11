@@ -1,8 +1,8 @@
 namespace Naninovel.Parsing;
 
-internal class MixedValueParser (bool unwrap, Identifiers ids)
+internal class MixedValueParser (bool unwrap, ISyntax stx)
 {
-    private readonly Utilities utils = new(ids);
+    private readonly Utilities utils = new(stx);
     private readonly List<IValueComponent> value = [];
     private readonly Queue<Token> expressions = new();
     private readonly Queue<Token> textIds = new();
@@ -143,7 +143,7 @@ internal class MixedValueParser (bool unwrap, Identifiers ids)
 
     private string UnescapeAuthor (string value)
     {
-        var target = $"\\{ids.AuthorAssign}";
+        var target = $"\\{stx.AuthorAssign}";
         var targetIndex = value.IndexOf(target, StringComparison.Ordinal);
         if (targetIndex < 1) return value;
         for (int i = 0; i < targetIndex; i++)

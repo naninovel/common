@@ -10,7 +10,7 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
     public Dictionary<string, string> Identifications { get; } = new();
 
     private readonly Func<string, IReadOnlyList<Token>, TLine> parse;
-    private readonly Lexer lexer = new();
+    private readonly Lexer lexer = new(Syntax.Default);
 
     public ParseTestHelper (Func<ParseOptions, Func<string, IReadOnlyList<Token>, TLine>> ctor)
     {
@@ -26,7 +26,7 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
             TextIdentifier = identifier.Object
         };
         var options = new ParseOptions {
-            Identifiers = Identifiers.Default,
+            Syntax = Syntax.Default,
             Handlers = handlers
         };
         parse = ctor(options);

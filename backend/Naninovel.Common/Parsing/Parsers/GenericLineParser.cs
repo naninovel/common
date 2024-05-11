@@ -4,11 +4,11 @@ namespace Naninovel.Parsing;
 
 public class GenericLineParser (ParseOptions options)
 {
-    private readonly CommandParser commandParser = new(options.Identifiers);
-    private readonly MixedValueParser valueParser = new(false, options.Identifiers);
+    private readonly CommandParser commandParser = new(options.Syntax);
+    private readonly MixedValueParser valueParser = new(false, options.Syntax);
     private readonly List<IGenericContent> content = [];
     private readonly LineWalker walker = new(options.Handlers);
-    private readonly Identifiers ids = options.Identifiers;
+    private readonly ISyntax stx = options.Syntax;
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
 
@@ -98,7 +98,7 @@ public class GenericLineParser (ParseOptions options)
     private bool IsEmptyInlined (Token openInlinedToken)
     {
         return walker.TryGetCharAt(openInlinedToken.EndIndex + 1, out var next) &&
-               next == ids.InlinedClose[0];
+               next == stx.InlinedClose[0];
     }
 
     private void ParseInlined ()

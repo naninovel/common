@@ -8,7 +8,7 @@ public class ParseOptions
     /// <summary>
     /// Control symbols identifying NaniScript lexical artifacts.
     /// </summary>
-    public Identifiers Identifiers { get; set; } = new();
+    public ISyntax Syntax { get; set; } = Parsing.Syntax.Default;
     /// <summary>
     /// Parsing hooks.
     /// </summary>

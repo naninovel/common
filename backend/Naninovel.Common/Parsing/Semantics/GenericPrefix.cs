@@ -23,10 +23,10 @@ public class GenericPrefix (PlainText author,
         var builder = new StringBuilder(Author.Text);
         if (Appearance != null)
         {
-            builder.Append(Identifiers.Default.AuthorAppearance);
+            builder.Append(Syntax.Default.AuthorAppearance);
             builder.Append(Appearance);
         }
-        builder.Append(Identifiers.Default.AuthorAssign);
+        builder.Append(Syntax.Default.AuthorAssign);
         return builder.ToString();
     }
 }

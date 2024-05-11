@@ -5,17 +5,17 @@ public class Lexer
     private readonly LexState state;
     private readonly CommandBodyLexer commandLexer;
     private readonly GenericLineLexer genericLineLexer;
-    private readonly Identifiers ids;
+    private readonly ISyntax stx;
 
-    public Lexer (Identifiers? identifiers = null)
+    public Lexer (ISyntax syntax)
     {
-        ids = identifiers ?? Identifiers.Default;
-        state = new LexState(ids);
-        var expressionLexer = new ExpressionLexer(ids);
-        var textIdLexer = new TextIdentifierLexer(ids);
-        var parameterLexer = new CommandParameterLexer(expressionLexer, textIdLexer, ids);
-        commandLexer = new CommandBodyLexer(parameterLexer, ids);
-        genericLineLexer = new GenericLineLexer(expressionLexer, commandLexer, textIdLexer, ids);
+        stx = syntax;
+        state = new LexState(stx);
+        var expressionLexer = new ExpressionLexer(stx);
+        var textIdLexer = new TextIdentifierLexer(stx);
+        var parameterLexer = new CommandParameterLexer(expressionLexer, textIdLexer, stx);
+        commandLexer = new CommandBodyLexer(parameterLexer, stx);
+        genericLineLexer = new GenericLineLexer(expressionLexer, commandLexer, textIdLexer, stx);
     }
 
     public LineType TokenizeLine (string text, ICollection<Token> tokens)
@@ -43,7 +43,7 @@ public class Lexer
 
     private LineType? TryCommentLine ()
     {
-        if (!state.Is(ids.CommentLine[0])) return null;
+        if (!state.Is(stx.CommentLine[0])) return null;
         AddLineIdentifier();
         AddCommentText();
         return LineType.Comment;
@@ -63,7 +63,7 @@ public class Lexer
 
     private LineType? TryLabelLine ()
     {
-        if (!state.Is(ids.LabelLine[0])) return null;
+        if (!state.Is(stx.LabelLine[0])) return null;
         AddLineIdentifier();
         AddLabelText();
         CheckSpaceInText();
@@ -90,7 +90,7 @@ public class Lexer
 
     private LineType? TryCommandLine ()
     {
-        if (!state.Is(ids.CommandLine[0])) return null;
+        if (!state.Is(stx.CommandLine[0])) return null;
         AddLineIdentifier();
         commandLexer.AddCommandBody(state, false);
         return LineType.Command;

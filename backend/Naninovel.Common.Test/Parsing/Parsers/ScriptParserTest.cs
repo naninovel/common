@@ -8,7 +8,7 @@ public class ScriptParserTest
     public ScriptParserTest ()
     {
         var options = new ParseOptions {
-            Identifiers = Identifiers.Default,
+            Syntax = Syntax.Default,
             Handlers = new ParseHandlers { ErrorHandler = errors }
         };
         parser = new(options);
@@ -55,7 +55,7 @@ public class ScriptParserTest
     public void CanOverrideDefaultIdentifiers ()
     {
         var parser = new ScriptParser(new ParseOptions {
-            Identifiers = new() {
+            Syntax = new Syntax {
                 CommentLine = "/",
                 CommandLine = ":",
                 LabelLine = "%",

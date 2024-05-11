@@ -202,9 +202,9 @@ public class Parser (ParseOptions options)
 
     private IExpression TryBoolean (string name)
     {
-        if (name.Equals(options.Identifiers.True, StringComparison.OrdinalIgnoreCase))
+        if (name.Equals(options.Syntax.True, StringComparison.OrdinalIgnoreCase))
             return new Boolean(true);
-        if (name.Equals(options.Identifiers.False, StringComparison.OrdinalIgnoreCase))
+        if (name.Equals(options.Syntax.False, StringComparison.OrdinalIgnoreCase))
             return new Boolean(false);
         return DoVariable(name);
     }

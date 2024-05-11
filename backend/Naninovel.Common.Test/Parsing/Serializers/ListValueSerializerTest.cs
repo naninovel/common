@@ -2,7 +2,7 @@
 
 public class ListValueSerializerTest
 {
-    private readonly ListValueSerializer serializer = new(Identifiers.Default);
+    private readonly ListValueSerializer serializer = new(Syntax.Default);
 
     [Fact]
     public void WhenEmptyReturnsEmpty ()

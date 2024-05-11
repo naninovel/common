@@ -8,5 +8,5 @@ namespace Naninovel.Expression;
 public class ParseOptions
 {
     public Action<ParseDiagnostic>? HandleDiagnostic { get; set; }
-    public Identifiers Identifiers { get; set; } = Identifiers.Default;
+    public ISyntax Syntax { get; set; } = Parsing.Syntax.Default;
 }

@@ -1,25 +1,25 @@
 namespace Naninovel.Parsing;
 
-internal class CommandBodyLexer (CommandParameterLexer parameterLexer, Identifiers ids)
+internal class CommandBodyLexer (CommandParameterLexer parameterLexer, ISyntax stx)
 {
     private LexState state = null!;
     private int bodyStartIndex;
     private bool inlined;
 
-    public static bool IsInlinedOpening (LexState state, Identifiers ids)
+    public static bool IsInlinedOpening (LexState state, ISyntax stx)
     {
-        return state.IsUnescaped(ids.InlinedOpen[0]);
+        return state.IsUnescaped(stx.InlinedOpen[0]);
     }
 
-    public static bool IsEndReached (LexState state, bool inlined, Identifiers ids)
+    public static bool IsEndReached (LexState state, bool inlined, ISyntax stx)
     {
-        if (inlined && state.IsUnescaped(ids.InlinedClose[0])) return true;
+        if (inlined && state.IsUnescaped(stx.InlinedClose[0])) return true;
         return state.EndReached;
     }
 
-    public static bool IsLast (LexState state, bool inlined, Identifiers ids)
+    public static bool IsLast (LexState state, bool inlined, ISyntax stx)
     {
-        if (inlined && state.IsNextUnescaped(ids.InlinedClose[0])) return true;
+        if (inlined && state.IsNextUnescaped(stx.InlinedClose[0])) return true;
         return state.IsLast;
     }
 
@@ -47,7 +47,7 @@ internal class CommandBodyLexer (CommandParameterLexer parameterLexer, Identifie
         if (length <= 0) AddMissingId();
         else state.AddToken(TokenType.CommandId, startIndex, length);
 
-        bool ShouldMove () => state.IsNotSpace && !IsEndReached(state, inlined, ids);
+        bool ShouldMove () => state.IsNotSpace && !IsEndReached(state, inlined, stx);
 
         void AddMissingId ()
         {
@@ -60,7 +60,7 @@ internal class CommandBodyLexer (CommandParameterLexer parameterLexer, Identifie
     private void AddParameters ()
     {
         state.SkipSpace();
-        if (IsEndReached(state, inlined, ids)) return;
+        if (IsEndReached(state, inlined, stx)) return;
         parameterLexer.AddParameters(state, inlined);
     }
 

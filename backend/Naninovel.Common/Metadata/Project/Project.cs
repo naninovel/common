@@ -1,4 +1,6 @@
-﻿namespace Naninovel.Metadata;
+﻿using Naninovel.Parsing;
+
+namespace Naninovel.Metadata;
 
 /// <summary>
 /// Describes a Naninovel project.
@@ -30,7 +32,7 @@ public class Project
     /// </summary>
     public string[] Functions { get; set; } = [];
     /// <summary>
-    /// Project-wide shared developer preferences.
+    /// Project-specific NaniScript syntax.
     /// </summary>
-    public Preferences Preferences { get; set; } = new();
+    public Syntax Syntax { get; set; } = new();
 }

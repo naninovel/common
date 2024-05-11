@@ -4,7 +4,7 @@ namespace Naninovel.Parsing.Test;
 
 public class ErrorHandlerTest
 {
-    private readonly Lexer lexer = new();
+    private readonly Lexer lexer = new(Syntax.Default);
     private readonly List<Token> tokens = [];
 
     [Fact]

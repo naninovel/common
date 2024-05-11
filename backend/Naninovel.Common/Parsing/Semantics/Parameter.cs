@@ -37,7 +37,7 @@ public class Parameter (PlainText? identifier, MixedValue value)
         if (!Nameless)
         {
             builder.Append(Identifier!);
-            builder.Append(Identifiers.Default.ParameterAssign);
+            builder.Append(Syntax.Default.ParameterAssign);
         }
         builder.Append(Value);
         return builder.ToString();

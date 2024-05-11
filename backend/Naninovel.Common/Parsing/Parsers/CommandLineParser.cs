@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 public class CommandLineParser (ParseOptions options)
 {
     private static readonly Command emptyBody = new(PlainText.Empty, Array.Empty<Parameter>());
-    private readonly CommandParser commandParser = new(options.Identifiers);
+    private readonly CommandParser commandParser = new(options.Syntax);
     private readonly LineWalker walker = new(options.Handlers);
     private Command command = emptyBody;
 

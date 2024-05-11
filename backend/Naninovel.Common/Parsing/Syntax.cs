@@ -1,11 +1,12 @@
 namespace Naninovel.Parsing;
 
-/// <summary>
-/// Control symbols identifying NaniScript lexical artifacts.
-/// </summary>
-public class Identifiers
+/// <inheritdoc cref="ISyntax"/>
+public class Syntax : ISyntax
 {
-    public static readonly Identifiers Default = new();
+    /// <summary>
+    /// Canonical syntax.
+    /// </summary>
+    public static readonly Syntax Default = new();
 
     public string CommentLine { get; set; } = ";";
     public string LabelLine { get; set; } = "#";

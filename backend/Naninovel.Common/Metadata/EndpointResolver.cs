@@ -5,8 +5,10 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Allows resolving <see cref="Endpoint"/> from parsed commands.
 /// </summary>
-public class EndpointResolver (MetadataProvider provider)
+public class EndpointResolver (IMetadataProvider meta)
 {
+    private readonly NamedValueParser namedParser = new(meta.Syntax);
+
     /// <summary>
     /// When specified command has a parameter with navigation context (script name and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
@@ -35,7 +37,6 @@ public class EndpointResolver (MetadataProvider provider)
     {
         if (HasEndpointContext(commandAliasOrId, parameter.Identifier))
         {
-            var namedParser = new NamedValueParser(provider.Preferences.Identifiers);
             var (script, label) = namedParser.Parse(parameter.Value.ToString());
             endpoint = new Endpoint(script, label);
             return true;
@@ -46,7 +47,7 @@ public class EndpointResolver (MetadataProvider provider)
 
     private bool HasEndpointContext (string commandAliasOrId, string? paramAliasOrId)
     {
-        var param = provider.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
+        var param = meta.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
         if (param?.ValueContext is null ||
             param.ValueContext.Length != 2 ||
             param.ValueContext.Any(c => c is null)) return false;

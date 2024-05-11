@@ -2,7 +2,7 @@
 
 public class ScriptSerializerTest
 {
-    private readonly ScriptSerializer serializer = new(Identifiers.Default);
+    private readonly ScriptSerializer serializer = new(Syntax.Default);
 
     [Fact]
     public void CanSerializeCommentLine ()

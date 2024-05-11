@@ -1,13 +1,13 @@
 namespace Naninovel.Parsing;
 
-internal class Utilities (Identifiers ids)
+internal class Utilities (ISyntax stx)
 {
     public bool IsPlainTextControlChar (char ch, char next = default)
     {
         if (ch == '\\') return true;
-        if (ch == ids.ExpressionOpen[0] || ch == ids.ExpressionClose[0]) return true;
-        if (ch == ids.InlinedOpen[0] || ch == ids.InlinedClose[0]) return true;
-        if (ch == ids.TextIdOpen[0] && next == ids.TextIdOpen[1]) return true;
+        if (ch == stx.ExpressionOpen[0] || ch == stx.ExpressionClose[0]) return true;
+        if (ch == stx.InlinedOpen[0] || ch == stx.InlinedClose[0]) return true;
+        if (ch == stx.TextIdOpen[0] && next == stx.TextIdOpen[1]) return true;
         return false;
     }
 

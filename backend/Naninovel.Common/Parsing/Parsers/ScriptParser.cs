@@ -19,7 +19,7 @@ public class ScriptParser
     public ScriptParser (ParseOptions? options = null)
     {
         options ??= new ParseOptions();
-        lexer = new Lexer(options.Identifiers);
+        lexer = new Lexer(options.Syntax);
         commandParser = new(options);
         commentParser = new(options);
         genericParser = new(options);
