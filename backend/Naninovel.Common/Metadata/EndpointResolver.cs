@@ -5,7 +5,7 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Allows resolving <see cref="Endpoint"/> from parsed commands.
 /// </summary>
-public class EndpointResolver (IMetadataProvider meta)
+public class EndpointResolver (IMetadata meta)
 {
     private readonly NamedValueParser namedParser = new(meta.Syntax);
 

@@ -3,9 +3,9 @@ using Naninovel.Parsing;
 namespace Naninovel.Metadata;
 
 /// <summary>
-/// Provides access to Naninovel project metadata.
+/// Provides access to current Naninovel project metadata.
 /// </summary>
-public interface IMetadataProvider
+public interface IMetadata
 {
     /// <inheritdoc cref="Project.Actors"/>
     public IReadOnlyCollection<Actor> Actors { get; }

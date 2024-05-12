@@ -12,6 +12,7 @@ public class SyntaxProvider : ISyntax
     public string CommandLine { get; private set; } = Syntax.Default.CommandLine;
     public string AuthorAssign { get; private set; } = Syntax.Default.AuthorAssign;
     public string AuthorAppearance { get; private set; } = Syntax.Default.AuthorAppearance;
+    public string ParametrizeGeneric { get; private set; } = Syntax.Default.ParametrizeGeneric;
     public string ExpressionOpen { get; private set; } = Syntax.Default.ExpressionOpen;
     public string ExpressionClose { get; private set; } = Syntax.Default.ExpressionClose;
     public string InlinedOpen { get; private set; } = Syntax.Default.InlinedOpen;
@@ -32,6 +33,7 @@ public class SyntaxProvider : ISyntax
         CommandLine = stx.CommandLine;
         AuthorAssign = stx.AuthorAssign;
         AuthorAppearance = stx.AuthorAppearance;
+        ParametrizeGeneric = stx.ParametrizeGeneric;
         ExpressionOpen = stx.ExpressionOpen;
         ExpressionClose = stx.ExpressionClose;
         InlinedOpen = stx.InlinedOpen;

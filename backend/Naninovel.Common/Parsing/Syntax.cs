@@ -13,6 +13,7 @@ public class Syntax : ISyntax
     public string CommandLine { get; set; } = "@";
     public string AuthorAssign { get; set; } = ": ";
     public string AuthorAppearance { get; set; } = ".";
+    public string ParametrizeGeneric { get; set; } = "<";
     public string ExpressionOpen { get; set; } = "{";
     public string ExpressionClose { get; set; } = "}";
     public string InlinedOpen { get; set; } = "[";

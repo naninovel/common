@@ -26,6 +26,11 @@ public interface ISyntax
     /// </summary>
     string AuthorAppearance { get; }
     /// <summary>
+    /// When specified as inlined command identifier, hints the command intent is to apply
+    /// parameters to print command handling previous text part of <see cref="GenericLine"/>.
+    /// </summary>
+    string ParametrizeGeneric { get; }
+    /// <summary>
     /// Identifies start of <see cref="Expression"/>.
     /// </summary>
     string ExpressionOpen { get; }

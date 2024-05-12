@@ -5,7 +5,7 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Hosts and provides access to current Naninovel project metadata.
 /// </summary>
-public class MetadataProvider : IMetadataProvider
+public class MetadataProvider : IMetadata
 {
     public IReadOnlyCollection<Actor> Actors => actors;
     public IReadOnlyCollection<Command> Commands => commands;
