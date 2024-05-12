@@ -8,6 +8,7 @@ public class Syntax : ISyntax
     /// </summary>
     public static readonly Syntax Default = new();
 
+    // TODO: Change to init-only on runtime upgrade.
     public string CommentLine { get; set; } = ";";
     public string LabelLine { get; set; } = "#";
     public string CommandLine { get; set; } = "@";
