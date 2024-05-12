@@ -108,7 +108,7 @@ public class ProviderTest
     [Fact]
     public void SyntaxIsCopied ()
     {
-        var syntax = new Syntax { True = "+" };
+        var syntax = new Syntax(@true: "+");
         var provider = new MetadataProvider(new Project { Syntax = syntax });
         Assert.NotSame(syntax, provider.Syntax);
         Assert.Equal("+", provider.Syntax.True);

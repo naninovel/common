@@ -43,7 +43,7 @@ public class ValueValidatorTest
     [Fact]
     public void RespectsLocalizedBoolean ()
     {
-        var validator = new ValueValidator(new Syntax { True = "+", False = "-" });
+        var validator = new ValueValidator(new Syntax(@true: "+", @false: "-"));
         Assert.True(validator.Validate("+", ValueContainerType.Single, ValueType.Boolean));
         Assert.True(validator.Validate("-", ValueContainerType.Single, ValueType.Boolean));
         Assert.False(validator.Validate("true", ValueContainerType.Single, ValueType.Boolean));

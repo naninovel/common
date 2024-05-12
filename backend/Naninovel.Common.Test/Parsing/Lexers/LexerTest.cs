@@ -43,7 +43,7 @@ public class LexerTest (ITestOutputHelper output)
     public void CanOverrideDefaultIdentifiers ()
     {
         var tokens = new List<Token>();
-        var lexer = new Lexer(new Syntax { ParameterAssign = "=" });
+        var lexer = new Lexer(new Syntax(parameterAssign: "="));
         lexer.TokenizeCommandBody("x y=z", tokens);
         Assert.Equal(6, tokens.Count);
         Assert.Equal(new Token(TokenType.CommandId, 0, 1), tokens[0]);

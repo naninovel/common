@@ -55,16 +55,16 @@ public class ScriptParserTest
     public void CanOverrideDefaultIdentifiers ()
     {
         var parser = new ScriptParser(new ParseOptions {
-            Syntax = new Syntax {
-                CommentLine = "/",
-                CommandLine = ":",
-                LabelLine = "%",
-                ParameterAssign = "=",
-                InlinedOpen = "(",
-                InlinedClose = ")",
-                True = "да",
-                False = "нет"
-            }
+            Syntax = new Syntax(
+                commentLine: "/",
+                commandLine: ":",
+                labelLine: "%",
+                parameterAssign: "=",
+                inlinedOpen: "(",
+                inlinedClose: ")",
+                @true: "да",
+                @false: "нет"
+            )
         });
         var lines = parser.ParseText(
             """
