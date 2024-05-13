@@ -27,6 +27,16 @@ test("can merge with object", () => {
     expect(merged.object.bar).toEqual("bar");
 });
 
+test("can merge constants", () => {
+    const merged = merge(
+        { constants: [{ name: "foo", values: ["1", "2"] }] },
+        { constants: [{ name: "bar", values: ["3", "4"] }] }
+    );
+    expect(merged.constants).toHaveLength(2);
+    expect(merged.constants).toContainEqual({ name: "foo", values: ["1", "2"] });
+    expect(merged.constants).toContainEqual({ name: "bar", values: ["3", "4"] });
+});
+
 test("overrides object on merge", () => {
     const merged = merge({ object: { foo: "foo" } }, { object: { foo: "bar" } });
     expect(merged.object.foo).toEqual("bar");
@@ -38,6 +48,14 @@ test("replaces overridden commands by alias", () => {
     const merged = merge(def, custom);
     expect(merged.commands.filter(c => c.alias === "foo").length).toEqual(1);
     expect(merged.commands.filter(c => c.alias === "foo")[0].id).toEqual("custom");
+});
+
+test("replaces overridden constant values", () => {
+    const def = { constants: [{ name: "foo", values: ["a", "b", "c"] }] };
+    const custom = { constants: [{ name: "foo", values: ["x", "y", "z"] }] };
+    const merged = merge(def, custom);
+    expect(merged.constants).toHaveLength(1);
+    expect(merged.constants).toContainEqual({ name: "foo", values: ["x", "y", "z"] });
 });
 
 test("transfers docs to the overridden commands and parameters", () => {

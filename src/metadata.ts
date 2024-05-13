@@ -51,7 +51,7 @@ function mergeConstants(custom: Array<Metadata.Constant>, builtins: Array<Metada
         if (overridden == null) constants.push(builtin);
         else constants.push(overridden);
     }
-    return constants;
+    return constants.concat(custom.filter(c => !constants.includes(c)));
 }
 
 function mergeOverriddenCommand(overridden: Metadata.Command, builtin: Metadata.Command) {
