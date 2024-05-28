@@ -8,6 +8,7 @@ namespace Naninovel.Bridging.Test;
 public partial class JsonTest
 {
     [JsonSerializable(typeof(Message))]
+    [JsonSerializable(typeof(IReadOnlyList<string>))]
     internal partial class AdditionalContext : JsonSerializerContext;
 
     [ExcludeFromCodeCoverage] public record Record (string Value);
@@ -37,6 +38,17 @@ public partial class JsonTest
     }
 
     [Fact]
+    public void CanSerializeCollectionExpressions ()
+    {
+        var options = new JsonSerializerOptions();
+        options.TypeInfoResolverChain.Add(AdditionalContext.Default);
+        var serializer = new JsonSerializer(options);
+        serializer.TrySerialize((IReadOnlyList<string>) ["foo", "bar"], typeof(IReadOnlyList<string>), out var serialized);
+        Assert.Equal("""["foo","bar"]""", serialized);
+        Assert.Equal("""["foo","bar"]""", serializer.SerializeOrNull((IReadOnlyList<string>) ["foo", "bar"], typeof(IReadOnlyList<string>)));
+    }
+
+    [Fact]
     public void ThrowsWhenMissingTypeInfo ()
     {
         var serializer = new JsonSerializer();
@@ -55,6 +67,7 @@ public partial class JsonTest
     public void FailsWhenSerializingNull ()
     {
         Assert.False(new JsonSerializer().TrySerialize(null, out _));
+        Assert.False(new JsonSerializer().TrySerialize(null, null, out _));
     }
 
     [Fact]

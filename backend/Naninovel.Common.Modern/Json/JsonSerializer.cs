@@ -15,6 +15,11 @@ public class JsonSerializer : ISerializer
     public string Serialize (object poco)
     {
         var type = poco.GetType();
+        return Serialize(poco, type);
+    }
+
+    public string Serialize (object poco, Type type)
+    {
         if (!Options.TryGetTypeInfo(type, out var info))
             throw new SerializeError($"Failed to serialize '{type.FullName}' object: missing type info.");
         return System.Text.Json.JsonSerializer.Serialize(poco, info);
