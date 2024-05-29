@@ -8,5 +8,6 @@ namespace Naninovel.Expression;
 public class ParseOptions
 {
     public Action<ParseDiagnostic>? HandleDiagnostic { get; set; }
+    public Action<ExpressionRange>? HandleRange { get; set; }
     public ISyntax Syntax { get; set; } = Parsing.Syntax.Default;
 }

@@ -5,13 +5,15 @@ public class ExpressionTest
     private class UnsupportedExpression : IExpression;
 
     private readonly Stack<ParseDiagnostic> diagnostics = [];
+    private readonly List<ExpressionRange> ranges = [];
     private readonly Parser parser;
     private readonly Evaluator evaluator;
 
     public ExpressionTest ()
     {
         parser = new Parser(new() {
-            HandleDiagnostic = diagnostics.Push
+            HandleDiagnostic = diagnostics.Push,
+            HandleRange = ranges.Add
         });
         evaluator = new(new() {
             ResolveVariable = ResolveVariable,
@@ -284,6 +286,26 @@ public class ExpressionTest
     public void ErrsWhenOperandValueCastFails ()
     {
         Assert.Throws<Error>(() => new String("foo").GetValue<double>());
+    }
+
+    [Fact]
+    public void MapsRanges ()
+    {
+        Assert.True(parser.TryParse(""" foo("bar", 2, true, baz) """, out _));
+        Assert.Contains(ranges, r => r.Expression is Function { Name: "foo" } && r.Index == 1 && r.Length == 24);
+        Assert.Contains(ranges, r => r.Expression is String { Value: "bar" } && r.Index == 5 && r.Length == 5);
+        Assert.Contains(ranges, r => r.Expression is Numeric { Value: 2 } && r.Index == 12 && r.Length == 1);
+        Assert.Contains(ranges, r => r.Expression is Boolean { Value: true } && r.Index == 15 && r.Length == 4);
+        Assert.Contains(ranges, r => r.Expression is Variable { Name: "baz" } && r.Index == 21 && r.Length == 3);
+    }
+
+    [Fact]
+    public void MapsRangesInAssignments ()
+    {
+        Assert.True(parser.TryParseAssignments("""foo=foo();bar=bar("baz")""", []));
+        Assert.Contains(ranges, r => r.Expression is Function { Name: "foo" } && r.Index == 4 && r.Length == 5);
+        Assert.Contains(ranges, r => r.Expression is Function { Name: "bar" } && r.Index == 14 && r.Length == 10);
+        Assert.Contains(ranges, r => r.Expression is String { Value: "baz" } && r.Index == 18 && r.Length == 5);
     }
 
     #pragma warning disable CS8509 // Ignore missing default arm.

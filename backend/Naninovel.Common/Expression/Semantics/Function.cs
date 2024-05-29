@@ -1,6 +1,9 @@
 namespace Naninovel.Expression;
 
-internal class Function (string name, IReadOnlyList<IExpression> @params) : IExpression
+/// <summary>
+/// Expression function.
+/// </summary>
+public class Function (string name, IReadOnlyList<IExpression> @params) : IExpression
 {
     /// <summary>
     /// Identifier of the function.

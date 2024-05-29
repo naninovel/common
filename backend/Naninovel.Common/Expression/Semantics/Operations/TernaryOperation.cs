@@ -1,6 +1,9 @@
 namespace Naninovel.Expression;
 
-internal class TernaryOperation (IExpression condition, IExpression truthy, IExpression falsy) : IExpression
+/// <summary>
+/// Boolean ternary operation.
+/// </summary>
+public class TernaryOperation (IExpression condition, IExpression truthy, IExpression falsy) : IExpression
 {
     /// <summary>
     /// Boolean expression determining whether <see cref="Truthy"/>

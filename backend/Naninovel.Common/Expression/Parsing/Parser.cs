@@ -10,7 +10,8 @@ public class Parser (ParseOptions options)
     private readonly Stack<Token> tokens = [];
     private readonly AssignmentParser assParser = new();
     private readonly List<(string var, string exp)> asses = [];
-    private int lastIdx, errOffset;
+    private Token lastToken;
+    private int assOffset;
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -47,12 +48,14 @@ public class Parser (ParseOptions options)
             assParser.Parse(text, asses);
             if (asses.Count == 0) return false;
 
-            errOffset = text.IndexOf(asses[0].exp, StringComparison.Ordinal);
-
-            foreach (var (var, assExp) in asses)
+            for (var i = 0; i < asses.Count; i++)
+            {
+                var (var, assExp) = asses[i];
+                assOffset = text.IndexOf(asses[i].exp, StringComparison.Ordinal);
                 if (TryParse(assExp, out var exp))
                     assignments.Add(new(var, exp));
                 else return false;
+            }
             return true;
         }
         catch (Error err)
@@ -62,14 +65,14 @@ public class Parser (ParseOptions options)
         }
         finally
         {
-            errOffset = 0;
+            assOffset = 0;
             asses.Clear();
         }
     }
 
     private void Reset (string text)
     {
-        lastIdx = 0;
+        lastToken = default;
         tokens.Clear();
         var lexed = lexer.Lex(text);
         for (var i = lexed.Length - 1; i >= 0; i--)
@@ -78,9 +81,15 @@ public class Parser (ParseOptions options)
 
     private void HandleError (string text, Error err)
     {
-        var index = errOffset + (err.Index ?? 0);
-        var length = (err.Length ?? text.Length - index) + errOffset;
+        var index = assOffset + (err.Index ?? 0);
+        var length = (err.Length ?? text.Length - index) + assOffset;
         options.HandleDiagnostic?.Invoke(new(index, length, err.Message));
+    }
+
+    private IExpression HandleRange (IExpression exp, int idx, int length)
+    {
+        options.HandleRange?.Invoke(new(exp, idx + assOffset, length));
+        return exp;
     }
 
     // Begin walking known expression morphemes, collapsing in order of associativity.
@@ -189,6 +198,8 @@ public class Parser (ParseOptions options)
     {
         if (!Is("(")) return TryBoolean(name);
 
+        var start = lastToken.Index - name.Length;
+
         Consume();
         var args = new List<IExpression>();
         while (!Is(")") && !IsEnd())
@@ -197,34 +208,41 @@ public class Parser (ParseOptions options)
             if (Is(",")) Consume();
         }
         Expect(")");
-        return new Function(name, args);
+
+        return HandleRange(new Function(name, args), start, lastToken.Index - start + 1);
     }
 
     private IExpression TryBoolean (string name)
     {
         if (name.Equals(options.Syntax.True, StringComparison.OrdinalIgnoreCase))
-            return new Boolean(true);
+            return HandleRange(new Boolean(true), lastToken.Index - name.Length, name.Length);
         if (name.Equals(options.Syntax.False, StringComparison.OrdinalIgnoreCase))
-            return new Boolean(false);
+            return HandleRange(new Boolean(false), lastToken.Index - name.Length, name.Length);
         return DoVariable(name);
     }
 
     private IExpression DoVariable (string name)
     {
-        return new Variable(name);
+        return HandleRange(new Variable(name), lastToken.Index - name.Length, lastToken.Content.Length);
     }
 
     private IExpression? TryString ()
     {
         if (token.Type == TokenType.String)
-            return new String(Consume().Content);
+        {
+            var value = Consume().Content;
+            return HandleRange(new String(value), lastToken.Index - value.Length - 2, value.Length + 2);
+        }
         return TryNumeric();
     }
 
     private IExpression? TryNumeric ()
     {
         if (token.Type == TokenType.Number)
-            return new Numeric(double.Parse(Consume().Content));
+        {
+            var value = Consume().Content;
+            return HandleRange(new Numeric(double.Parse(value)), lastToken.Index - value.Length, value.Length);
+        }
         return TryClosure();
     }
 
@@ -240,9 +258,7 @@ public class Parser (ParseOptions options)
 
     private Token Consume ()
     {
-        var popped = tokens.Pop();
-        lastIdx = popped.Index;
-        return popped;
+        return lastToken = tokens.Pop();
     }
 
     private void Expect (string content)
@@ -252,7 +268,7 @@ public class Parser (ParseOptions options)
         Consume();
     }
 
-    private Error Err (string message) => new(message, lastIdx);
+    private Error Err (string message) => new(message, lastToken.Index);
     private bool Is (string content) => token.Content == content;
     private bool IsOp () => token.Type == TokenType.Operator;
     private bool IsEnd () => tokens.Count == 0;

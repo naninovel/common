@@ -1,6 +1,9 @@
 namespace Naninovel.Expression;
 
-internal class Variable (string name) : IExpression
+/// <summary>
+/// Script variable.
+/// </summary>
+public class Variable (string name) : IExpression
 {
     /// <summary>
     /// Identifier of the variable.

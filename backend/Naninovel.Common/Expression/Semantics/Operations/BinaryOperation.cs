@@ -1,6 +1,9 @@
 namespace Naninovel.Expression;
 
-internal class BinaryOperation (IBinaryOperator op, IExpression lhs, IExpression rhs) : IExpression
+/// <summary>
+/// An operation over two operands.
+/// </summary>
+public class BinaryOperation (IBinaryOperator op, IExpression lhs, IExpression rhs) : IExpression
 {
     /// <summary>
     /// Operator to apply over the operands.

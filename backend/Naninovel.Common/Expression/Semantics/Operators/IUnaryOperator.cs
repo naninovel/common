@@ -1,6 +1,6 @@
 namespace Naninovel.Expression;
 
-internal interface IUnaryOperator
+public interface IUnaryOperator
 {
     IOperand Operate (IOperand operand);
 }
