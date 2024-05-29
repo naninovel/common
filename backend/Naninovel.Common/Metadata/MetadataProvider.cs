@@ -12,7 +12,7 @@ public class MetadataProvider : IMetadata
     public IReadOnlyCollection<Constant> Constants => constants;
     public IReadOnlyCollection<Resource> Resources => resources;
     public IReadOnlyCollection<string> Variables => variables;
-    public IReadOnlyCollection<string> Functions => functions;
+    public IReadOnlyCollection<Function> Functions => functions;
     public ISyntax Syntax => syntaxProvider;
 
     private readonly List<Actor> actors = [];
@@ -20,9 +20,10 @@ public class MetadataProvider : IMetadata
     private readonly List<Constant> constants = [];
     private readonly List<Resource> resources = [];
     private readonly List<string> variables = [];
-    private readonly List<string> functions = [];
+    private readonly List<Function> functions = [];
     private readonly Dictionary<string, Command> commandById = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Command> commandByAlias = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Function> functionByName = new(StringComparer.OrdinalIgnoreCase);
     private readonly SyntaxProvider syntaxProvider = new();
 
     public MetadataProvider () { }
@@ -42,6 +43,8 @@ public class MetadataProvider : IMetadata
         functions.AddRange(meta.Functions);
         foreach (var command in Commands)
             IndexCommand(command);
+        foreach (var fn in Functions)
+            functionByName[fn.Name] = fn;
         syntaxProvider.Update(meta.Syntax);
     }
 
@@ -64,6 +67,26 @@ public class MetadataProvider : IMetadata
         }
     }
 
+    public Function? FindFunction (string name)
+    {
+        return functionByName.TryGetValue(name, out var fn) ? fn : null;
+    }
+
+    public FunctionParameter? FindFunctionParameter (string functionName, string paramName)
+    {
+        var fn = FindFunction(functionName);
+        if (fn is null) return null;
+        foreach (var param in fn.Parameters)
+            if (string.Equals(param.Name, paramName, StringComparison.OrdinalIgnoreCase))
+                return param;
+        return null;
+    }
+
+    public FunctionParameter? FindFunctionParameter (string functionName, int index)
+    {
+        return FindFunction(functionName)?.Parameters.ElementAtOrDefault(index);
+    }
+
     private void Reset ()
     {
         actors.Clear();
@@ -74,6 +97,7 @@ public class MetadataProvider : IMetadata
         functions.Clear();
         commandById.Clear();
         commandByAlias.Clear();
+        functionByName.Clear();
     }
 
     private void IndexCommand (Command command)

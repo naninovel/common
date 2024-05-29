@@ -12,5 +12,5 @@ public class Constant
     /// <summary>
     /// The list of available values.
     /// </summary>
-    public string[] Values { get; set; } = Array.Empty<string>();
+    public string[] Values { get; set; } = [];
 }

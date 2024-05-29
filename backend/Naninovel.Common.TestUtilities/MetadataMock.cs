@@ -12,7 +12,7 @@ public class MetadataMock : IMetadata
     public List<Resource> Resources { get; set; } = [];
     public List<Constant> Constants { get; set; } = [];
     public List<string> Variables { get; set; } = [];
-    public List<string> Functions { get; set; } = [];
+    public List<Function> Functions { get; set; } = [];
     public Syntax Syntax { get; set; } = new();
 
     IReadOnlyCollection<Actor> IMetadata.Actors => Actors;
@@ -20,7 +20,7 @@ public class MetadataMock : IMetadata
     IReadOnlyCollection<Constant> IMetadata.Constants => Constants;
     IReadOnlyCollection<Resource> IMetadata.Resources => Resources;
     IReadOnlyCollection<string> IMetadata.Variables => Variables;
-    IReadOnlyCollection<string> IMetadata.Functions => Functions;
+    IReadOnlyCollection<Function> IMetadata.Functions => Functions;
     ISyntax IMetadata.Syntax => Syntax;
 
     public Project AsProject () => new() {
@@ -41,5 +41,20 @@ public class MetadataMock : IMetadata
     public Metadata.Parameter FindParameter (string commandAliasOrId, string paramAliasOrId)
     {
         return new MetadataProvider(AsProject()).FindParameter(commandAliasOrId, paramAliasOrId);
+    }
+
+    public Function FindFunction (string name)
+    {
+        return new MetadataProvider(AsProject()).FindFunction(name);
+    }
+
+    public FunctionParameter FindFunctionParameter (string functionName, string paramName)
+    {
+        return new MetadataProvider(AsProject()).FindFunctionParameter(functionName, paramName);
+    }
+
+    public FunctionParameter FindFunctionParameter (string functionName, int index)
+    {
+        return new MetadataProvider(AsProject()).FindFunctionParameter(functionName, index);
     }
 }

@@ -30,7 +30,7 @@ public class Project
     /// <summary>
     /// Expression functions available in the project.
     /// </summary>
-    public string[] Functions { get; set; } = [];
+    public Function[] Functions { get; set; } = [];
     /// <summary>
     /// Project-specific NaniScript syntax.
     /// </summary>

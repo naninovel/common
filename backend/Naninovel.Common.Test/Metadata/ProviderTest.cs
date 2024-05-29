@@ -95,14 +95,59 @@ public class ProviderTest
     }
 
     [Fact]
+    public void WhenFunctionNotFoundNullIsReturned ()
+    {
+        Assert.Null(provider.FindFunction(""));
+    }
+
+    [Fact]
+    public void WhenFunctionParameterNotFoundNullIsReturned ()
+    {
+        var meta = new Project { Functions = [new Function { Name = "foo" }] };
+        provider.Update(meta);
+        Assert.Null(provider.FindFunctionParameter("", ""));
+        Assert.Null(provider.FindFunctionParameter("", 0));
+        Assert.Null(provider.FindFunctionParameter("foo", ""));
+        Assert.Null(provider.FindFunctionParameter("foo", 0));
+    }
+
+    [Fact]
+    public void CanFindFunction ()
+    {
+        var meta = new Project { Functions = [new() { Name = "foo" }] };
+        provider.Update(meta);
+        Assert.Equal(meta.Functions[0], provider.FindFunction("foo"));
+    }
+
+    [Fact]
+    public void CanFindFunctionParameterByName ()
+    {
+        var param1 = new FunctionParameter { Name = "bar" };
+        var param2 = new FunctionParameter { Name = "baz" };
+        var meta = new Project { Functions = [new() { Name = "foo", Parameters = [param1, param2] }] };
+        provider.Update(meta);
+        Assert.Equal(meta.Functions[0].Parameters[1], provider.FindFunctionParameter("foo", "baz"));
+    }
+
+    [Fact]
+    public void CanFindFunctionParameterByIndex ()
+    {
+        var param1 = new FunctionParameter { Name = "bar" };
+        var param2 = new FunctionParameter { Name = "baz" };
+        var meta = new Project { Functions = [new() { Name = "foo", Parameters = [param1, param2] }] };
+        provider.Update(meta);
+        Assert.Equal(meta.Functions[0].Parameters[1], provider.FindFunctionParameter("foo", 1));
+    }
+
+    [Fact]
     public void CanCreateProviderWithMeta ()
     {
         var provider = new MetadataProvider(new() {
             Variables = ["foo"],
-            Functions = ["bar"]
+            Functions = [new() { Name = "bar" }]
         });
         Assert.Equal("foo", provider.Variables.First());
-        Assert.Equal("bar", provider.Functions.First());
+        Assert.Equal("bar", provider.Functions.First().Name);
     }
 
     [Fact]
