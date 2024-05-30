@@ -259,15 +259,15 @@ public class CommandLineParserTest
         Assert.Equal(new(1, 1), parser.Resolve(line.Command.Identifier));
         Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0]));
         Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value));
-        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value[0] as IdentifiedText));
+        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value[0]));
         Assert.Equal(new(3, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Text));
         Assert.Equal(new(4, 4), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id));
         Assert.Equal(new(6, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id.Body));
         Assert.Equal(new(9, 6), parser.Resolve(line.Command.Parameters[1]));
         Assert.Equal(new(9, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
         Assert.Equal(new(11, 4), parser.Resolve(line.Command.Parameters[1].Value));
-        Assert.Equal(new(11, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
-        Assert.Equal(new(12, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
+        Assert.Equal(new(11, 1), parser.Resolve(line.Command.Parameters[1].Value[0]));
+        Assert.Equal(new(12, 3), parser.Resolve(line.Command.Parameters[1].Value[1]));
         Assert.Equal(new(13, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
         Assert.Equal(new(16, 2), parser.Resolve(line.Command.Parameters[2]));
         Assert.Equal(new(16, 1), parser.Resolve(line.Command.Parameters[2].Identifier));
