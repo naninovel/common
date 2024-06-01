@@ -1,11 +1,6 @@
 namespace Naninovel.Expression;
 
 /// <summary>
-/// Exception thrown from Naninovel expression processing internals.
+/// Exception thrown while evaluating script expression.
 /// </summary>
-public class Error (string message, int? index = null, int? length = null)
-    : Naninovel.Error(message)
-{
-    public int? Index { get; } = index;
-    public int? Length { get; } = length;
-}
+public class Error (string message) : Naninovel.Error(message);

@@ -1,6 +1,6 @@
 namespace Naninovel.Expression;
 
-internal class AssignmentParser
+internal class AssignmentParser (Action<ParseDiagnostic> err)
 {
     private static readonly char[] separator = [';'];
 
@@ -31,10 +31,10 @@ internal class AssignmentParser
     {
         var = text.GetBefore("=").Trim();
         if (string.IsNullOrWhiteSpace(var))
-            throw new Error("Missing assigned variable name.");
+            err(new(0, text.Length, "Missing assigned variable name."));
         exp = text.GetAfterFirst("=").Trim();
         if (string.IsNullOrWhiteSpace(exp))
-            throw new Error("Missing expression to assign.");
+            err(new(0, text.Length, "Missing expression to assign."));
     }
 
     private void ProcessCompoundAssignment (ref string var, ref string exp)

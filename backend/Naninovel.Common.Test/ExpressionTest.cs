@@ -207,7 +207,7 @@ public class ExpressionTest
     public void DiagnosesSyntaxErrors (string text, int idx, int length, string message)
     {
         Assert.False(parser.TryParse(text, out _));
-        Assert.Equal(new ParseDiagnostic(idx, length, message), diagnostics.Pop());
+        Assert.Contains(new ParseDiagnostic(idx, length, message), diagnostics);
     }
 
     [
@@ -247,13 +247,14 @@ public class ExpressionTest
         Theory,
         InlineData("=1", 0, 2, "Missing assigned variable name."),
         InlineData("x=", 0, 2, "Missing expression to assign."),
+        InlineData("x=+", 2, 1, "Missing unary operand."),
         InlineData("foo=\"", 4, 1, "Unclosed string.")
     ]
     public void DiagnosesAssignmentErrors (string text, int idx, int length, string message)
     {
         var asses = new List<Assignment>();
         Assert.False(parser.TryParseAssignments(text, asses));
-        Assert.Equal(new ParseDiagnostic(idx, length, message), diagnostics.Pop());
+        Assert.Contains(new ParseDiagnostic(idx, length, message), diagnostics);
     }
 
     [Fact]
@@ -306,6 +307,37 @@ public class ExpressionTest
         Assert.Contains(ranges, r => r.Expression is Function { Name: "foo" } && r.Index == 4 && r.Length == 5);
         Assert.Contains(ranges, r => r.Expression is Function { Name: "bar" } && r.Index == 14 && r.Length == 10);
         Assert.Contains(ranges, r => r.Expression is String { Value: "baz" } && r.Index == 18 && r.Length == 5);
+    }
+
+    [Fact]
+    public void MapsRangeOfIncompleteFunction ()
+    {
+        _ = parser.TryParse("foo(", out _);
+        Assert.Contains(ranges, r => r.Expression is Function { Name: "foo" } && r.Index == 0 && r.Length == 4);
+    }
+
+    [Fact]
+    public void MapsRangeOfIncompleteFunctionInAssignment ()
+    {
+        _ = parser.TryParseAssignments("foo=bar(", []);
+        Assert.Contains(ranges, r => r.Expression is Function { Name: "bar" } && r.Index == 4 && r.Length == 4);
+    }
+
+    [Fact]
+    public void MapsRangeOfFirstIncompleteFunctionParameter ()
+    {
+        _ = parser.TryParse("foo(\"", out _);
+        Assert.Contains(ranges, r => r.Expression is Function { Parameters: [String { Value: "" }] });
+        Assert.Contains(ranges, r => r.Expression is String { Value: "" } && r.Index == 4 && r.Length == 1);
+    }
+
+    [Fact]
+    public void MapsRangeOfSecondIncompleteFunctionParameter ()
+    {
+        _ = parser.TryParse("""foo("x", "y""", out _);
+        Assert.Contains(ranges, r => r.Expression is Function { Parameters: [String { Value: "x" }, String { Value: "y" }] });
+        Assert.Contains(ranges, r => r.Expression is String { Value: "x" } && r.Index == 4 && r.Length == 3);
+        Assert.Contains(ranges, r => r.Expression is String { Value: "y" } && r.Index == 9 && r.Length == 2);
     }
 
     #pragma warning disable CS8509 // Ignore missing default arm.

@@ -14,7 +14,7 @@ public class Evaluator (EvaluateOptions options)
     /// <param name="exp">Expression to evaluate.</param>
     /// <typeparam name="TResult">Expected type of the result.</typeparam>
     /// <returns>Result of the evaluated expression.</returns>
-    /// <exception cref="Error">Thrown when expression evaluation fails.</exception>
+    /// <exception cref="Invalid">Thrown when expression evaluation fails.</exception>
     public TResult Evaluate<TResult> (IExpression exp) => Evaluate(exp).GetValue<TResult>();
 
     /// <summary>
@@ -22,7 +22,7 @@ public class Evaluator (EvaluateOptions options)
     /// </summary>
     /// <param name="exp">Expression to evaluate.</param>
     /// <returns>Result of the evaluated expression.</returns>
-    /// <exception cref="Error">Thrown when expression evaluation fails.</exception>
+    /// <exception cref="Invalid">Thrown when expression evaluation fails.</exception>
     public IOperand Evaluate (IExpression exp) => exp switch {
         String str => str,
         Numeric num => num,

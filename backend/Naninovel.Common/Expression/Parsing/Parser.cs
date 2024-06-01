@@ -3,15 +3,25 @@ namespace Naninovel.Expression;
 /// <summary>
 /// Parses expression text into <see cref="TryExpression"/> that can be evaluated.
 /// </summary>
-public class Parser (ParseOptions options)
+public class Parser
 {
     private Token token => IsEnd() ? default : tokens.Peek();
-    private readonly Lexer lexer = new();
     private readonly Stack<Token> tokens = [];
-    private readonly AssignmentParser assParser = new();
     private readonly List<(string var, string exp)> asses = [];
+    private readonly Lexer lexer;
+    private readonly ParseOptions options;
+    private readonly AssignmentParser assParser;
     private Token lastToken;
+    private string text = "";
     private int assOffset;
+    private bool anyError;
+
+    public Parser (ParseOptions options)
+    {
+        this.options = options;
+        lexer = new(Err);
+        assParser = new(Err);
+    }
 
     /// <summary>
     /// Attempts to parse specified text as expression.
@@ -21,17 +31,8 @@ public class Parser (ParseOptions options)
     /// <returns>Whether the text was parsed successfully.</returns>
     public bool TryParse (string text, out IExpression exp)
     {
-        try
-        {
-            Reset(text);
-            return (exp = TryExpression()!) != null;
-        }
-        catch (Error err)
-        {
-            exp = null!;
-            HandleError(text, err);
-            return false;
-        }
+        Reset(text);
+        return (exp = TryExpression()!) != null && !anyError;
     }
 
     /// <summary>
@@ -43,50 +44,38 @@ public class Parser (ParseOptions options)
     /// <returns>Whether all the assignments were parsed successfully.</returns>
     public bool TryParseAssignments (string text, IList<Assignment> assignments)
     {
-        try
-        {
-            assParser.Parse(text, asses);
-            if (asses.Count == 0) return false;
+        this.anyError = false;
+        assParser.Parse(text, asses);
+        if (asses.Count == 0) return false;
 
-            for (var i = 0; i < asses.Count; i++)
-            {
-                var (var, assExp) = asses[i];
-                assOffset = text.IndexOf(asses[i].exp, StringComparison.Ordinal);
-                if (TryParse(assExp, out var exp))
-                    assignments.Add(new(var, exp));
-                else return false;
-            }
-            return true;
-        }
-        catch (Error err)
+        var anyError = this.anyError;
+        for (var i = 0; i < asses.Count; i++)
         {
-            HandleError(text, err);
-            return false;
+            var (var, assExp) = asses[i];
+            assOffset = text.IndexOf(asses[i].exp, StringComparison.Ordinal);
+            if (TryParse(assExp, out var exp))
+                assignments.Add(new(var, exp));
+            else anyError = true;
         }
-        finally
-        {
-            assOffset = 0;
-            asses.Clear();
-        }
+
+        assOffset = 0;
+        asses.Clear();
+
+        return !anyError;
     }
 
     private void Reset (string text)
     {
+        this.text = text;
         lastToken = default;
+        anyError = false;
         tokens.Clear();
         var lexed = lexer.Lex(text);
         for (var i = lexed.Length - 1; i >= 0; i--)
             tokens.Push(lexed[i]);
     }
 
-    private void HandleError (string text, Error err)
-    {
-        var index = assOffset + (err.Index ?? 0);
-        var length = (err.Length ?? text.Length - index) + assOffset;
-        options.HandleDiagnostic?.Invoke(new(index, length, err.Message));
-    }
-
-    private IExpression HandleRange (IExpression exp, int idx, int length)
+    private IExpression Map (IExpression exp, int idx, int length)
     {
         options.HandleRange?.Invoke(new(exp, idx + assOffset, length));
         return exp;
@@ -100,11 +89,11 @@ public class Parser (ParseOptions options)
         var predicate = TryLogicalOr();
         if (!IsOp() || !Is("?")) return predicate;
 
-        if (predicate is null) throw Err("Missing ternary predicate.");
+        predicate ??= Err("Missing ternary predicate.");
         Consume();
-        var truthy = TryExpression() ?? throw Err("Missing truthy ternary branch.");
+        var truthy = TryExpression() ?? Err("Missing truthy ternary branch.");
         Expect(":");
-        var falsy = TryExpression() ?? throw Err("Missing falsy ternary branch.");
+        var falsy = TryExpression() ?? Err("Missing falsy ternary branch.");
         return new TernaryOperation(predicate, truthy, falsy);
     }
 
@@ -113,9 +102,9 @@ public class Parser (ParseOptions options)
         var lhs = TryLogicalAnd();
         if (!IsOp() || !(Is("||") || Is("|"))) return lhs;
 
-        if (lhs is null) throw Err("Missing left logical 'or' operand.");
+        lhs ??= Err("Missing left logical 'or' operand.");
         var op = Consume();
-        var rhs = TryLogicalOr() ?? throw Err("Missing right logical 'or' operand.");
+        var rhs = TryLogicalOr() ?? Err("Missing right logical 'or' operand.");
         return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
@@ -124,9 +113,9 @@ public class Parser (ParseOptions options)
         var lhs = TryRelational();
         if (!IsOp() || !(Is("&&") || Is("&"))) return lhs;
 
-        if (lhs is null) throw Err("Missing left logical 'and' operand.");
+        lhs ??= Err("Missing left logical 'and' operand.");
         var op = Consume();
-        var rhs = TryLogicalAnd() ?? throw Err("Missing right logical 'and' operand.");
+        var rhs = TryLogicalAnd() ?? Err("Missing right logical 'and' operand.");
         return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
@@ -136,9 +125,9 @@ public class Parser (ParseOptions options)
         if (!IsOp() || !(Is("=") || Is("==") || Is("!=") || Is(">=") ||
                          Is("<=") || Is(">") || Is("<"))) return lhs;
 
-        if (lhs is null) throw Err("Missing left relational operand.");
+        lhs ??= Err("Missing left relational operand.");
         var op = Consume();
-        var rhs = TryAdditive() ?? throw Err("Missing right relational operand.");
+        var rhs = TryAdditive() ?? Err("Missing right relational operand.");
         return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
@@ -148,7 +137,7 @@ public class Parser (ParseOptions options)
         while (IsOp() && (Is("+") || Is("-")))
         {
             var op = Consume();
-            var rhs = TryMultiplicative() ?? throw Err("Missing right additive operand.");
+            var rhs = TryMultiplicative() ?? Err("Missing right additive operand.");
             lhs = new BinaryOperation(Operators.Binary[op.Content], lhs!, rhs);
         }
         return lhs;
@@ -159,9 +148,9 @@ public class Parser (ParseOptions options)
         var lhs = TryUnary();
         while (IsOp() && (Is("*") || Is("/") || Is("%")))
         {
-            if (lhs is null) throw Err("Missing left multiplicative operand.");
+            lhs ??= Err("Missing left multiplicative operand.");
             var op = Consume();
-            var rhs = TryUnary() ?? throw Err("Missing right multiplicative operand.");
+            var rhs = TryUnary() ?? Err("Missing right multiplicative operand.");
             lhs = new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
         }
         return lhs;
@@ -172,7 +161,7 @@ public class Parser (ParseOptions options)
         if (!IsOp() || !(Is("-") || Is("+") || Is("!"))) return TryPow();
 
         var op = Consume();
-        var operand = TryUnary() ?? throw Err("Missing unary operand.");
+        var operand = TryUnary() ?? Err("Missing unary operand.");
         return new UnaryOperation(Operators.Unary[op.Content], operand);
     }
 
@@ -181,9 +170,9 @@ public class Parser (ParseOptions options)
         var lhs = TrySymbol();
         if (!IsOp() || !Is("^")) return lhs;
 
-        if (lhs is null) throw Err("Missing left pow operand.");
+        lhs ??= Err("Missing left pow operand.");
         var op = Consume();
-        var rhs = TryUnary() ?? throw Err("Missing right pow operand.");
+        var rhs = TryUnary() ?? Err("Missing right pow operand.");
         return new BinaryOperation(Operators.Binary[op.Content], lhs, rhs);
     }
 
@@ -204,34 +193,37 @@ public class Parser (ParseOptions options)
         var args = new List<IExpression>();
         while (!Is(")") && !IsEnd())
         {
-            args.Add(TryExpression() ?? throw Err("Missing function parameter."));
+            args.Add(TryExpression() ?? Err("Missing function parameter."));
             if (Is(",")) Consume();
         }
         Expect(")");
 
-        return HandleRange(new Function(name, args), start, lastToken.Index - start + 1);
+        return Map(new Function(name, args), start, lastToken.Index - start + 1);
     }
 
     private IExpression TryBoolean (string name)
     {
         if (name.Equals(options.Syntax.True, StringComparison.OrdinalIgnoreCase))
-            return HandleRange(new Boolean(true), lastToken.Index - name.Length, name.Length);
+            return Map(new Boolean(true), lastToken.Index - name.Length, name.Length);
         if (name.Equals(options.Syntax.False, StringComparison.OrdinalIgnoreCase))
-            return HandleRange(new Boolean(false), lastToken.Index - name.Length, name.Length);
+            return Map(new Boolean(false), lastToken.Index - name.Length, name.Length);
         return DoVariable(name);
     }
 
     private IExpression DoVariable (string name)
     {
-        return HandleRange(new Variable(name), lastToken.Index - name.Length, lastToken.Content.Length);
+        return Map(new Variable(name), lastToken.Index - name.Length, lastToken.Content.Length);
     }
 
     private IExpression? TryString ()
     {
         if (token.Type == TokenType.String)
         {
-            var value = Consume().Content;
-            return HandleRange(new String(value), lastToken.Index - value.Length - 2, value.Length + 2);
+            var content = Consume().Content;
+            var value = content;
+            if (value.StartsWith("\"", StringComparison.Ordinal)) value = value.Substring(1);
+            if (value.EndsWith("\"", StringComparison.Ordinal)) value = value.Substring(0, value.Length - 1);
+            return Map(new String(value), lastToken.Index - content.Length, content.Length);
         }
         return TryNumeric();
     }
@@ -240,8 +232,9 @@ public class Parser (ParseOptions options)
     {
         if (token.Type == TokenType.Number)
         {
-            var value = Consume().Content;
-            return HandleRange(new Numeric(double.Parse(value)), lastToken.Index - value.Length, value.Length);
+            var content = Consume().Content;
+            var number = double.Parse(content);
+            return Map(new Numeric(number), lastToken.Index - content.Length, content.Length);
         }
         return TryClosure();
     }
@@ -251,7 +244,7 @@ public class Parser (ParseOptions options)
         if (!Is("(")) return null; // Walked all supported morphemes, none found.
 
         Consume();
-        var exp = TryExpression() ?? throw Err("Empty closure.");
+        var exp = TryExpression() ?? Err("Empty closure.");
         Expect(")");
         return exp;
     }
@@ -264,11 +257,27 @@ public class Parser (ParseOptions options)
     private void Expect (string content)
     {
         if (!Is(content))
-            throw Err($"Missing content: {content}");
-        Consume();
+            Err($"Missing content: {content}");
+        else Consume();
     }
 
-    private Error Err (string message) => new(message, lastToken.Index);
+    private Invalid Err (string message)
+    {
+        var index = assOffset + lastToken.Index;
+        var length = text.Length - index + assOffset;
+        options.HandleDiagnostic?.Invoke(new(index, length, message));
+        anyError = true;
+        return new(message);
+    }
+
+    private void Err (ParseDiagnostic diag)
+    {
+        var index = assOffset + diag.Index;
+        var length = diag.Length - index + assOffset;
+        options.HandleDiagnostic?.Invoke(new(index, length, diag.Message));
+        anyError = true;
+    }
+
     private bool Is (string content) => token.Content == content;
     private bool IsOp () => token.Type == TokenType.Operator;
     private bool IsEnd () => tokens.Count == 0;

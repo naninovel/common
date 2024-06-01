@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Naninovel.Expression;
 
-internal class Lexer
+internal class Lexer (Action<ParseDiagnostic> err)
 {
     private readonly List<Token> tokens = [];
     private readonly StringBuilder str = new();
@@ -13,7 +13,8 @@ internal class Lexer
     {
         Reset(text);
         while (index < text.Length)
-            LexNext(Peek());
+            if (!LexNext(Peek()))
+                break;
         return tokens.ToArray();
     }
 
@@ -25,14 +26,20 @@ internal class Lexer
         index = 0;
     }
 
-    private void LexNext (char c)
+    private bool LexNext (char c)
     {
         if (IsSpace(c)) Consume();
         else if (IsOperator(c, out var op)) LexOperator(op);
         else if (IsNumber(c)) LexNumber();
         else if (IsQuote(c)) LexString();
         else if (IsIdentifier(c)) LexIdentifier();
-        else throw new Error($"Unexpected character: {c}", index);
+        else
+        {
+            err(new(index, 1, $"Unexpected character: {c}"));
+            return false;
+        }
+
+        return true;
     }
 
     private char Peek (int offset = 0)
@@ -78,20 +85,28 @@ internal class Lexer
 
     private void LexString ()
     {
-        Consume();
         str.Clear();
+        str.Append(Consume());
         var escape = false;
         while (true)
         {
             var c = Consume();
-            if (IsEnd()) throw new Error("Unclosed string.", index - 2);
-
+            if (IsEnd())
+            {
+                err(new(index - 2, str.Length, "Unclosed string."));
+                tokens.Add(new(TokenType.String, index - 1, str.ToString()));
+                return;
+            }
             if (escape)
             {
                 str.Append('\"');
                 escape = false;
             }
-            else if (IsQuote(c)) break;
+            else if (IsQuote(c))
+            {
+                str.Append(c);
+                break;
+            }
             else if (c == '\\') escape = true;
             else str.Append(c);
         }
