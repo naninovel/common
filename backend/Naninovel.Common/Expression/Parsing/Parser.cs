@@ -196,9 +196,9 @@ public class Parser
             args.Add(TryExpression() ?? Err("Missing function parameter."));
             if (Is(",")) Consume();
         }
-        Expect(")");
 
-        return Map(new Function(name, args), start, lastToken.Index - start + 1);
+        var length = Expect(")") ? lastToken.Index - start + 1 : text.Length - start;
+        return Map(new Function(name, args), start, length);
     }
 
     private IExpression TryBoolean (string name)
@@ -254,11 +254,15 @@ public class Parser
         return lastToken = tokens.Pop();
     }
 
-    private void Expect (string content)
+    private bool Expect (string content)
     {
         if (!Is(content))
+        {
             Err($"Missing content: {content}");
-        else Consume();
+            return false;
+        }
+        Consume();
+        return true;
     }
 
     private Invalid Err (string message)

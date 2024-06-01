@@ -327,7 +327,7 @@ public class ExpressionTest
     public void MapsRangeOfFirstIncompleteFunctionParameter ()
     {
         _ = parser.TryParse("foo(\"", out _);
-        Assert.Contains(ranges, r => r.Expression is Function { Parameters: [String { Value: "" }] });
+        Assert.Contains(ranges, r => r.Expression is Function { Parameters: [String { Value: "" }] } && r.Index == 0 && r.Length == 5);
         Assert.Contains(ranges, r => r.Expression is String { Value: "" } && r.Index == 4 && r.Length == 1);
     }
 
@@ -335,7 +335,7 @@ public class ExpressionTest
     public void MapsRangeOfSecondIncompleteFunctionParameter ()
     {
         _ = parser.TryParse("""foo("x", "y""", out _);
-        Assert.Contains(ranges, r => r.Expression is Function { Parameters: [String { Value: "x" }, String { Value: "y" }] });
+        Assert.Contains(ranges, r => r.Expression is Function { Parameters: [String { Value: "x" }, String { Value: "y" }] } && r.Index == 0 && r.Length == 11);
         Assert.Contains(ranges, r => r.Expression is String { Value: "x" } && r.Index == 4 && r.Length == 3);
         Assert.Contains(ranges, r => r.Expression is String { Value: "y" } && r.Index == 9 && r.Length == 2);
     }
