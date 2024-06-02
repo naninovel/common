@@ -36,23 +36,11 @@ public interface IMetadata
     /// <param name="paramAliasOrId">Alias or ID of the parameter; use empty or null for nameless.</param>
     public Parameter? FindParameter (string commandAliasOrId, string paramAliasOrId);
     /// <summary>
-    /// Attempts to find a function, which has specified name.
-    /// Returns null when such function is not found.
+    /// Attempts to find functions, which have specified name.
+    /// Multiple results possible in case of overloaded functions.
     /// </summary>
     /// <param name="name">Name of the function.</param>
-    public Function? FindFunction (string name);
-    /// <summary>
-    /// Attempts to find a parameter of a function, which has specified name.
-    /// Returns null when such parameter or function are not found.
-    /// </summary>
-    /// <param name="functionName">Name of the parameter's function.</param>
-    /// <param name="paramName">Name of the parameter.</param>
-    public FunctionParameter? FindFunctionParameter (string functionName, string paramName);
-    /// <summary>
-    /// Attempts to find a parameter of a function, which has specified index in function signature.
-    /// Returns null when such parameter or function are not found.
-    /// </summary>
-    /// <param name="functionName">Name of the parameter's function.</param>
-    /// <param name="index">Index of the parameter in function signature.</param>
-    public FunctionParameter? FindFunctionParameter (string functionName, int index);
+    /// <param name="result">Buffer to store result; will be cleared.</param>
+    /// <returns>Whether at least one function was found.</returns>
+    public bool FindFunctions (string name, ICollection<Function> result);
 }

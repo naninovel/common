@@ -43,18 +43,8 @@ public class MetadataMock : IMetadata
         return new MetadataProvider(AsProject()).FindParameter(commandAliasOrId, paramAliasOrId);
     }
 
-    public Function FindFunction (string name)
+    public bool FindFunctions (string name, ICollection<Function> result)
     {
-        return new MetadataProvider(AsProject()).FindFunction(name);
-    }
-
-    public FunctionParameter FindFunctionParameter (string functionName, string paramName)
-    {
-        return new MetadataProvider(AsProject()).FindFunctionParameter(functionName, paramName);
-    }
-
-    public FunctionParameter FindFunctionParameter (string functionName, int index)
-    {
-        return new MetadataProvider(AsProject()).FindFunctionParameter(functionName, index);
+        return new MetadataProvider(AsProject()).FindFunctions(name, result);
     }
 }

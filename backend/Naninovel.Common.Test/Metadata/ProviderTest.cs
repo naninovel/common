@@ -95,48 +95,27 @@ public class ProviderTest
     }
 
     [Fact]
-    public void WhenFunctionNotFoundNullIsReturned ()
+    public void WhenFunctionNotFoundFalseIsReturned ()
     {
-        Assert.Null(provider.FindFunction(""));
+        Assert.False(provider.FindFunctions("", []));
     }
 
     [Fact]
-    public void WhenFunctionParameterNotFoundNullIsReturned ()
+    public void CanFindFunctions ()
     {
-        var meta = new Project { Functions = [new Function { Name = "foo" }] };
+        var fns = new List<Function> { new() { Name = "ShouldBeCleared" } };
+        var meta = new Project {
+            Functions = [
+                new() { Name = "foo" },
+                new() { Name = "bar" },
+                new() { Name = "foo", Parameters = [new() { Name = "x" }] }
+            ]
+        };
         provider.Update(meta);
-        Assert.Null(provider.FindFunctionParameter("", ""));
-        Assert.Null(provider.FindFunctionParameter("", 0));
-        Assert.Null(provider.FindFunctionParameter("foo", ""));
-        Assert.Null(provider.FindFunctionParameter("foo", 0));
-    }
-
-    [Fact]
-    public void CanFindFunction ()
-    {
-        var meta = new Project { Functions = [new() { Name = "foo" }] };
-        provider.Update(meta);
-        Assert.Equal(meta.Functions[0], provider.FindFunction("foo"));
-    }
-
-    [Fact]
-    public void CanFindFunctionParameterByName ()
-    {
-        var param1 = new FunctionParameter { Name = "bar" };
-        var param2 = new FunctionParameter { Name = "baz" };
-        var meta = new Project { Functions = [new() { Name = "foo", Parameters = [param1, param2] }] };
-        provider.Update(meta);
-        Assert.Equal(meta.Functions[0].Parameters[1], provider.FindFunctionParameter("foo", "baz"));
-    }
-
-    [Fact]
-    public void CanFindFunctionParameterByIndex ()
-    {
-        var param1 = new FunctionParameter { Name = "bar" };
-        var param2 = new FunctionParameter { Name = "baz" };
-        var meta = new Project { Functions = [new() { Name = "foo", Parameters = [param1, param2] }] };
-        provider.Update(meta);
-        Assert.Equal(meta.Functions[0].Parameters[1], provider.FindFunctionParameter("foo", 1));
+        Assert.True(provider.FindFunctions("Foo", fns));
+        Assert.Equal(2, fns.Count);
+        Assert.Equal(meta.Functions[0], fns[0]);
+        Assert.Equal(meta.Functions[2], fns[1]);
     }
 
     [Fact]
