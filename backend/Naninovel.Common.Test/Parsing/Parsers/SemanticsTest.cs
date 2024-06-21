@@ -45,7 +45,7 @@ public class SemanticsTest
     {
         var param1 = new Parameter(new IValueComponent[] { new PlainText("v1"), new Expression("e") });
         var param2 = new Parameter("p2", new[] { new PlainText("v2") });
-        var line = new CommandLine(new("c", new[] { param1, param2 }));
+        var line = new CommandLine(new("c", [param1, param2]));
         Assert.Equal("@c v1{e} p2:v2", line.ToString());
     }
 
@@ -166,5 +166,13 @@ public class SemanticsTest
     public void EmptyIdentifiedTextToStringIsCorrect ()
     {
         Assert.Equal("|#|", new IdentifiedText(new(""), new("")).ToString());
+    }
+
+    [Fact]
+    public void ParameterWithWhitespaceToStringIsWrappedInQuotes ()
+    {
+        var param = new Parameter(new[] { new PlainText("lorem ipsum") });
+        var line = new CommandLine(new("c", [param]));
+        Assert.Equal("@c \"lorem ipsum\"", line.ToString());
     }
 }
