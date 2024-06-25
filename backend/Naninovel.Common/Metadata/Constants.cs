@@ -29,4 +29,13 @@ public static class Constants
     /// Subtype of the label part of an endpoint.
     /// </summary>
     public const string EndpointLabel = "Label";
+    /// <summary>
+    /// Subtype of expression parameter context indicating that the expression is assignment.
+    /// </summary>
+    public const string Assignment = "Assignment";
+    /// <summary>
+    /// Subtype of expression parameter context indicating that the expression result
+    /// is a condition for the associated command execution.
+    /// </summary>
+    public const string Condition = "Condition";
 }
