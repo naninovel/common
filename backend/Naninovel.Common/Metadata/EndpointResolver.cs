@@ -47,7 +47,7 @@ public class EndpointResolver (IMetadata meta)
 
     private bool HasEndpointContext (string commandAliasOrId, string? paramAliasOrId)
     {
-        var param = meta.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
+        var param = meta.FindParameter(commandAliasOrId, paramAliasOrId);
         if (param?.ValueContext is null ||
             param.ValueContext.Length != 2 ||
             param.ValueContext.Any(c => c is null)) return false;

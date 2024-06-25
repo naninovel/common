@@ -34,7 +34,7 @@ public interface IMetadata
     /// </summary>
     /// <param name="commandAliasOrId">Alias or ID of the parameter's command.</param>
     /// <param name="paramAliasOrId">Alias or ID of the parameter; use empty or null for nameless.</param>
-    public Parameter? FindParameter (string commandAliasOrId, string paramAliasOrId);
+    public Parameter? FindParameter (string commandAliasOrId, string? paramAliasOrId);
     /// <summary>
     /// Attempts to find functions, which have specified name.
     /// Multiple results possible in case of overloaded functions.

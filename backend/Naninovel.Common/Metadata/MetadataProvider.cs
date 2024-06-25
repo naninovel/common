@@ -52,7 +52,7 @@ public class MetadataProvider : IMetadata
         return null;
     }
 
-    public Parameter? FindParameter (string commandAliasOrId, string paramAliasOrId)
+    public Parameter? FindParameter (string commandAliasOrId, string? paramAliasOrId)
     {
         return FindCommand(commandAliasOrId)?.Parameters.FirstOrDefault(IsMatch);
 
