@@ -10,17 +10,9 @@ public class Function
     /// </summary>
     public string Name { get; set; } = string.Empty;
     /// <summary>
-    /// Optional documentation, when specified or null.
+    /// Documentation for the function, when specified or null.
     /// </summary>
-    public string? Summary { get; set; }
-    /// <summary>
-    /// Optional remarks, when specified or null.
-    /// </summary>
-    public string? Remarks { get; set; }
-    /// <summary>
-    /// Optional usage examples, when specified or null.
-    /// </summary>
-    public string? Example { get; set; }
+    public Documentation? Documentation { get; set; }
     /// <summary>
     /// Parameters of the function, in signature order.
     /// </summary>

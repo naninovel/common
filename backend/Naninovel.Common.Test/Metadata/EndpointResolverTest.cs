@@ -32,64 +32,94 @@ public class EndpointResolverTest
     }
 
     [Fact]
+    public void WhenParameterHasNoEndpointContextReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [new Command { Id = "c", Parameters = [new() { Id = "p" }] }]
+        });
+        Assert.False(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("v") })]), out _));
+    }
+
+    [Fact]
+    public void WhenCommandDoesntBranchReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [new Command { Id = "c", Branch = null, Parameters = [CreateEndpointParamMeta("p")] }]
+        });
+        Assert.False(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("v") })]), out _));
+    }
+
+    [Fact]
+    public void WhenCommandHaveEndpointBranchFlagReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [new Command { Id = "c", Branch = new() { Traits = BranchTraits.Nest }, Parameters = [CreateEndpointParamMeta("p")] }]
+        });
+        Assert.False(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("v") })]), out _));
+    }
+
+    [Fact]
     public void WhenUnknownParameterReturnsFalse ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c" }]
+            Commands = [new Command { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint }, Parameters = [CreateEndpointParamMeta("p")] }]
+        });
+        Assert.False(resolver.TryResolve(new("x", new[] { new PlainText("v") }), "c", out _));
+    }
+
+    [Fact]
+    public void WhenParameterIsNotAssignedReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
         Assert.False(resolver.TryResolve(new("c"), out _));
     }
 
     [Fact]
-    public void WhenOtherParameterReturnsFalse ()
+    public void CanResolveScriptComponentOfEndpoint ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [new Parameter { Id = "p" }] }]
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
-        Assert.False(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("v") }) }), out _));
-    }
-
-    [Fact]
-    public void CanResolveScript ()
-    {
-        meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
-        });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s") }) }), out var point));
+        Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s") })]), out var point));
         Assert.Equal("s", point.Script);
     }
 
     [Fact]
-    public void CanResolveLabel ()
+    public void CanResolveLabelComponentOfTheEndpoint ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText(".l") }) }), out var point));
+        Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText(".l") })]), out var point));
         Assert.Equal("l", point.Label);
     }
 
     [Fact]
-    public void CanResolveScriptAndLabel ()
+    public void CanResolveBothComponentsOfTheEndpoint ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s.l") }) }), out var point));
+        Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s.l") })]), out var point));
         Assert.Equal("s", point.Script);
         Assert.Equal("l", point.Label);
     }
 
-    private Parameter CreateEndpointParameterMeta (string id)
-    {
-        return new Parameter {
-            Id = id,
-            ValueType = ValueType.String,
-            ValueContainerType = ValueContainerType.Named,
-            ValueContext = [
-                new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointScript },
-                new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointLabel }
-            ]
-        };
-    }
+    private Parameter CreateEndpointParamMeta (string id) => new() {
+        Id = id,
+        ValueType = ValueType.String,
+        ValueContainerType = ValueContainerType.Named,
+        ValueContext = [
+            new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointScript },
+            new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointLabel }
+        ]
+    };
+
+    private Command CreateEndpointCommandMeta (string commandId, string paramId) => new() {
+        Id = commandId,
+        Branch = new() { Traits = BranchTraits.Endpoint },
+        Parameters = [CreateEndpointParamMeta(paramId)]
+    };
 }

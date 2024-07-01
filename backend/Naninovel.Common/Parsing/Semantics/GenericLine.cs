@@ -19,7 +19,7 @@ public class GenericLine (GenericPrefix? prefix,
     public IReadOnlyList<IGenericContent> Content { get; } = content;
     public int Indent { get; } = indent;
 
-    public GenericLine (IReadOnlyList<IGenericContent> content) : this(null, content) { }
+    public GenericLine (IReadOnlyList<IGenericContent> content, int indent = 0) : this(null, content, indent) { }
 
     public override string ToString ()
     {

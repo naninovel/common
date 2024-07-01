@@ -19,27 +19,21 @@ public class Command
     /// </summary>
     public bool Localizable { get; set; }
     /// <summary>
-    /// Whether the command can contain nested commands.
+    /// Nesting properties of the command or null in case the command
+    /// doesn't support nesting other commands under itself.
     /// </summary>
-    public bool NestedHost { get; set; }
+    public Nest? Nest { get; set; }
     /// <summary>
-    /// Whether the command requires nested commands and can't execute otherwise.
+    /// Nature of script playback flow branching caused by the command execution
+    /// or null when the command execution doesn't cause branching.
     /// </summary>
-    public bool RequiresNested { get; set; }
+    public Branch? Branch { get; set; }
     /// <summary>
-    /// Human-readable description of the command.
+    /// Documentation for the command, when specified or null.
     /// </summary>
-    public string? Summary { get; set; }
+    public Documentation? Documentation { get; set; }
     /// <summary>
-    /// Additional, less important information about the command.
-    /// </summary>
-    public string? Remarks { get; set; }
-    /// <summary>
-    /// Command usage examples in scenario script.
-    /// </summary>
-    public string? Examples { get; set; }
-    /// <summary>
-    /// List of parameters the command supports.
+    /// List of parameters supported by the command.
     /// </summary>
     public Parameter[] Parameters { get; set; } = [];
 
