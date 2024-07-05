@@ -13,12 +13,6 @@ namespace Naninovel.ManagedText;
 /// ; comment (optional, space around comment is ignored)
 /// value (all lines until next key are joined, space is preserved)
 /// </code>
-/// Multiple records can be joined into single line with pipes:
-/// <code>
-/// # key1|key2|key3
-/// ; comment1|comment2|co\|ent3 (pipes in comments are escaped)
-/// value1|value2|va\|ue3 (pipes in values are escaped)
-/// </code>
 /// </remarks>
 public class MultilineManagedTextParser
 {
@@ -60,7 +54,7 @@ public class MultilineManagedTextParser
     private void ParseKeyLine (string line)
     {
         if (keys.Count > 0) AddLastRecord();
-        Split(line.GetAfterFirst(RecordMultilineKeyLiteral).Trim(), keys);
+        keys.Add(line.GetAfterFirst(RecordMultilineKeyLiteral).Trim());
         if (keys.Any(string.IsNullOrWhiteSpace))
             throw new Error($"Managed text key can't be empty: {line}");
     }
@@ -81,12 +75,8 @@ public class MultilineManagedTextParser
 
     private void AddLastRecord ()
     {
-        Split(valueBuilder.ToString(), values);
-        if (values.Count > keys.Count)
-            throw new Error($"Managed text has more values than keys. Last key: {keys.Last()}");
-        Split(commentBuilder.ToString(), comments);
-        if (comments.Count > keys.Count)
-            throw new Error($"Managed text has more comments than keys. Last key: {keys.Last()}");
+        values.Add(valueBuilder.ToString());
+        comments.Add(commentBuilder.ToString());
         for (int i = 0; i < keys.Count; i++)
             records.Add(new(keys[i], values.ElementAtOrDefault(i), comments.ElementAtOrDefault(i)));
         keys.Clear();
@@ -94,18 +84,5 @@ public class MultilineManagedTextParser
         commentBuilder.Clear();
         values.Clear();
         valueBuilder.Clear();
-    }
-
-    private void Split (string line, IList<string> collection)
-    {
-        var startIdx = 0;
-        for (int i = 0; i < line.Length; i++)
-            if (line[i] == RecordJoinLiteral[0] && line.ElementAtOrDefault(i - 1) != '\\')
-            {
-                collection.Add(line.Substring(startIdx, i - startIdx)
-                    .Replace($"\\{RecordJoinLiteral}", RecordJoinLiteral));
-                startIdx = i + 1;
-            }
-        collection.Add(line.Substring(startIdx, line.Length - startIdx));
     }
 }

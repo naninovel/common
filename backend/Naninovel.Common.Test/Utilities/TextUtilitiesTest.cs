@@ -164,4 +164,29 @@ public class TextUtilitiesTest
         Assert.Equal("X", "x".FirstToUpper());
         Assert.Equal("XxX", "xxX".FirstToUpper());
     }
+
+    [Theory]
+    [InlineData("", new[] { "" })]
+    [InlineData("a", new[] { "a" })]
+    [InlineData("a,b", new[] { "a", "b" })]
+    [InlineData("abc,a,abc,b,abc,c", new[] { "abc", "a", "abc", "b", "abc", "c" })]
+    [InlineData(" a , b , c ", new[] { " a ", " b ", " c " })]
+    [InlineData("a,,c", new[] { "a", "", "c" })]
+    [InlineData(",", new[] { "", "" })]
+    [InlineData(",,", new[] { "", "", "" })]
+    [InlineData(",,c", new[] { "", "", "c" })]
+    [InlineData(@"a\,b", new[] { "a,b" })]
+    [InlineData("a\n,b\n\\,", new[] { "a\n", "b\n," })]
+    [InlineData(@"\,", new[] { "," })]
+    [InlineData(@"\,\,,", new[] { ",,", "" })]
+    [InlineData(@"\,,\,,\,", new[] { ",", ",", "," })]
+    [InlineData(@"\\,\\,\,", new[] { @"\\", @"\\", "," })]
+    public void SplitAndJoinEscapedWorkCorrectly (string input, string[] expected)
+    {
+        var splitter = new TextSplitter(',');
+        var entries = new List<string>();
+        splitter.Split(input, entries);
+        Assert.Equal(expected, entries);
+        Assert.Equal(input, splitter.Join(entries));
+    }
 }

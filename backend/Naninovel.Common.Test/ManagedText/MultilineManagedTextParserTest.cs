@@ -22,17 +22,7 @@ public class MultilineManagedTextParserTest
         { "# keyA\na 1 \na2\n# keyB\n b 1\nb2 \n", [new("keyA", "a 1 a2"), new("keyB", " b 1b2 ")] },
         { "# key\nfoo\n\nbar\n", [new("key", "foobar")] },
         { "#key1\n\n\nfoo\nbar\n\n\n#key2\n\n\nvalue\n\n\n", [new("key1", "foobar"), new("key2", "value")] },
-        { "# k1|k2\n; c1|c2\nv1|v2\n", [new("k1", "v1", "c1"), new("k2", "v2", "c2")] },
-        { "# k1|k2\nv1|v2\n", [new("k1", "v1"), new("k2", "v2")] },
-        { "# k1|k2\n# k3\n; c3", [new("k1", ""), new("k2", ""), new("k3", "", "c3")] },
-        { "# k1|k2\n; c1|c2\n", [new("k1", "", "c1"), new("k2", "", "c2")] },
-        { "# k1|k2\n; c1|c2\n|\n", [new("k1", "", "c1"), new("k2", "", "c2")] },
-        { "# k1|k2\nv1|v2\n; c1|c2\n", [new("k1", "v1", "c1"), new("k2", "v2", "c2")] },
-        { "# k1|k2\n; c1|c2\nv1|v2\n# k3|k4\nv3|v4\n", [new("k1", "v1", "c1"), new("k2", "v2", "c2"), new("k3", "v3"), new("k4", "v4")] },
-        { "# k1\nv1\n# k2|k3\nv2|v3\n# k4\nv4", [new("k1", "v1"), new("k2", "v2"), new("k3", "v3"), new("k4", "v4")] },
-        { "# k1|k2|k3\n; c1||\n||v3\n", [new("k1", "", "c1"), new("k2", ""), new("k3", "v3")] },
-        { "# k1|k2\n; c\\|1|c2\nv\\|1|v2\n", [new("k1", "v|1", "c|1"), new("k2", "v2", "c2")] },
-        { "# k1|k2|k3\n; c1|\n;c2\n\nv1\n|v\n2 | \nv3", [new("k1", "v1", "c1"), new("k2", "v2 ", "c2"), new("k3", " v3")] }
+        { "# k1|k2\n; c1|c2\nv1|v2\n", [new("k1|k2", "v1|v2", "c1|c2")] },
     };
 
     private readonly MultilineManagedTextParser parser = new();
@@ -75,12 +65,8 @@ public class MultilineManagedTextParserTest
     }
 
     [Fact]
-    public void ErrsOnInvalidJoins ()
+    public void ErrsOnEmptyKey ()
     {
-        Assert.Throws<Error>(() => parser.Parse("# |\n"));
-        Assert.Throws<Error>(() => parser.Parse("# k1|\n"));
-        Assert.Throws<Error>(() => parser.Parse("# k1||k3\n"));
-        Assert.Throws<Error>(() => parser.Parse("# k1\n; c1|c2\n"));
-        Assert.Throws<Error>(() => parser.Parse("# k1\nv1|v2\n"));
+        Assert.Throws<Error>(() => parser.Parse("# \n"));
     }
 }
