@@ -48,8 +48,9 @@ public class MultilineManagedTextSerializer
     {
         AppendSpace();
         AppendKey();
-        if (!string.IsNullOrWhiteSpace(record.Comment))
-            AppendComment();
+        foreach (var line in record.Comment.SplitLines())
+            if (!string.IsNullOrWhiteSpace(line))
+                AppendCommentLine(line);
         AppendValue();
 
         void AppendSpace ()
@@ -65,10 +66,10 @@ public class MultilineManagedTextSerializer
             builder.Append('\n');
         }
 
-        void AppendComment ()
+        void AppendCommentLine (string line)
         {
             builder.Append(RecordCommentLiteral).Append(' ');
-            builder.Append(record.Comment);
+            builder.Append(line);
             builder.Append('\n');
         }
 

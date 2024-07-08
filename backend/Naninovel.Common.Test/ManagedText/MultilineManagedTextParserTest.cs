@@ -23,6 +23,7 @@ public class MultilineManagedTextParserTest
         { "# key\nfoo\n\nbar\n", [new("key", "foobar")] },
         { "#key1\n\n\nfoo\nbar\n\n\n#key2\n\n\nvalue\n\n\n", [new("key1", "foobar"), new("key2", "value")] },
         { "# k1|k2\n; c1|c2\nv1|v2\n", [new("k1|k2", "v1|v2", "c1|c2")] },
+        { "# k\n; c1\n; c2\n; c3\nv\n", [new("k", "v", "c1\nc2\nc3")] }
     };
 
     private readonly MultilineManagedTextParser parser = new();
