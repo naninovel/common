@@ -25,7 +25,8 @@ public class InlineManagedTextSerializer
         builder.Clear();
         if (!string.IsNullOrEmpty(document.Header))
             AppendHeader(document.Header);
-        else builder.Append('\n');
+        else if (!string.IsNullOrEmpty(document.Records.FirstOrDefault().Comment))
+            builder.Append('\n');
         foreach (var record in document.Records)
             AppendRecord(record);
         return builder.ToString();
