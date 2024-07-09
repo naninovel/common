@@ -61,13 +61,16 @@ public class MultilineManagedTextParser
 
     private void ParseCommentLine (string line, int index)
     {
+        if (index == 0)
+        {
+            header = line.GetAfterFirst(RecordCommentLiteral);
+            return;
+        }
+
         var comment = line.GetAfterFirst(RecordCommentLiteral);
-        if (comment.Length > 0 && comment[0] == ' ')
-            comment = comment.Substring(1);
         if (commentBuilder.Length > 0)
             commentBuilder.Append('\n');
         commentBuilder.Append(comment);
-        if (index == 0) header = comment;
     }
 
     private void ParseValueLine (string line)

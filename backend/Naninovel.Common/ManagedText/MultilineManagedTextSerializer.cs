@@ -39,8 +39,7 @@ public class MultilineManagedTextSerializer
     private void AppendHeader (string header)
     {
         builder.Append(RecordCommentLiteral)
-            .Append(' ')
-            .Append(header.Trim())
+            .Append(header)
             .Append('\n');
     }
 
@@ -48,8 +47,8 @@ public class MultilineManagedTextSerializer
     {
         AppendSpace();
         AppendKey();
-        foreach (var line in record.Comment.SplitLines())
-            if (!string.IsNullOrWhiteSpace(line))
+        if (!string.IsNullOrEmpty(record.Comment))
+            foreach (var line in record.Comment.SplitLines())
                 AppendCommentLine(line);
         AppendValue();
 
@@ -61,16 +60,16 @@ public class MultilineManagedTextSerializer
 
         void AppendKey ()
         {
-            builder.Append(RecordMultilineKeyLiteral).Append(' ');
-            builder.Append(record.Key);
-            builder.Append('\n');
+            builder.Append(RecordMultilineKeyLiteral)
+                .Append(record.Key)
+                .Append('\n');
         }
 
         void AppendCommentLine (string line)
         {
-            builder.Append(RecordCommentLiteral).Append(' ');
-            builder.Append(line);
-            builder.Append('\n');
+            builder.Append(RecordCommentLiteral)
+                .Append(line)
+                .Append('\n');
         }
 
         void AppendValue ()

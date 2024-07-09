@@ -1,3 +1,5 @@
+namespace Naninovel;
+
 using System.Text;
 
 /// <summary>

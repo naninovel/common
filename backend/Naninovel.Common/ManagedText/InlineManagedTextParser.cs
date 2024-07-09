@@ -1,4 +1,5 @@
-﻿using static Naninovel.ManagedText.ManagedTextConstants;
+﻿using System.Text;
+using static Naninovel.ManagedText.ManagedTextConstants;
 
 namespace Naninovel.ManagedText;
 
@@ -15,7 +16,8 @@ namespace Naninovel.ManagedText;
 public class InlineManagedTextParser
 {
     private readonly HashSet<ManagedTextRecord> records = [];
-    private string header = "", lastComment = "";
+    private readonly StringBuilder commentBuilder = new();
+    private string header = "";
 
     /// <summary>
     /// Creates document from specified serialized text string.
@@ -33,15 +35,22 @@ public class InlineManagedTextParser
     private void Reset ()
     {
         records.Clear();
-        header = lastComment = "";
+        commentBuilder.Clear();
+        header = "";
     }
 
     private void ParseCommentLine (string line, int index)
     {
-        lastComment = line.GetAfterFirst(RecordCommentLiteral);
-        if (lastComment.Length > 0 && lastComment[0] == ' ')
-            lastComment = lastComment.Substring(1);
-        if (index == 0) header = lastComment;
+        if (index == 0)
+        {
+            header = line.GetAfterFirst(RecordCommentLiteral);
+            return;
+        }
+
+        var comment = line.GetAfterFirst(RecordCommentLiteral);
+        if (commentBuilder.Length > 0)
+            commentBuilder.Append('\n');
+        commentBuilder.Append(comment);
     }
 
     private void ParseRecordLine (string line)
@@ -49,7 +58,7 @@ public class InlineManagedTextParser
         var id = line.GetBefore(RecordInlineKeyLiteral);
         if (string.IsNullOrWhiteSpace(id)) return;
         var value = line.Substring(id.Length + RecordInlineKeyLiteral.Length);
-        records.Add(new ManagedTextRecord(id, value, lastComment));
-        lastComment = "";
+        records.Add(new ManagedTextRecord(id, value, commentBuilder.ToString()));
+        commentBuilder.Clear();
     }
 }
