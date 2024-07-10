@@ -15,6 +15,11 @@ namespace Naninovel.ManagedText;
 /// </remarks>
 public class InlineManagedTextParser
 {
+    /// <summary>
+    /// Exception thrown when managed text parsing fails due to incorrect document format.
+    /// </summary>
+    public class SyntaxError (string message) : Error(message);
+
     private readonly HashSet<ManagedTextRecord> records = [];
     private readonly StringBuilder commentBuilder = new();
     private string header = "";
@@ -22,13 +27,15 @@ public class InlineManagedTextParser
     /// <summary>
     /// Creates document from specified serialized text string.
     /// </summary>
+    /// <exception cref="SyntaxError">Parsing failed to incorrect document format.</exception>
     public ManagedTextDocument Parse (string text)
     {
         Reset();
         foreach (var (line, index) in text.TrimJunk().IterateLinesIndexed())
-            if (line.StartsWithOrdinal(RecordCommentLiteral))
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            else if (line.StartsWithOrdinal(RecordCommentLiteral))
                 ParseCommentLine(line, index);
-            else ParseRecordLine(line);
+            else ParseRecordLine(line, index);
         return new ManagedTextDocument(records, header);
     }
 
@@ -53,10 +60,10 @@ public class InlineManagedTextParser
         commentBuilder.Append(comment);
     }
 
-    private void ParseRecordLine (string line)
+    private void ParseRecordLine (string line, int index)
     {
         var id = line.GetBefore(RecordInlineKeyLiteral);
-        if (string.IsNullOrWhiteSpace(id)) return;
+        if (string.IsNullOrWhiteSpace(id)) throw new SyntaxError($"Incorrect record syntax at line #{index + 1}.");
         var value = line.Substring(id.Length + RecordInlineKeyLiteral.Length);
         records.Add(new ManagedTextRecord(id, value, commentBuilder.ToString()));
         commentBuilder.Clear();

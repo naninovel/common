@@ -5,12 +5,7 @@ public class InlineManagedTextParserTest
     public static TheoryData<string, ManagedTextRecord[]> Facts { get; } = new() {
         { "", [] },
         { "\n\r \n\t", [] },
-        { ":", [] },
-        { ":x", [] },
-        { " : x\n", [] },
-        { "\n;", [] },
-        { "\n; x\n:x", [] },
-        { "x:\n; x", [] },
+        { "", [] },
         { "key: value", [new("key", "value")] },
         { "key: ", [new("key", "")] },
         { " ke \t y : value", [new(" ke \t y ", "value")] },
@@ -22,7 +17,6 @@ public class InlineManagedTextParserTest
         { "\n;  \t comment\t \t\nkey: \tvalue\t", [new("key", "\tvalue\t", " \t comment\t \t")] },
         { "\n; comment 1\nkey1: value1\n; comment 2\nkey2: value2", [new("key1", "value1", "comment 1"), new("key2", "value2", "comment 2")] },
         { "\n; comment1\nkey1: value1\nkey2: value2\n; comment2", [new("key1", "value1", "comment1"), new("key2", "value2", "")] },
-        { "text\nkey1: value1\ntext2\nkey2: value2", [new("key1", "value1", ""), new("key2", "value2", "")] },
         { "\n; comment1\n; comment2\nkey: value", [new("key", "value", "comment1\ncomment2")] }
     };
 
@@ -39,6 +33,24 @@ public class InlineManagedTextParserTest
             Assert.Equal(expected[i].Value, records[i].Value);
             Assert.Equal(expected[i].Comment, records[i].Comment);
         }
+    }
+
+    [Fact]
+    public void ErrsOnInvalidRecord ()
+    {
+        Assert.Throws<InlineManagedTextParser.SyntaxError>(() => parser.Parse("x"));
+        Assert.Throws<InlineManagedTextParser.SyntaxError>(() => parser.Parse(":"));
+        Assert.Throws<InlineManagedTextParser.SyntaxError>(() => parser.Parse(":x"));
+        Assert.Throws<InlineManagedTextParser.SyntaxError>(() => parser.Parse(" : x\n"));
+        Assert.Throws<InlineManagedTextParser.SyntaxError>(() => parser.Parse(";x"));
+        Assert.Throws<InlineManagedTextParser.SyntaxError>(() => parser.Parse("\n;"));
+
+        Assert.Contains("line #1", Assert.Throws<InlineManagedTextParser.SyntaxError>(() =>
+            parser.Parse("x:\n; x")).Message);
+        Assert.Contains("line #3", Assert.Throws<InlineManagedTextParser.SyntaxError>(() =>
+            parser.Parse("\n; x\n:x")).Message);
+        Assert.Contains("line #1", Assert.Throws<InlineManagedTextParser.SyntaxError>(() =>
+            parser.Parse("x\nk1: v1\nx\nk2: v2")).Message);
     }
 
     [Fact]
