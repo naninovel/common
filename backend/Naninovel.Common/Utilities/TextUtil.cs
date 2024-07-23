@@ -7,7 +7,7 @@ namespace Naninovel.Utilities; // Don't remove Utilities sub-space
 /// <summary>
 /// Common text-related helpers and extensions.
 /// </summary>
-public static class TextUtilities
+public static class TextUtil
 {
     private static readonly string[] breaks = ["\r\n", "\n", "\r"];
     private static readonly char[] junk = ['\uFEFF', '\u200B'];

@@ -3,7 +3,7 @@ namespace Naninovel;
 /// <summary>
 /// Common LINQ-related helpers and extensions.
 /// </summary>
-public static class LinqUtilities
+public static class LinqUtil
 {
     /// <inheritdoc cref="Enumerable.FirstOrDefault{TSource}(System.Collections.Generic.IEnumerable{TSource})"/>
     /// <remarks>This overload for structs returns null instead of default value.</remarks>

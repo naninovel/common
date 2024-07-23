@@ -1,6 +1,6 @@
 namespace Naninovel.Utilities.Test;
 
-public class TextUtilitiesTest
+public class TextUtilTest
 {
     [Fact]
     public void SplitLinesDetectsAllTypesOfLineBreak ()

@@ -1,8 +1,8 @@
-using static Naninovel.PathUtilities;
+using static Naninovel.PathUtil;
 
 namespace Naninovel.Utilities.Test;
 
-public class PathUtilitiesTest
+public class PathUtilTest
 {
     [Fact]
     public void CanResolveScriptName ()

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Naninovel.Utilities.Test;
 
 [ExcludeFromCodeCoverage]
-public class LinqUtilitiesTest
+public class LinqUtilTest
 {
     [Fact]
     public void OrNullExtensionsReturnNullWhenElementNotFound ()

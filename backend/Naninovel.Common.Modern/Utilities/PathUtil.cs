@@ -3,7 +3,7 @@ namespace Naninovel;
 /// <summary>
 /// Common path and URI related helpers and extensions.
 /// </summary>
-public static class PathUtilities
+public static class PathUtil
 {
     /// <summary>
     /// Resolves script name (unique identifier) from specified script file path or URI.
