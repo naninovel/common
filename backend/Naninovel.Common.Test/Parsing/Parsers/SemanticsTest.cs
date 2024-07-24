@@ -53,7 +53,7 @@ public class SemanticsTest
     public void GenericLineToStringIsCorrect ()
     {
         var line = new GenericLine(new GenericPrefix("a", "b"), new IGenericContent[] {
-            new MixedValue(new[] { new PlainText("x") }),
+            new MixedValue([new PlainText("x")]),
             new InlinedCommand(new("i", Array.Empty<Parameter>()))
         });
         Assert.Equal("a.b: x[i]", line.ToString());
@@ -62,23 +62,23 @@ public class SemanticsTest
     [Fact]
     public void MixedValueToStringIsCorrect ()
     {
-        Assert.Equal("foo|#id|{bar}nya", new MixedValue(new IValueComponent[] {
+        Assert.Equal("foo|#id|{bar}nya", new MixedValue([
             new IdentifiedText(new("foo"), new(new("id"))),
             new Expression("bar"),
             new PlainText("nya")
-        }).ToString());
+        ]).ToString());
     }
 
     [Fact]
     public void MixedValueCountEqualsItemCount ()
     {
-        Assert.Equal(2, new MixedValue(new[] { new PlainText(""), new PlainText("") }).Count);
+        Assert.Equal(2, new MixedValue([new PlainText(""), new PlainText("")]).Count);
     }
 
     [Fact]
     public void MixedValueHasIndexerOverComponents ()
     {
-        Assert.Equal("foo", new MixedValue(new[] { new PlainText("foo") })[0] as PlainText);
+        Assert.Equal("foo", new MixedValue([new PlainText("foo")])[0] as PlainText);
     }
 
     [Fact]

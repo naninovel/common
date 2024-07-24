@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 /// <summary>
 /// Represents a collection of <see cref="IValueComponent"/>.
 /// </summary>
-public class MixedValue (IEnumerable<IValueComponent> components)
+public class MixedValue (IValueComponent[] components)
     : IReadOnlyList<IValueComponent>, ILineComponent, IGenericContent
 {
     /// <summary>
@@ -15,7 +15,7 @@ public class MixedValue (IEnumerable<IValueComponent> components)
     public bool Dynamic => HasExpression();
     public int Count => components.Count;
 
-    private readonly IReadOnlyList<IValueComponent> components = components.ToArray();
+    private readonly IReadOnlyList<IValueComponent> components = components;
 
     public static implicit operator MixedValue (IValueComponent[]? components)
     {

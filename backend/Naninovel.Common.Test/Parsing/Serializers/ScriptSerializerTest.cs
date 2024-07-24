@@ -72,12 +72,12 @@ public class ScriptSerializerTest
         var prefix = new GenericPrefix("auth", "app");
         var inlined1 = new InlinedCommand(new("i"));
         var inlined2 = new InlinedCommand(new("cmd", new[] { new Parameter("p", new[] { new PlainText("v") }) }));
-        var text1 = new MixedValue(new IValueComponent[] {
+        var text1 = new MixedValue([
             new PlainText(@"""{}"),
             new Expression("x < y"),
             new PlainText(@"[]\ ")
-        });
-        var text2 = new MixedValue(new[] { new PlainText("x") });
+        ]);
+        var text2 = new MixedValue([new PlainText("x")]);
         var line = new GenericLine(prefix, new IGenericContent[] { text1, inlined1, inlined2, text2 });
         Assert.Equal(@"auth.app: ""\{\}{x < y}\[\]\\ [i][cmd p:v]x", serializer.Serialize(line));
     }
@@ -85,7 +85,7 @@ public class ScriptSerializerTest
     [Fact]
     public void WhenStartingWithQuoteGenericTextIsNotWrapped ()
     {
-        var text = new MixedValue(new[] { new PlainText("\"") });
+        var text = new MixedValue([new PlainText("\"")]);
         var line = new GenericLine(new[] { text });
         Assert.Equal(@"""", serializer.Serialize(line));
     }
@@ -93,7 +93,7 @@ public class ScriptSerializerTest
     [Fact]
     public void WhenGenericTextContainQuotesItIsNotWrapped ()
     {
-        var text = new MixedValue(new[] { new PlainText("x\"x") });
+        var text = new MixedValue([new PlainText("x\"x")]);
         var line = new GenericLine(new[] { text });
         Assert.Equal("x\"x", serializer.Serialize(line));
     }
@@ -101,14 +101,14 @@ public class ScriptSerializerTest
     [Fact]
     public void CanSerializeGenericLineWithoutPrefix ()
     {
-        var line = new GenericLine(new[] { new MixedValue(new[] { new PlainText("x") }) });
+        var line = new GenericLine(new[] { new MixedValue([new PlainText("x")]) });
         Assert.Equal("x", serializer.Serialize(line));
     }
 
     [Fact]
     public void CanSerializeGenericLineWithoutAppearance ()
     {
-        var line = new GenericLine(new GenericPrefix("k"), new[] { new MixedValue(new[] { new PlainText("x") }) });
+        var line = new GenericLine(new GenericPrefix("k"), new[] { new MixedValue([new PlainText("x")]) });
         Assert.Equal("k: x", serializer.Serialize(line));
     }
 
@@ -185,7 +185,7 @@ public class ScriptSerializerTest
     public void TrimsTrailingEmptyLines ()
     {
         Assert.Equal("foo\n", serializer.Serialize(new IScriptLine[] {
-            new GenericLine(new[] { new MixedValue(new[] { new PlainText("foo") }) }),
+            new GenericLine(new[] { new MixedValue([new PlainText("foo")]) }),
             new GenericLine(Array.Empty<IGenericContent>()),
             new GenericLine(Array.Empty<IGenericContent>())
         }));
@@ -202,10 +202,10 @@ public class ScriptSerializerTest
     public void CanSerializeEscapedAuthorAssign ()
     {
         Assert.Equal("x\\: x:x :x\n", serializer.Serialize(new IScriptLine[] {
-            new GenericLine(new[] { new MixedValue(new[] { new PlainText("x: x:x :x") }) }),
+            new GenericLine(new[] { new MixedValue([new PlainText("x: x:x :x")]) }),
         }));
         Assert.Equal("x : x\n", serializer.Serialize(new IScriptLine[] {
-            new GenericLine(new[] { new MixedValue(new[] { new PlainText("x : x") }) })
+            new GenericLine(new[] { new MixedValue([new PlainText("x : x")]) })
         }));
     }
 
@@ -226,7 +226,7 @@ public class ScriptSerializerTest
         var comment = new CommentLine("bar", 1);
         var command = new CommandLine(new Command("baz"), -1);
         var generic = new GenericLine(new GenericPrefix("x"),
-            new[] { new MixedValue(new[] { new PlainText("nya") }) }, 2);
+            new[] { new MixedValue([new PlainText("nya")]) }, 2);
         Assert.Equal("# foo", serializer.Serialize(label));
         Assert.Equal("    ; bar", serializer.Serialize(comment));
         Assert.Equal("@baz", serializer.Serialize(command));
@@ -239,19 +239,19 @@ public class ScriptSerializerTest
         Assert.Equal("[] x\t[]", serializer.Serialize(new GenericLine(null,
             new IGenericContent[] {
                 new InlinedCommand(new Command("")),
-                new MixedValue(new[] { new PlainText(" x\t") }),
+                new MixedValue([new PlainText(" x\t")]),
                 new InlinedCommand(new Command(""))
             })));
         Assert.Equal("    [] x\t[]", serializer.Serialize(new GenericLine(null,
             new IGenericContent[] {
                 new InlinedCommand(new Command("")),
-                new MixedValue(new[] { new PlainText(" x\t") }),
+                new MixedValue([new PlainText(" x\t")]),
                 new InlinedCommand(new Command(""))
             }, 1)));
         Assert.Equal("    x: [] x\t[]", serializer.Serialize(new GenericLine(new GenericPrefix("x"),
             new IGenericContent[] {
                 new InlinedCommand(new Command("")),
-                new MixedValue(new[] { new PlainText(" x\t") }),
+                new MixedValue([new PlainText(" x\t")]),
                 new InlinedCommand(new Command(""))
             }, 1)));
     }

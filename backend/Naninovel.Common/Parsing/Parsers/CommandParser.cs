@@ -7,7 +7,7 @@ namespace Naninovel.Parsing;
 internal class CommandParser (ISyntax stx)
 {
     private static readonly Command emptyBody = new(PlainText.Empty);
-    private static readonly MixedValue emptyValue = new(Array.Empty<IValueComponent>());
+    private static readonly MixedValue emptyValue = new([]);
     private readonly MixedValueParser valueParser = new(true, stx);
     private readonly List<Parameter> parameters = [];
     private LineWalker walker = null!;
@@ -105,13 +105,13 @@ internal class CommandParser (ISyntax stx)
     private void ParseBoolFlag (Token flagToken)
     {
         var value = flagToken.EndIndex > paramIdToken.EndIndex ? stx.True : stx.False;
-        paramValue = new MixedValue(new[] { new PlainText(value) });
+        paramValue = new MixedValue([new PlainText(value)]);
         walker.Associate(paramValue, flagToken);
     }
 
     private void ParseParameterValue (Token valueToken)
     {
-        paramValue = new MixedValue(valueParser.Parse(valueToken, walker, false));
+        paramValue = valueParser.Parse(valueToken, walker, false);
         walker.Associate(paramValue, valueToken);
         walker.Identify(paramValue);
     }

@@ -48,7 +48,7 @@ internal class MixedValueParser (bool unwrap, ISyntax stx)
         textIdBodies.Clear();
         expressions.Clear();
 
-        return new MixedValue(value);
+        return new MixedValue(value.ToArray());
 
         bool IsTextStarted () => textStartIndex != -1;
 
