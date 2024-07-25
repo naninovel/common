@@ -17,6 +17,8 @@ public class MixedValue (IValueComponent[] components)
 
     private readonly IReadOnlyList<IValueComponent> components = components;
 
+    public MixedValue () : this([]) { }
+
     public static implicit operator MixedValue (IValueComponent[]? components)
     {
         if (components is null) return null!;

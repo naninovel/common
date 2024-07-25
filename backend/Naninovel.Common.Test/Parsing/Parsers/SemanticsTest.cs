@@ -90,6 +90,14 @@ public class SemanticsTest
     }
 
     [Fact]
+    public void MixedValueHasImplicitConversionFromEmptyCollectionExpression ()
+    {
+        MixedValue mixed = [];
+        Assert.IsType<MixedValue>(mixed);
+        Assert.NotNull(mixed);
+    }
+
+    [Fact]
     public void WhenConvertedFromNullArrayMixedValueIsNull ()
     {
         MixedValue mixed = (IValueComponent[])null;
