@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Naninovel.Utilities.Test;
@@ -5,6 +7,72 @@ namespace Naninovel.Utilities.Test;
 [ExcludeFromCodeCoverage]
 public class LinqUtilTest
 {
+    private class CustomEnumerable (IEnumerable<int> items) : IEnumerable<int>
+    {
+        public IEnumerator<int> GetEnumerator () => items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator () => GetEnumerator();
+    }
+
+    [Fact, SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+    public void CanCheckIfIndexIsValid ()
+    {
+        var str = "0";
+        var array = new[] { 0 };
+        var list = new List<int> { 0 };
+        var dict = new Dictionary<int, int> { [0] = 0 };
+        var set = new HashSet<int> { 0 };
+        var frozen = set.ToFrozenSet();
+        var enumerable = new CustomEnumerable([0]);
+        ICollection<int> iColl = [0];
+        IReadOnlyCollection<int> iRoColl = [0];
+        IList<int> iList = [0];
+        IReadOnlyList<int> iRoList = [0];
+
+        Assert.True(str.IsIndexValid(0));
+        Assert.False(str.IsIndexValid(-1));
+        Assert.False(str.IsIndexValid(1));
+
+        Assert.True(array.IsIndexValid(0));
+        Assert.False(array.IsIndexValid(-1));
+        Assert.False(array.IsIndexValid(1));
+
+        Assert.True(list.IsIndexValid(0));
+        Assert.False(list.IsIndexValid(-1));
+        Assert.False(list.IsIndexValid(1));
+
+        Assert.True(dict.IsIndexValid(0));
+        Assert.False(dict.IsIndexValid(-1));
+        Assert.False(dict.IsIndexValid(1));
+
+        Assert.True(set.IsIndexValid(0));
+        Assert.False(set.IsIndexValid(-1));
+        Assert.False(set.IsIndexValid(1));
+
+        Assert.True(frozen.IsIndexValid(0));
+        Assert.False(frozen.IsIndexValid(-1));
+        Assert.False(frozen.IsIndexValid(1));
+
+        Assert.True(enumerable.IsIndexValid(0));
+        Assert.False(enumerable.IsIndexValid(-1));
+        Assert.False(enumerable.IsIndexValid(1));
+
+        Assert.True(iColl.IsIndexValid(0));
+        Assert.False(iColl.IsIndexValid(-1));
+        Assert.False(iColl.IsIndexValid(1));
+
+        Assert.True(iRoColl.IsIndexValid(0));
+        Assert.False(iRoColl.IsIndexValid(-1));
+        Assert.False(iRoColl.IsIndexValid(1));
+
+        Assert.True(iList.IsIndexValid(0));
+        Assert.False(iList.IsIndexValid(-1));
+        Assert.False(iList.IsIndexValid(1));
+
+        Assert.True(iRoList.IsIndexValid(0));
+        Assert.False(iRoList.IsIndexValid(-1));
+        Assert.False(iRoList.IsIndexValid(1));
+    }
+
     [Fact]
     public void OrNullExtensionsReturnNullWhenElementNotFound ()
     {
