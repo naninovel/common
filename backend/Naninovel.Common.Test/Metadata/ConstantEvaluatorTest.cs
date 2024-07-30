@@ -19,7 +19,7 @@ public class ConstantEvaluatorTest
     }
 
     [Fact]
-    public void CanInjectScriptName ()
+    public void CanResolveScript ()
     {
         inspectedScript = "foo";
         Assert.Equal(new[] { "foo" }, Evaluate("{$Script}"));

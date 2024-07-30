@@ -11,7 +11,7 @@ public class Resource
     /// </summary>
     public string Path { get; set; } = string.Empty;
     /// <summary>
-    /// Type of the resource: script, audio, spawned prefab, etc.
+    /// Type of the resource: script, audio, spawned, etc.
     /// </summary>
     public string Type { get; set; } = string.Empty;
 }

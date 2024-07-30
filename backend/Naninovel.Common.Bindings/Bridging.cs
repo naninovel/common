@@ -35,9 +35,9 @@ public static partial class Bridging
     }
 
     [JSInvokable]
-    public static void RequestGoto (string scriptName, int lineIndex)
+    public static void RequestGoto (string scriptId, int lineIndex)
     {
-        var spot = new PlaybackSpot { ScriptName = scriptName, LineIndex = lineIndex };
+        var spot = new PlaybackSpot { ScriptId = scriptId, LineIndex = lineIndex };
         client?.Send(new GotoRequest { PlaybackSpot = spot });
     }
 

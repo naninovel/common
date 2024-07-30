@@ -7,6 +7,7 @@ namespace Naninovel.Metadata;
 /// </summary>
 public class MetadataProvider : IMetadata
 {
+    public IReadOnlyCollection<Script> Scripts => scripts;
     public IReadOnlyCollection<Actor> Actors => actors;
     public IReadOnlyCollection<Command> Commands => commands;
     public IReadOnlyCollection<Constant> Constants => constants;
@@ -15,6 +16,7 @@ public class MetadataProvider : IMetadata
     public IReadOnlyCollection<Function> Functions => functions;
     public ISyntax Syntax => syntaxProvider;
 
+    private readonly List<Script> scripts = [];
     private readonly List<Actor> actors = [];
     private readonly List<Command> commands = [];
     private readonly List<Constant> constants = [];
@@ -34,6 +36,7 @@ public class MetadataProvider : IMetadata
     public void Update (Project meta)
     {
         Reset();
+        scripts.AddRange(meta.Scripts);
         actors.AddRange(meta.Actors);
         commands.AddRange(meta.Commands);
         constants.AddRange(meta.Constants);
@@ -75,6 +78,7 @@ public class MetadataProvider : IMetadata
 
     private void Reset ()
     {
+        scripts.Clear();
         actors.Clear();
         commands.Clear();
         constants.Clear();

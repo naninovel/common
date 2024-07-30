@@ -7,6 +7,8 @@ namespace Naninovel.Metadata;
 /// </summary>
 public interface IMetadata
 {
+    /// <inheritdoc cref="Project.Scripts"/>
+    public IReadOnlyCollection<Script> Scripts { get; }
     /// <inheritdoc cref="Project.Actors"/>
     public IReadOnlyCollection<Actor> Actors { get; }
     /// <inheritdoc cref="Project.Commands"/>
