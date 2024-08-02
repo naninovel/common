@@ -8,10 +8,6 @@ namespace Naninovel.Metadata;
 public class Project
 {
     /// <summary>
-    /// Scripts available in the project.
-    /// </summary>
-    public Script[] Scripts { get; set; } = [];
-    /// <summary>
     /// Actors available in the project.
     /// </summary>
     public Actor[] Actors { get; set; } = [];

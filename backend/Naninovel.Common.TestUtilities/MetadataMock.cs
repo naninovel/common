@@ -7,7 +7,6 @@ namespace Naninovel.TestUtilities;
 [ExcludeFromCodeCoverage]
 public class MetadataMock : IMetadata
 {
-    public List<Script> Scripts { get; set; } = [];
     public List<Actor> Actors { get; set; } = [];
     public List<Metadata.Command> Commands { get; set; } = [];
     public List<Resource> Resources { get; set; } = [];
@@ -16,7 +15,6 @@ public class MetadataMock : IMetadata
     public List<Function> Functions { get; set; } = [];
     public Syntax Syntax { get; set; } = new();
 
-    IReadOnlyCollection<Script> IMetadata.Scripts => Scripts;
     IReadOnlyCollection<Actor> IMetadata.Actors => Actors;
     IReadOnlyCollection<Metadata.Command> IMetadata.Commands => Commands;
     IReadOnlyCollection<Constant> IMetadata.Constants => Constants;
@@ -26,7 +24,6 @@ public class MetadataMock : IMetadata
     ISyntax IMetadata.Syntax => Syntax;
 
     public Project AsProject () => new() {
-        Scripts = Scripts.ToArray(),
         Actors = Actors.ToArray(),
         Commands = Commands.ToArray(),
         Resources = Resources.ToArray(),
