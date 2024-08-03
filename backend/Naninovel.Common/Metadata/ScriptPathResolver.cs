@@ -14,10 +14,12 @@ public class ScriptPathResolver
     /// </summary>
     public string RootUri { get => rootUri; set => rootUri = FormatRootUri(value); }
 
+    private readonly Dictionary<(string RootUri, string FileUri), string> memo = [];
     private string rootUri = "/";
 
     /// <summary>
     /// Resolves local resource path of a scenario script with specified file location.
+    /// Results are memoized on consequent requests with same file and root URIs.
     /// </summary>
     /// <remarks>
     /// When specified path doesn't start with <see cref="RootUri"/>, will keep
@@ -26,14 +28,20 @@ public class ScriptPathResolver
     /// </remarks>
     public string Resolve (string fileUri)
     {
+        var key = (rootUri, fileUri);
+        if (memo.TryGetValue(key, out var path)) return path;
+
         fileUri = FormatUri(fileUri);
         var localUri = fileUri.GetAfterFirst(rootUri);
         if (string.IsNullOrEmpty(localUri))
             localUri = fileUri.GetAfterFirst("/");
         if (string.IsNullOrEmpty(localUri))
             localUri = fileUri;
-        if (!localUri.EndsWithOrdinal(".nani")) return localUri;
-        return localUri.GetBeforeLast(".nani");
+        path = localUri.EndsWithOrdinal(".nani")
+            ? localUri.GetBeforeLast(".nani") : localUri;
+
+        memo[key] = path;
+        return path;
     }
 
     private static string FormatUri (string content)

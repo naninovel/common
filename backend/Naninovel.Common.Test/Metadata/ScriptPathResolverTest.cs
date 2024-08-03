@@ -24,4 +24,14 @@ public class ScriptPathResolverTest
     {
         Assert.Equal("foo/bar/", new ScriptPathResolver { RootUri = "foo\\bar" }.RootUri);
     }
+
+    [Fact]
+    public void MemoRespectsRoot ()
+    {
+        var resolver = new ScriptPathResolver { RootUri = "/foo" };
+        Assert.Equal("bar/nya", resolver.Resolve("/foo/bar/nya.nani"));
+        Assert.Equal("bar/nya", resolver.Resolve("/foo/bar/nya.nani"));
+        resolver.RootUri = "/foo/bar";
+        Assert.Equal("nya", resolver.Resolve("/foo/bar/nya.nani"));
+    }
 }
