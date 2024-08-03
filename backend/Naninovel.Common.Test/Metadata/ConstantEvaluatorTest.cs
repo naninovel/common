@@ -2,7 +2,7 @@ namespace Naninovel.Metadata.Test;
 
 public class ConstantEvaluatorTest
 {
-    private string inspectedScriptId = "";
+    private string inspectedScriptPath = "";
     private ConstantEvaluator.GetParamValue getParamValue = (id, idx) => null;
 
     [Fact]
@@ -21,14 +21,14 @@ public class ConstantEvaluatorTest
     [Fact]
     public void CanResolveScript ()
     {
-        inspectedScriptId = "foo";
+        inspectedScriptPath = "foo";
         Assert.Equal(new[] { "foo" }, Evaluate("{$Script}"));
     }
 
     [Fact]
     public void DoesntModifyContentOutsideOfExpression ()
     {
-        inspectedScriptId = "bar";
+        inspectedScriptPath = "bar";
         Assert.Equal(new[] { "foo/bar" }, Evaluate("foo/{$Script}"));
     }
 
@@ -49,7 +49,7 @@ public class ConstantEvaluatorTest
     [Fact]
     public void CanUseNullCoalescing ()
     {
-        inspectedScriptId = "bar";
+        inspectedScriptPath = "bar";
         getParamValue = (id, idx) => id == "foo" ? "foo" : null;
         Assert.Equal(new[] { "foobar" }, Evaluate("{:foo??:bar}{:bar??$Script}"));
     }
@@ -57,7 +57,7 @@ public class ConstantEvaluatorTest
     [Fact]
     public void CanGetEnumerableParamValue ()
     {
-        inspectedScriptId = "nya";
+        inspectedScriptPath = "nya";
         getParamValue = (id, idx) => idx == 0 ? "foo" : idx == 1 ? "bar" : null;
         Assert.Equal(new[] { "foo/bar/nya" }, Evaluate("{:foo[0]}/{:bar[1]}/{:nya[2]??$Script}"));
     }
@@ -65,7 +65,7 @@ public class ConstantEvaluatorTest
     [Fact]
     public void CanConcatenate ()
     {
-        inspectedScriptId = "nya";
+        inspectedScriptPath = "nya";
         getParamValue = (id, idx) => idx == 0 ? "foo" : idx == 1 ? "bar" : null;
         Assert.Equal(new[] { "foo/bar/nya", "nya/foo", "foo" }, Evaluate("{:foo[0]}/{:bar[1]}/{:nya[2]??$Script}+{$Script}/foo+{:foo[0]}"));
     }
@@ -78,6 +78,6 @@ public class ConstantEvaluatorTest
 
     private IReadOnlyList<string> Evaluate (string expression)
     {
-        return ConstantEvaluator.EvaluateNames(expression, inspectedScriptId, getParamValue);
+        return ConstantEvaluator.EvaluateNames(expression, inspectedScriptPath, getParamValue);
     }
 }

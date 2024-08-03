@@ -15,17 +15,17 @@ public static class ConstantEvaluator
     private static readonly string[] concatSeparator = [concatSymbol];
     private static readonly string[] nullSeparator = [nullCoalescingSymbol];
 
-    public static IReadOnlyList<string> EvaluateNames (string value, string scriptId, GetParamValue getParamValue)
+    public static IReadOnlyList<string> EvaluateNames (string value, string scriptPath, GetParamValue getParamValue)
     {
         if (string.IsNullOrEmpty(value)) return Array.Empty<string>();
         var parts = value.Split(concatSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
         for (int i = parts.Count - 1; i >= 0; i--)
-            if (EvaluatePart(parts[i], scriptId, getParamValue) is { } part) parts[i] = part;
+            if (EvaluatePart(parts[i], scriptPath, getParamValue) is { } part) parts[i] = part;
             else parts.RemoveAt(i);
         return parts;
     }
 
-    private static string? EvaluatePart (string part, string scriptId, GetParamValue getParamValue)
+    private static string? EvaluatePart (string part, string scriptPath, GetParamValue getParamValue)
     {
         var startIndex = part.IndexOf(expressionStartSymbol);
         var endIndex = part.IndexOf(expressionEndSymbol);
@@ -34,7 +34,7 @@ public static class ConstantEvaluator
         {
             var expression = part.Substring(startIndex + 1, endIndex - startIndex - 1);
             part = part.Remove(startIndex, endIndex - startIndex + 1);
-            part = part.Insert(startIndex, EvaluateExpression(expression, scriptId, getParamValue));
+            part = part.Insert(startIndex, EvaluateExpression(expression, scriptPath, getParamValue));
             startIndex = part.IndexOf(expressionStartSymbol);
             endIndex = part.IndexOf(expressionEndSymbol);
         }
@@ -42,18 +42,18 @@ public static class ConstantEvaluator
         return string.IsNullOrEmpty(part) ? null : part;
     }
 
-    private static string EvaluateExpression (string expression, string scriptId, GetParamValue getParamValue)
+    private static string EvaluateExpression (string expression, string scriptPath, GetParamValue getParamValue)
     {
         var atoms = expression.Split(nullSeparator, StringSplitOptions.RemoveEmptyEntries);
         foreach (var atom in atoms)
-            if (EvaluateAtom(atom, scriptId, getParamValue) is { } value)
+            if (EvaluateAtom(atom, scriptPath, getParamValue) is { } value)
                 return value;
         return "";
     }
 
-    private static string? EvaluateAtom (string atom, string scriptId, GetParamValue getParamValue)
+    private static string? EvaluateAtom (string atom, string scriptPath, GetParamValue getParamValue)
     {
-        if (atom == scriptSymbol) return scriptId;
+        if (atom == scriptSymbol) return scriptPath;
         if (!atom.StartsWith(paramIdSymbol.ToString())) return null;
         var indexStart = atom.IndexOf(paramIndexStartSymbol);
         var indexEnd = atom.IndexOf(paramIndexEndSymbol);
