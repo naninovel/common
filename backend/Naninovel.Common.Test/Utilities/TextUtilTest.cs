@@ -101,6 +101,7 @@ public class TextUtilTest
         Assert.Empty("".GetBefore(" "));
         Assert.Empty("".GetBefore("x"));
         Assert.Empty("xx".GetBefore("x"));
+        Assert.Equal("", "/foo".GetBefore("bar"));
         Assert.Equal("x", "xw".GetBefore("w"));
         Assert.Equal("x", "xwx".GetBefore("w"));
         Assert.Equal("foo\n", "foo\nbar\nfoo".GetBefore("bar"));
@@ -112,6 +113,7 @@ public class TextUtilTest
         Assert.Empty("".GetBeforeLast(""));
         Assert.Empty("".GetBeforeLast(" "));
         Assert.Empty("".GetBeforeLast("x"));
+        Assert.Equal("", "/foo".GetBeforeLast("bar"));
         Assert.Equal("x", "xx".GetBeforeLast("x"));
         Assert.Equal("opp", "oppo".GetBeforeLast("o"));
         Assert.Equal("foo\nbar\n", "foo\nbar\nfoo\nnya".GetBeforeLast("foo"));
@@ -123,6 +125,7 @@ public class TextUtilTest
         Assert.Empty("".GetAfter(""));
         Assert.Empty("".GetAfter(" "));
         Assert.Empty("".GetAfter("x"));
+        Assert.Equal("", "/foo".GetAfter("bar"));
         Assert.Empty("xx".GetAfter("x"));
         Assert.Equal("w", "xw".GetAfter("x"));
         Assert.Empty("xwx".GetAfter("x"));
@@ -135,6 +138,7 @@ public class TextUtilTest
         Assert.Empty("".GetAfterFirst(""));
         Assert.Empty("".GetAfterFirst(" "));
         Assert.Empty("".GetAfterFirst("x"));
+        Assert.Equal("", "/foo".GetAfterFirst("bar"));
         Assert.Equal("x", "xx".GetAfterFirst("x"));
         Assert.Equal("w", "xw".GetAfterFirst("x"));
         Assert.Equal("x", "xwx".GetAfterFirst("w"));
