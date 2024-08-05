@@ -3,7 +3,7 @@ namespace Naninovel;
 /// <summary>
 /// Common LINQ-related helpers and extensions.
 /// </summary>
-public static class LinqUtil
+public static class LinqUtils
 {
     /// <summary>
     /// Checks whether specified index is in bounds for the collection.

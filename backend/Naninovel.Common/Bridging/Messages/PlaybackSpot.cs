@@ -6,9 +6,9 @@ namespace Naninovel.Bridging;
 public class PlaybackSpot
 {
     /// <summary>
-    /// Unique identifier of the scenario script.
+    /// Unique (project-wide) local resource path of the scenario script.
     /// </summary>
-    public string ScriptId { get; set; } = null!;
+    public string ScriptPath { get; set; } = null!;
     /// <summary>
     /// Zero-based index of the script line.
     /// </summary>
