@@ -9,7 +9,7 @@ public class MessagesTest
     public void MessagePropsInitializedWithDefaults ()
     {
         Assert.Null(new GotoRequest().PlaybackSpot);
-        Assert.Null(new PlaybackSpot().ScriptName);
+        Assert.Null(new PlaybackSpot().ScriptPath);
         Assert.Equal(0, new PlaybackSpot().LineIndex);
         Assert.Equal(0, new PlaybackSpot().InlineIndex);
         Assert.Null(new PlaybackStatus().PlayedSpot);

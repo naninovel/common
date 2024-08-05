@@ -10,12 +10,12 @@ public class ProviderTest
     public void ProjectMetadataIsAssignedToCollections ()
     {
         provider.Update(new() {
-            Actors = [new Actor { Id = "foo" }],
-            Constants = [new Constant { Name = "bar" }],
+            Actors = [new Actor { Id = "bar" }],
+            Constants = [new Constant { Name = "baz" }],
             Resources = [new Resource { Path = "nya" }]
         });
-        Assert.Equal("foo", provider.Actors.First().Id);
-        Assert.Equal("bar", provider.Constants.First().Name);
+        Assert.Equal("bar", provider.Actors.First().Id);
+        Assert.Equal("baz", provider.Constants.First().Name);
         Assert.Equal("nya", provider.Resources.First().Path);
     }
 

@@ -11,7 +11,7 @@ public class EndpointResolver (IMetadata meta)
 
     /// <summary>
     /// When specified command has <see cref="BranchTraits.Endpoint"/> branch flag and
-    /// a parameter with navigation context (script name and/or label),
+    /// a parameter with navigation context (script path and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
     /// </summary>
     /// <param name="command">Command to extract the endpoint from.</param>
@@ -28,7 +28,7 @@ public class EndpointResolver (IMetadata meta)
 
     /// <summary>
     /// When command with specified ID has <see cref="BranchTraits.Endpoint"/> branch flag and
-    /// specified parameter has navigation context (script name and/or label),
+    /// specified parameter has navigation context (script path and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
     /// </summary>
     /// <param name="parameter">Parameter to extract the endpoint from.</param>

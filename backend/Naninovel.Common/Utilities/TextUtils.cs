@@ -7,7 +7,7 @@ namespace Naninovel.Utilities; // Don't remove Utilities sub-space
 /// <summary>
 /// Common text-related helpers and extensions.
 /// </summary>
-public static class TextUtil
+public static class TextUtils
 {
     private static readonly string[] breaks = ["\r\n", "\n", "\r"];
     private static readonly char[] junk = ['\uFEFF', '\u200B'];
@@ -89,7 +89,10 @@ public static class TextUtil
     /// </summary>
     public static string GetAfter (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return (str.LastIndexOf(match, comp) + match.Length) is var idx and >= 0 && idx < str.Length ? str.Substring(idx) : "";
+        var matchIdx = str.LastIndexOf(match, comp);
+        if (matchIdx == -1) return "";
+        var cutIdx = matchIdx + match.Length;
+        return cutIdx < str.Length ? str.Substring(cutIdx) : "";
     }
 
     /// <summary>
@@ -97,7 +100,10 @@ public static class TextUtil
     /// </summary>
     public static string GetAfterFirst (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return (str.IndexOf(match, comp) + match.Length) is var idx and >= 0 && idx < str.Length ? str.Substring(idx) : "";
+        var matchIdx = str.IndexOf(match, comp);
+        if (matchIdx == -1) return "";
+        var cutIdx = matchIdx + match.Length;
+        return cutIdx < str.Length ? str.Substring(cutIdx) : "";
     }
 
     /// <summary>

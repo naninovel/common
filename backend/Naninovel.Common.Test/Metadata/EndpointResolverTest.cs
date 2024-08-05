@@ -83,7 +83,7 @@ public class EndpointResolverTest
             Commands = [CreateEndpointCommandMeta("c", "p")]
         });
         Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s") })]), out var point));
-        Assert.Equal("s", point.Script);
+        Assert.Equal("s", point.ScriptPath);
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class EndpointResolverTest
             Commands = [CreateEndpointCommandMeta("c", "p")]
         });
         Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s.l") })]), out var point));
-        Assert.Equal("s", point.Script);
+        Assert.Equal("s", point.ScriptPath);
         Assert.Equal("l", point.Label);
     }
 
