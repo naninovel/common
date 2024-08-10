@@ -29,7 +29,7 @@ public class NetClientTransport : IClientTransport
             result = await socket.ReceiveAsync(segment, token);
             if (result.MessageType == WebSocketMessageType.Close)
                 throw new OperationCanceledException();
-            stream.Write(segment.Array ?? Array.Empty<byte>(), segment.Offset, result.Count);
+            stream.Write(segment.Array ?? [], segment.Offset, result.Count);
         } while (!result.EndOfMessage);
         return Encoding.UTF8.GetString(stream.ToArray());
     }
