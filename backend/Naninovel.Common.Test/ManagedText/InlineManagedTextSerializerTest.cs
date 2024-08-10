@@ -3,8 +3,8 @@
 public class InlineManagedTextSerializerTest
 {
     public static TheoryData<string, int, ManagedTextRecord[], string> Facts { get; } = new() {
-        { "", 0, [], "" },
-        { "", 1, [], "" },
+        { "", 0, [], "\n" },
+        { "", 1, [], "\n" },
         { "header", 0, [], "; header\n" },
         { "header", 0, [new("key", "value", "comment")], "; header\n; comment\nkey: value\n" },
         { "header", 1, [new("key", "value", "comment")], "; header\n\n; comment\nkey: value\n" },

@@ -28,6 +28,8 @@ public class MultilineManagedTextSerializer
             AppendHeader(document.Header);
         foreach (var record in document.Records)
             AppendRecord(record);
+        if (builder.Length == 0)
+            builder.Append('\n');
         return builder.ToString();
     }
 
