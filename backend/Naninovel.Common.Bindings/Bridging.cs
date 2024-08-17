@@ -22,7 +22,7 @@ public static partial class Bridging
         BreakConnectionLoop();
         Bridging.preferredPort = preferredPort;
         while (tcs is { IsCancellationRequested: false })
-            try { await ConnectToServerAsync(tcs.Token); }
+            try { await ConnectToServer(tcs.Token); }
             catch (Exception e) { LogError($"Bridging error: {e.Message}"); }
     }
 
@@ -44,13 +44,13 @@ public static partial class Bridging
     [JSFunction] public static partial void OnMetadataUpdated (Project metadata);
     [JSFunction] public static partial void OnPlaybackStatusUpdated (PlaybackStatus status);
 
-    private static async Task ConnectToServerAsync (CancellationToken token)
+    private static async Task ConnectToServer (CancellationToken token)
     {
         await Task.Delay(scanDelay, token);
         using var client = CreateClient();
-        if (await FindServerAsync() is not { } server) return;
-        if (await TryConnectAsync(client, server.Port) is not { } status) return;
-        await MaintainConnectionAsync(status);
+        if (await FindServer() is not { } server) return;
+        if (await TryConnect(client, server.Port) is not { } status) return;
+        await MaintainConnection(status);
     }
 
     private static Client CreateClient ()
@@ -61,23 +61,23 @@ public static partial class Bridging
         return client;
     }
 
-    private static async Task<ServerInfo?> FindServerAsync ()
+    private static async Task<ServerInfo?> FindServer ()
     {
         var startPort = preferredPort;
         var endPort = startPort + 2;
-        var servers = await finder.FindServersAsync(startPort, endPort, timeout);
+        var servers = await finder.FindServers(startPort, endPort, timeout);
         return servers.FirstOrDefault();
     }
 
-    private static async Task<ConnectionStatus?> TryConnectAsync (Client client, int port)
+    private static async Task<ConnectionStatus?> TryConnect (Client client, int port)
     {
         using var cts = new CancellationTokenSource(timeout);
-        try { return await client.ConnectAsync(port, cts.Token); }
+        try { return await client.Connect(port, cts.Token); }
         catch (WebSocketException) { return null; }
         catch (OperationCanceledException) { return null; }
     }
 
-    private static async Task MaintainConnectionAsync (ConnectionStatus status)
+    private static async Task MaintainConnection (ConnectionStatus status)
     {
         LogInfo($"Connected to {status.ServerInfo.Name} bridging server.");
         try { await status.MaintainTask; }

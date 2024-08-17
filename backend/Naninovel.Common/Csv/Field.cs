@@ -35,14 +35,6 @@ internal sealed class Field
     {
         var bufLen = buf.Length;
         start = start < bufLen ? start : start % bufLen;
-        var endIdx = start + len - 1;
-        if (endIdx >= bufLen)
-        {
-            var prefixLen = buf.Length - start;
-            var prefix = new string(buf, start, prefixLen);
-            var suffix = new string(buf, 0, len - prefixLen);
-            return prefix + suffix;
-        }
         return new string(buf, start, len);
     }
 }

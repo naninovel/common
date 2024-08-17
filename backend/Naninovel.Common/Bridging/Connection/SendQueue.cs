@@ -15,7 +15,7 @@ internal class SendQueue : IDisposable
     }
 
     [ExcludeFromCodeCoverage]
-    public async Task<IMessage> WaitAsync (CancellationToken token)
+    public async Task<IMessage> Wait (CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {

@@ -64,42 +64,42 @@ namespace Naninovel.Csv.Test
             };
             for (var i = 0; i < input.Length; i++)
             {
-                var csvRdr = new Reader(new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(input[i]))), new() {
+                var reader = new Reader(new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(input[i]))), new() {
                     TrimFields = trim[i],
                     BufferSize = size[i]
                 });
-                var sb = new StringBuilder();
-                csvRdr.ReadRow(); // skip header row
-                while (csvRdr.ReadRow())
+                var builder = new StringBuilder();
+                reader.ReadRow(); // skip header row
+                while (reader.ReadRow())
                 {
-                    sb.Append(csvRdr[0] + "|");
-                    sb.Append(csvRdr[1] + "|");
-                    sb.Append(csvRdr[2] + "|");
-                    sb.Append('#');
+                    builder.Append(reader[0] + "|");
+                    builder.Append(reader[1] + "|");
+                    builder.Append(reader[2] + "|");
+                    builder.Append('#');
                 }
-                Assert.Equal(expected[i], sb.ToString());
+                Assert.Equal(expected[i], builder.ToString());
             }
         }
 
         [Fact]
         public void CanParseLinesThatExceedBufferSize ()
         {
-            var csvRdr = new Reader(
+            var reader = new Reader(
                 new StreamReader(new MemoryStream("ABCDEF,123456"u8.ToArray())), new() {
                     BufferSize = 5
                 });
-            Assert.Throws<InvalidDataException>(() => csvRdr.ReadRow());
+            Assert.Throws<InvalidDataException>(() => reader.ReadRow());
         }
 
         [Fact]
         public void ThrowsWhenCantReadQuotedFieldDueToInsufficientBufferLength ()
         {
             var test = "\"xxx\"";
-            var csvRdr = new Reader(
+            var reader = new Reader(
                 new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(test))), new() {
                     BufferSize = 2
                 });
-            Assert.Throws<InvalidDataException>(() => csvRdr.ReadRow());
+            Assert.Throws<InvalidDataException>(() => reader.ReadRow());
         }
 
         [Fact]

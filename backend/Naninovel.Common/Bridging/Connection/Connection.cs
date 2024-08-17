@@ -18,9 +18,9 @@ public class Connection : IDisposable
         this.waiter = waiter ?? new Waiter();
     }
 
-    internal async Task MaintainAsync ()
+    internal async Task Maintain ()
     {
-        try { await await Task.WhenAny(RunSendLoopAsync(), RunReceiveLoopAsync()); }
+        try { await await Task.WhenAny(RunSendLoop(), RunReceiveLoop()); }
         catch (OperationCanceledException) { }
     }
 
@@ -45,9 +45,9 @@ public class Connection : IDisposable
         return waiter.WaitAsync<T>(combinedCts.Token);
     }
 
-    public async Task CloseAsync (CancellationToken token = default)
+    public async Task Close (CancellationToken token = default)
     {
-        await transport.CloseAsync(token);
+        await transport.Close(token);
         cts.Cancel();
     }
 
@@ -58,21 +58,21 @@ public class Connection : IDisposable
         sendQueue.Dispose();
     }
 
-    private async Task RunSendLoopAsync ()
+    private async Task RunSendLoop ()
     {
         while (transport.Open && !cts.IsCancellationRequested)
         {
-            var message = await sendQueue.WaitAsync(cts.Token);
+            var message = await sendQueue.Wait(cts.Token);
             var data = serializer.Serialize(message);
-            await transport.SendMessageAsync(data, cts.Token);
+            await transport.SendMessage(data, cts.Token);
         }
     }
 
-    private async Task RunReceiveLoopAsync ()
+    private async Task RunReceiveLoop ()
     {
         while (transport.Open && !cts.IsCancellationRequested)
         {
-            var data = await transport.WaitMessageAsync(cts.Token);
+            var data = await transport.WaitMessage(cts.Token);
             if (!serializer.TryDeserialize(data, out var message)) continue;
             subscriber.InvokeHandlers(message);
             waiter.SetResult(message);

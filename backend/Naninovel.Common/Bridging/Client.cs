@@ -5,12 +5,12 @@ public class Client (IClientTransport transport, ISerializer serializer) : IDisp
     private readonly Connection connection = new(transport, serializer);
     private Task? maintainTask;
 
-    public async Task<ConnectionStatus> ConnectAsync (int port, CancellationToken token = default)
+    public async Task<ConnectionStatus> Connect (int port, CancellationToken token = default)
     {
         if (maintainTask != null) throw new InvalidOperationException("Already connected.");
-        await transport.ConnectToServerAsync(port, token);
+        await transport.ConnectToServer(port, token);
         var waitAcceptedTask = connection.WaitAsync<ConnectionAccepted>(token);
-        maintainTask = connection.MaintainAsync();
+        maintainTask = connection.Maintain();
         var acceptedMessage = await waitAcceptedTask;
         var serverInfo = new ServerInfo(acceptedMessage.ServerName, port);
         return new ConnectionStatus(maintainTask, serverInfo);
@@ -38,6 +38,6 @@ public class Client (IClientTransport transport, ISerializer serializer) : IDisp
 
     public void Dispose ()
     {
-        connection.CloseAsync().ContinueWith(_ => connection.Dispose());
+        connection.Close().ContinueWith(_ => connection.Dispose());
     }
 }

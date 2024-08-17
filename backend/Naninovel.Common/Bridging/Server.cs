@@ -21,12 +21,12 @@ public class Server (string name, IServerTransport listener, ISerializer seriali
         if (Listening) throw new InvalidOperationException("Already listening.");
         listener.StartListening(port);
         ListenedPort = port;
-        WaitForExit = ListenConnectionsAsync(token);
+        WaitForExit = ListenConnections(token);
     }
 
-    public Task StopAsync (CancellationToken token = default)
+    public Task Stop (CancellationToken token = default)
     {
-        var tasks = connections.Enumerate().Select(c => c.CloseAsync(token)
+        var tasks = connections.Enumerate().Select(c => c.Close(token)
             .ContinueWith(_ => c.Dispose(), token)).ToList();
         connections.Clear();
         listener.StopListening();
@@ -50,7 +50,7 @@ public class Server (string name, IServerTransport listener, ISerializer seriali
         subscriber.Unsubscribe(handler);
     }
 
-    public Task<T> WaitAsync<T> (CancellationToken token = default) where T : IClientMessage
+    public Task<T> Wait<T> (CancellationToken token = default) where T : IClientMessage
     {
         return waiter.WaitAsync<T>(token);
     }
@@ -62,10 +62,10 @@ public class Server (string name, IServerTransport listener, ISerializer seriali
         listener.Dispose();
     }
 
-    private async Task ListenConnectionsAsync (CancellationToken token)
+    private async Task ListenConnections (CancellationToken token)
     {
         while (listener.Listening)
-            try { AcceptConnection(await listener.WaitConnectionAsync(token)); }
+            try { AcceptConnection(await listener.WaitConnection(token)); }
             catch (OperationCanceledException) { break; }
     }
 
@@ -80,7 +80,7 @@ public class Server (string name, IServerTransport listener, ISerializer seriali
 
     private async void MaintainConnection (Connection connection)
     {
-        try { await connection.MaintainAsync(); }
+        try { await connection.Maintain(); }
         catch (Exception e) { OnClientException?.Invoke(e, connection); }
         finally
         {

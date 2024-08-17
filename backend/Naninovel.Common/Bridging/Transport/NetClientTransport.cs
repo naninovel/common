@@ -14,12 +14,12 @@ public class NetClientTransport : IClientTransport
     private readonly byte[] sendBuffer = new byte[bufferSize];
     private readonly ClientWebSocket socket = new();
 
-    public Task ConnectToServerAsync (int port, CancellationToken token)
+    public Task ConnectToServer (int port, CancellationToken token)
     {
         return socket.ConnectAsync(new Uri($"ws://localhost:{port}"), token);
     }
 
-    public async Task<string> WaitMessageAsync (CancellationToken token)
+    public async Task<string> WaitMessage (CancellationToken token)
     {
         using var stream = new MemoryStream();
         var segment = new ArraySegment<byte>(receiveBuffer);
@@ -34,7 +34,7 @@ public class NetClientTransport : IClientTransport
         return Encoding.UTF8.GetString(stream.ToArray());
     }
 
-    public async Task SendMessageAsync (string message, CancellationToken token)
+    public async Task SendMessage (string message, CancellationToken token)
     {
         var messageLength = message.Length;
         var messageCount = (int)Math.Ceiling((double)messageLength / bufferSize);
@@ -51,7 +51,7 @@ public class NetClientTransport : IClientTransport
         }
     }
 
-    public Task CloseAsync (CancellationToken token)
+    public Task Close (CancellationToken token)
     {
         return socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", token);
     }
