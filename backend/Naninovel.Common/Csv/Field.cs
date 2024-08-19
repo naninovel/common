@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Naninovel.Csv;
 
 internal sealed class Field
@@ -21,20 +23,29 @@ internal sealed class Field
     {
         if (Quoted)
         {
-            var s = Start + 1;
+            var start = Start + 1;
             var lenWithoutQuotes = Length - 2;
-            var val = lenWithoutQuotes > 0 ? GetString(buf, s, lenWithoutQuotes) : string.Empty;
-            if (EscapedQuotesCount > 0) val = val.Replace("\"\"", "\"");
-            return val;
+            var value = lenWithoutQuotes > 0 ? GetString(buf, start, lenWithoutQuotes) : string.Empty;
+            if (EscapedQuotesCount > 0) value = value.Replace("\"\"", "\"");
+            return value;
         }
         var len = Length;
         return len > 0 ? GetString(buf, Start, len) : string.Empty;
     }
 
+    [ExcludeFromCodeCoverage]
     private string GetString (char[] buf, int start, int len)
     {
         var bufLen = buf.Length;
         start = start < bufLen ? start : start % bufLen;
+        var endIdx = start + len - 1;
+        if (endIdx >= bufLen) // TODO: Figure how to test this condition; triggers when importing 'LargeScript.csv'.
+        {
+            var prefixLen = buf.Length - start;
+            var prefix = new string(buf, start, prefixLen);
+            var suffix = new string(buf, 0, len - prefixLen);
+            return prefix + suffix;
+        }
         return new string(buf, start, len);
     }
 }

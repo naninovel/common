@@ -110,5 +110,15 @@ namespace Naninovel.Csv.Test
             reader.ReadRow();
             Assert.Equal("x", reader[0]);
         }
+
+        [Fact]
+        public void CanReadQuotedWithMinBuffer ()
+        {
+            var stream = new MemoryStream("\"x\",y"u8.ToArray());
+            var reader = new Reader(new StreamReader(stream), new() { BufferSize = 3 });
+            reader.ReadRow();
+            reader.ReadRow();
+            Assert.Equal("y", reader[1]);
+        }
     }
 }
