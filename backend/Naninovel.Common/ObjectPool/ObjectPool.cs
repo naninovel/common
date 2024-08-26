@@ -123,8 +123,7 @@ public sealed class ObjectPool<T> : IDisposable where T : class
     }
 
     /// <summary>
-    /// Drops all the currently pooled "free" objects,
-    /// so that they can be reclaimed by the garbage collector.
+    /// Drops the pooled objects, allowing them to be reclaimed by the garbage collector.
     /// </summary>
     public void Drop ()
     {
