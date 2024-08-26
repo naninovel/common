@@ -128,12 +128,12 @@ public sealed class ObjectPool<T> : IDisposable where T : class
     /// </summary>
     public void Drop ()
     {
-        if (options.OnDrop != null)
+        if (options.OnDrop is { } drop)
         {
             foreach (var obj in pool)
-                options.OnDrop?.Invoke(obj);
+                drop(obj);
             if (lastReturned != null)
-                options.OnDrop?.Invoke(lastReturned);
+                drop(lastReturned);
         }
 
         Total = 0;
