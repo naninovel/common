@@ -221,8 +221,8 @@ public class Parser
         {
             var content = Consume().Content;
             var value = content;
-            if (value.StartsWith("\"", StringComparison.Ordinal)) value = value.Substring(1);
-            if (value.EndsWith("\"", StringComparison.Ordinal)) value = value.Substring(0, value.Length - 1);
+            if (value.StartsWith("\"", StringComparison.Ordinal)) value = value[1..];
+            if (value.EndsWith("\"", StringComparison.Ordinal)) value = value[..^1];
             return Map(new String(value), lastToken.Index - content.Length, content.Length);
         }
         return TryNumeric();

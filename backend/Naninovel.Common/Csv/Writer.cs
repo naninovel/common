@@ -11,13 +11,13 @@ public class Writer (TextWriter writer, Writer.Options? options = null)
     public class Options
     {
         /// <summary>
-        /// Whether to wrap all fields in quotes.
+        /// Whether to wrap all fields in quotes; disabled by default;
         /// </summary>
-        public bool QuoteAll { get; set; } = false;
+        public bool QuoteAll { get; set; }
         /// <summary>
-        /// Whether to trim leading and trailing whitespace in fields.
+        /// Whether to trim leading and trailing whitespace in fields; disabled by default;
         /// </summary>
-        public bool Trim { get; set; } = false;
+        public bool Trim { get; set; }
     }
 
     private const char delimiter = ',';
@@ -36,7 +36,7 @@ public class Writer (TextWriter writer, Writer.Options? options = null)
             field = field.Trim();
 
         if (!shouldQuote && field.Length > 0)
-            if (field.Contains(quote) || field[0] == ' ' || field[field.Length - 1] == ' ' || field.IndexOfAny(quoted) > -1)
+            if (field.Contains(quote) || field[0] == ' ' || field[^1] == ' ' || field.IndexOfAny(quoted) > -1)
                 shouldQuote = true;
         if (shouldQuote && field.Length > 0)
             field = field.Replace(quote, doubleQuote);

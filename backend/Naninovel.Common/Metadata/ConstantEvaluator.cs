@@ -58,7 +58,7 @@ public static class ConstantEvaluator
         var indexStart = atom.IndexOf(paramIndexStartSymbol);
         var indexEnd = atom.IndexOf(paramIndexEndSymbol);
         var hasIndex = indexEnd - indexStart > 1 && indexStart >= 2;
-        var id = hasIndex ? atom.Substring(1, indexStart - 1) : atom.Substring(1);
+        var id = hasIndex ? atom.Substring(1, indexStart - 1) : atom[1..];
         var indexString = hasIndex ? atom.Substring(indexStart + 1, indexEnd - indexStart - 1) : null;
         if (hasIndex && int.TryParse(indexString, out var index)) return getParamValue(id, index);
         return getParamValue(id);

@@ -73,7 +73,7 @@ public static class TextUtils
     /// </summary>
     public static string GetBefore (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return str.IndexOf(match, comp) is var idx and >= 0 ? str.Substring(0, idx) : "";
+        return str.IndexOf(match, comp) is var idx and >= 0 ? str[..idx] : "";
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public static class TextUtils
     /// </summary>
     public static string GetBeforeLast (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return str.LastIndexOf(match, comp) is var idx and >= 0 ? str.Substring(0, idx) : "";
+        return str.LastIndexOf(match, comp) is var idx and >= 0 ? str[..idx] : "";
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public static class TextUtils
         var matchIdx = str.LastIndexOf(match, comp);
         if (matchIdx == -1) return "";
         var cutIdx = matchIdx + match.Length;
-        return cutIdx < str.Length ? str.Substring(cutIdx) : "";
+        return cutIdx < str.Length ? str[cutIdx..] : "";
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public static class TextUtils
         var matchIdx = str.IndexOf(match, comp);
         if (matchIdx == -1) return "";
         var cutIdx = matchIdx + match.Length;
-        return cutIdx < str.Length ? str.Substring(cutIdx) : "";
+        return cutIdx < str.Length ? str[cutIdx..] : "";
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public static class TextUtils
     {
         if (string.IsNullOrEmpty(str) || char.IsLower(str, 0)) return str;
         if (str.Length <= 1) return str.ToLowerInvariant();
-        return $"{char.ToLowerInvariant(str[0])}{str.Substring(1)}";
+        return $"{char.ToLowerInvariant(str[0])}{str[1..]}";
     }
 
     /// <summary>
@@ -123,6 +123,6 @@ public static class TextUtils
     {
         if (string.IsNullOrEmpty(str) || char.IsUpper(str, 0)) return str;
         if (str.Length <= 1) return str.ToUpperInvariant();
-        return $"{char.ToUpperInvariant(str[0])}{str.Substring(1)}";
+        return $"{char.ToUpperInvariant(str[0])}{str[1..]}";
     }
 }

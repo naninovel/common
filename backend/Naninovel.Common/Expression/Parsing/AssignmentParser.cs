@@ -42,6 +42,6 @@ internal class AssignmentParser (Action<ParseDiagnostic> err)
         if (!var.EndsWith("+", StringComparison.Ordinal) && !var.EndsWith("-", StringComparison.Ordinal) &&
             !var.EndsWith("*", StringComparison.Ordinal) && !var.EndsWith("/", StringComparison.Ordinal)) return;
         exp = var + exp;
-        var = var.Substring(0, var.Length - 1).Trim();
+        var = var[..^1].Trim();
     }
 }

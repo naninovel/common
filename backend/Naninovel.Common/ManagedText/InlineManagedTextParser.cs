@@ -64,7 +64,7 @@ public class InlineManagedTextParser
     {
         var id = line.GetBefore(RecordInlineKeyLiteral);
         if (string.IsNullOrWhiteSpace(id)) throw new SyntaxError($"Incorrect record syntax at line #{index + 1}.");
-        var value = line.Substring(id.Length + RecordInlineKeyLiteral.Length);
+        var value = line[(id.Length + RecordInlineKeyLiteral.Length)..];
         records.Add(new ManagedTextRecord(id, value, commentBuilder.ToString()));
         commentBuilder.Clear();
     }

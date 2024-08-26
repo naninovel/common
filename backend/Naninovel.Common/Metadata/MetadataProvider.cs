@@ -48,8 +48,7 @@ public class MetadataProvider : IMetadata
     public Command? FindCommand (string aliasOrId)
     {
         if (commandByAlias.TryGetValue(aliasOrId, out var byAlias)) return byAlias;
-        if (commandById.TryGetValue(aliasOrId, out var byId)) return byId;
-        return null;
+        return commandById.GetValueOrDefault(aliasOrId);
     }
 
     public Parameter? FindParameter (string commandAliasOrId, string? paramAliasOrId)

@@ -17,7 +17,7 @@ public class NamedValueParser (ISyntax stx)
         if (string.IsNullOrEmpty(value)) return (null, null);
         var delimiterIndex = FindDelimiterIndex(value);
         if (delimiterIndex < 0) return (value, null);
-        var name = delimiterIndex == 0 ? null : value.Substring(0, delimiterIndex);
+        var name = delimiterIndex == 0 ? null : value[..delimiterIndex];
         var namedValue = delimiterIndex == value.Length - 1 ? null
             : value.Substring(delimiterIndex + 1, value.Length - (delimiterIndex + 1));
         return (name is null ? null : Unescape(name), namedValue);

@@ -7,7 +7,7 @@ using System.Text;
 /// </summary>
 /// <remarks>
 /// Un-/escaping (adding and removing of the specified escape character) will only happen
-/// for specified seperator; escapes of the non-seperator characters will be ignored.
+/// for specified separator; escapes of the non-separator characters will be ignored.
 /// </remarks>
 /// <param name="separator">The character to split and join with.</param>
 /// <param name="escape">The character used to escape separator.</param>
