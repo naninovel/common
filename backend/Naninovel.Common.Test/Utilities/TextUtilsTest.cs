@@ -185,12 +185,25 @@ public class TextUtilsTest
     [InlineData(@"\,\,,", new[] { ",,", "" })]
     [InlineData(@"\,,\,,\,", new[] { ",", ",", "," })]
     [InlineData(@"\\,\\,\,", new[] { @"\\", @"\\", "," })]
-    public void SplitAndJoinEscapedWorkCorrectly (string input, string[] expected)
+    public void SplitAndJoinEscapedWorksCorrectly (string input, string[] expected)
     {
         var splitter = new TextSplitter(',');
         var entries = new List<string>();
         splitter.Split(input, entries);
         Assert.Equal(expected, entries);
         Assert.Equal(input, splitter.Join(entries));
+    }
+
+    [Theory]
+    [InlineData("", new char[] { }, "")]
+    [InlineData("", new[] { ' ' }, "")]
+    [InlineData(" ", new[] { ' ' }, "")]
+    [InlineData(" ", new char[] { }, " ")]
+    [InlineData("xyz", new[] { 'x', 'y' }, "z")]
+    [InlineData("xxx-yyy-zzz", new[] { 'x', 'x', 'y', '-' }, "zzz")]
+    [InlineData("xxx-yyy-zzz", new[] { 'a', 'b', 'c' }, "xxx-yyy-zzz")]
+    public void SanitizeWorksCorrectly (string input, IReadOnlyCollection<char> invalid, string expected)
+    {
+        Assert.Equal(expected, input.Sanitize(invalid));
     }
 }

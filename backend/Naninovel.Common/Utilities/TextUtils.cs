@@ -125,4 +125,29 @@ public static class TextUtils
         if (str.Length <= 1) return str.ToUpperInvariant();
         return $"{char.ToUpperInvariant(str[0])}{str[1..]}";
     }
+
+    /// <summary>
+    /// Removes specified <paramref name="invalid"/> characters from the string.
+    /// </summary>
+    /// <remarks>
+    /// This is faster than using <see cref="string.Replace(char,char)"/>, as it only allocates once
+    /// and doesn't allocate at all (returns initial string) when the string doesn't contain invalid chars.
+    /// </remarks>
+    public static string Sanitize (this string str, IReadOnlyCollection<char> invalid)
+    {
+        // TODO: Use IReadOnlySet when Unity switches to the modern .NET.
+
+        var validCharCount = 0;
+        foreach (var c in str)
+            if (!invalid.Contains(c))
+                validCharCount++;
+        if (validCharCount == str.Length) return str;
+
+        return string.Create(validCharCount, (str, invalid), (span, ctx) => {
+            var idx = 0;
+            foreach (var c in ctx.str)
+                if (!ctx.invalid.Contains(c))
+                    span[idx++] = c;
+        });
+    }
 }
