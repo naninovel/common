@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Naninovel.Utilities.Test;
 
-[ExcludeFromCodeCoverage]
 public class LinqUtilsTest
 {
     private class CustomEnumerable (IEnumerable<int> items) : IEnumerable<int>

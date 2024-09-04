@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Naninovel.Bridging.Test;
 
-[ExcludeFromCodeCoverage]
 public class MockSerializer : ISerializer
 {
     private readonly JsonSerializer json;

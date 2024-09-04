@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Naninovel.Metadata;
@@ -11,8 +10,8 @@ public partial class JsonTest
     [JsonSerializable(typeof(IReadOnlyList<string>))]
     internal partial class AdditionalContext : JsonSerializerContext;
 
-    [ExcludeFromCodeCoverage] public record Record (string Value);
-    [ExcludeFromCodeCoverage] public record Message (Record[] Records);
+    public record Record (string Value);
+    public record Message (Record[] Records);
 
     [Fact]
     public void CanSerializeCommonTypes ()

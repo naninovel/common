@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Xunit.Abstractions;
 
 namespace Naninovel.Parsing.Test;
@@ -66,7 +65,6 @@ public class LexerTest (ITestOutputHelper output)
     [Theory, MemberData(nameof(LexerTestData.GenericLines), MemberType = typeof(LexerTestData))]
     public void GenericLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Generic, tokens);
 
-    [ExcludeFromCodeCoverage]
     private void LineTokenized (string text, LineType expectedLineType, params Token[] expectedTokens)
     {
         var tokens = new List<Token>();

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 
 namespace Naninovel.Bridging.Test;
@@ -35,7 +34,6 @@ public class MockTransport : ITransport
         readChannel.Writer.TryWrite(message);
     }
 
-    [ExcludeFromCodeCoverage]
     public async Task<T> WaitOutcomingAsync<T> () where T : class, IMessage
     {
         while (!cts.IsCancellationRequested)

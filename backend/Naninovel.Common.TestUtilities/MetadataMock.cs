@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using Naninovel.Metadata;
 using Naninovel.Parsing;
 
 namespace Naninovel.TestUtilities;
 
-[ExcludeFromCodeCoverage]
 public class MetadataMock : IMetadata
 {
     public List<Actor> Actors { get; set; } = [];
@@ -46,5 +44,21 @@ public class MetadataMock : IMetadata
     public bool FindFunctions (string name, ICollection<Function> result)
     {
         return new MetadataProvider(AsProject()).FindFunctions(name, result);
+    }
+
+    public void SetupCommandWithEndpoint (string commandId)
+    {
+        var parameter = new Metadata.Parameter {
+            Id = "Path",
+            Nameless = true,
+            ValueType = Metadata.ValueType.String,
+            ValueContainerType = ValueContainerType.Named,
+            ValueContext = [
+                new ValueContext { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointScript },
+                new ValueContext { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointLabel }
+            ]
+        };
+        var command = new Metadata.Command { Id = commandId, Parameters = [parameter], Branch = new() { Traits = BranchTraits.Endpoint } };
+        Commands = Commands.Append(command).ToList();
     }
 }
