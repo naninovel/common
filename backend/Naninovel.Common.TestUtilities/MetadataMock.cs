@@ -46,19 +46,75 @@ public class MetadataMock : IMetadata
         return new MetadataProvider(AsProject()).FindFunctions(name, result);
     }
 
-    public void SetupCommandWithEndpoint (string commandId)
+    public void SetupNavigationCommands (string navCommandId = "goto", string returnCommandId = "gosub")
     {
-        var parameter = new Metadata.Parameter {
-            Id = "Path",
-            Nameless = true,
-            ValueType = Metadata.ValueType.String,
-            ValueContainerType = ValueContainerType.Named,
-            ValueContext = [
-                new ValueContext { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointScript },
-                new ValueContext { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointLabel }
-            ]
+        var navCommand = new Metadata.Command {
+            Id = navCommandId,
+            Parameters = [
+                new Metadata.Parameter {
+                    Id = "Path",
+                    Nameless = true,
+                    ValueType = Metadata.ValueType.String,
+                    ValueContainerType = ValueContainerType.Named,
+                    ValueContext = [
+                        new() { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointScript },
+                        new() { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointLabel }
+                    ]
+                }
+            ],
+            Branch = new() { Traits = BranchTraits.Endpoint }
         };
-        var command = new Metadata.Command { Id = commandId, Parameters = [parameter], Branch = new() { Traits = BranchTraits.Endpoint } };
-        Commands = Commands.Append(command).ToList();
+        var returnCommand = new Metadata.Command {
+            Id = returnCommandId,
+            Parameters = [
+                new Metadata.Parameter {
+                    Id = "Path",
+                    Nameless = true,
+                    ValueType = Metadata.ValueType.String,
+                    ValueContainerType = ValueContainerType.Named,
+                    ValueContext = [
+                        new() { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointScript },
+                        new() { Type = ValueContextType.Endpoint, SubType = Metadata.Constants.EndpointLabel }
+                    ]
+                }
+            ],
+            Branch = new() { Traits = BranchTraits.Endpoint | BranchTraits.Return }
+        };
+        Commands.AddRange([navCommand, returnCommand]);
+    }
+
+    public void SetupSwitchCommands (string rootCommandId = "if", string switchCommandId = "else")
+    {
+        var rootCommand = new Metadata.Command {
+            Id = rootCommandId,
+            Parameters = [
+                new Metadata.Parameter {
+                    Id = "Condition",
+                    Nameless = true,
+                    ValueType = Metadata.ValueType.String,
+                    ValueContainerType = ValueContainerType.Single,
+                    ValueContext = [
+                        new() { Type = ValueContextType.Expression, SubType = Metadata.Constants.Condition }
+                    ]
+                }
+            ],
+            Branch = new() { Traits = BranchTraits.Nest | BranchTraits.Return | BranchTraits.Switch }
+        };
+        var switchCommand = new Metadata.Command {
+            Id = switchCommandId,
+            Parameters = [
+                new Metadata.Parameter {
+                    Id = "Condition",
+                    Nameless = true,
+                    ValueType = Metadata.ValueType.String,
+                    ValueContainerType = ValueContainerType.Single,
+                    ValueContext = [
+                        new() { Type = ValueContextType.Expression, SubType = Metadata.Constants.Condition }
+                    ]
+                }
+            ],
+            Branch = new() { Traits = BranchTraits.Nest | BranchTraits.Return, SwitchRoot = rootCommandId }
+        };
+        Commands.AddRange([rootCommand, switchCommand]);
     }
 }
