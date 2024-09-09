@@ -55,20 +55,23 @@ function mergeConstants(custom: Array<Metadata.Constant>, builtins: Array<Metada
 }
 
 function mergeOverriddenCommand(overridden: Metadata.Command, builtin: Metadata.Command) {
-    if (overridden.summary == null || overridden.summary.length === 0)
-        overridden.summary = builtin.summary;
-    if (overridden.remarks == null || overridden.remarks.length === 0)
-        overridden.remarks = builtin.remarks;
-    if (overridden.examples == null || overridden.examples.length === 0)
-        overridden.examples = builtin.examples;
+    overridden.documentation ??= {};
+    if (overridden.documentation.summary == null || overridden.documentation.summary.length === 0)
+        overridden.documentation.summary = builtin.documentation?.summary;
+    if (overridden.documentation.remarks == null || overridden.documentation.remarks.length === 0)
+        overridden.documentation.remarks = builtin.documentation?.remarks;
+    if (overridden.documentation.examples == null || overridden.documentation.examples.length === 0)
+        overridden.documentation.examples = builtin.documentation?.examples;
     overridden.parameters = mergeOverriddenParams(overridden.parameters, builtin.parameters);
     return overridden;
 }
 
 function mergeOverriddenParams(overridden: Array<Metadata.Parameter>, builtin: Array<Metadata.Parameter>) {
     const lengthDelta = overridden.length - builtin.length;
-    for (let i = lengthDelta; i < overridden.length; i++)
-        if (overridden[i].summary == null || overridden[i].summary!.length === 0)
-            overridden[i].summary = builtin[i - lengthDelta].summary;
+    for (let i = lengthDelta; i < overridden.length; i++) {
+        overridden[i].documentation ??= {};
+        if (overridden[i].documentation!.summary == null || overridden[i].documentation!.summary!.length === 0)
+            overridden[i].documentation!.summary = builtin[i - lengthDelta].documentation!.summary;
+    }
     return overridden;
 }

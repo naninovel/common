@@ -59,15 +59,24 @@ test("replaces overridden constant values", () => {
 });
 
 test("transfers docs to the overridden commands and parameters", () => {
-    const def = { id: "*", alias: "foo", summary: "", remarks: "", examples: "", parameters: [{ id: "*", summary: "" }] };
-    const custom = { id: "*", alias: "foo", parameters: [{ id: "*" }] };
+    const def = {
+        id: "*",
+        alias: "foo",
+        documentation: { summary: "", remarks: "", examples: "" },
+        parameters: [{ id: "*", documentation: { summary: "" } }]
+    };
+    const custom = {
+        id: "*",
+        alias: "foo",
+        parameters: [{ id: "*" }]
+    };
     const merged = merge({ commands: [def] }, { commands: [custom] });
     const command = merged.commands.find(c => c.alias === "foo");
-    expect(command.summary).toStrictEqual("");
-    expect(command.remarks).toStrictEqual("");
-    expect(command.examples).toStrictEqual("");
+    expect(command.documentation.summary).toStrictEqual("");
+    expect(command.documentation.remarks).toStrictEqual("");
+    expect(command.documentation.examples).toStrictEqual("");
     expect(command.parameters.length).toEqual(1);
-    expect(command.parameters[0].summary).toStrictEqual("");
+    expect(command.parameters[0].documentation.summary).toStrictEqual("");
 });
 
 test("doesn't mutate original metadata", async () => {
