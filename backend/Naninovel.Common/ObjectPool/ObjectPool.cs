@@ -3,10 +3,26 @@ using System.Runtime.CompilerServices;
 namespace Naninovel;
 
 /// <summary>
+/// Controls behaviour of the <see cref="ObjectPool{T}"/> instances.
+/// </summary>
+public abstract class ObjectPool
+{
+    /// <summary>
+    /// Whether the pool is active, ie reuses pooled objects and invokes specified
+    /// rent, return and drop hooks on the pooled objects.
+    /// </summary>
+    /// <remarks>
+    /// Use to globally disable the pooling behaviour for edge cases, such as unit tests,
+    /// where MOQ verification is not possible when the objects are pooled.
+    /// </remarks>
+    public static bool PoolingEnabled { get; set; } = true;
+}
+
+/// <summary>
 /// Allows re-using object instances to limit heap allocations.
 /// </summary>
 /// <typeparam name="T">Type of the pooled objects.</typeparam>
-public sealed class ObjectPool<T> : IDisposable where T : class
+public sealed class ObjectPool<T> : ObjectPool, IDisposable where T : class
 {
     /// <summary>
     /// Configures the pool behaviour.
@@ -70,6 +86,8 @@ public sealed class ObjectPool<T> : IDisposable where T : class
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Rent ()
     {
+        if (!PoolingEnabled) return factory();
+
         T obj;
         if (lastReturned != null)
         {
@@ -106,6 +124,8 @@ public sealed class ObjectPool<T> : IDisposable where T : class
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Return (T obj)
     {
+        if (!PoolingEnabled) return;
+
         options.OnReturn?.Invoke(obj);
         if (lastReturned == null)
         {

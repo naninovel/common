@@ -181,6 +181,19 @@ public class ObjectPoolTest
         Assert.NotSame(rentB2, rentC);
     }
 
+    [Fact]
+    public void CanDisablePooling ()
+    {
+        ObjectPool.PoolingEnabled = false;
+        var pool = CreatePool();
+        var rentA = default(MockObject);
+        var rentB = default(MockObject);
+        using (pool.Rent(out rentA)) { }
+        using (pool.Rent(out rentB)) { }
+        Assert.NotSame(rentA, rentB);
+        ObjectPool.PoolingEnabled = true;
+    }
+
     private ObjectPool<MockObject> CreatePool (ObjectPool<MockObject>.Options options = null)
     {
         return new ObjectPool<MockObject>(() => new(), options);
