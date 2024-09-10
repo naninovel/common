@@ -50,7 +50,7 @@ public class Writer (TextWriter writer, Writer.Options? options = null)
 
     public void NextRecord ()
     {
-        writer.WriteLine();
+        writer.Write('\n');
         recordFieldCount = 0;
     }
 }

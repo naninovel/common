@@ -15,7 +15,7 @@ namespace Naninovel.Csv.Test
             writer.NextRecord();
             writer.WriteField("x");
             writer.NextRecord();
-            Assert.Equal("xxx,\"x\"\"xx\",\" xxx \",\"x, x\",\"x\nx x\"\r\nx\r\n", buffer.ToString());
+            Assert.Equal("xxx,\"x\"\"xx\",\" xxx \",\"x, x\",\"x\nx x\"\nx\n", buffer.ToString());
         }
 
         [Fact]
