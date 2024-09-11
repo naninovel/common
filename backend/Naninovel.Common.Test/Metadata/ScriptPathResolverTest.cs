@@ -22,7 +22,14 @@ public class ScriptPathResolverTest
     [Fact]
     public void RootUriFormatted ()
     {
-        Assert.Equal("foo/bar/", new ScriptPathResolver { RootUri = "foo\\bar" }.RootUri);
+        Assert.Equal("/", new ScriptPathResolver { RootUri = "" }.RootUri);
+        Assert.Equal("/", new ScriptPathResolver { RootUri = " " }.RootUri);
+        Assert.Equal("/foo", new ScriptPathResolver { RootUri = " /foo " }.RootUri);
+        Assert.Equal("/foo", new ScriptPathResolver { RootUri = "foo" }.RootUri);
+        Assert.Equal("/foo", new ScriptPathResolver { RootUri = "/foo" }.RootUri);
+        Assert.Equal("/foo/bar", new ScriptPathResolver { RootUri = "foo\\bar" }.RootUri);
+        Assert.Equal("/foo/bar", new ScriptPathResolver { RootUri = "/foo/bar" }.RootUri);
+        Assert.Equal("/foo/bar", new ScriptPathResolver { RootUri = "foo/bar/" }.RootUri);
     }
 
     [Fact]
