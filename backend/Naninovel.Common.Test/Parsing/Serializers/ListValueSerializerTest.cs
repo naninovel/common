@@ -26,7 +26,7 @@ public class ListValueSerializerTest
     [Fact]
     public void WhenAllElementsAreNullPreservesThem ()
     {
-        Assert.Equal(",", serializer.Serialize(new string[] { null, null }));
+        Assert.Equal(",", serializer.Serialize([null, null]));
     }
 
     [Fact]

@@ -52,10 +52,10 @@ public class SemanticsTest
     [Fact]
     public void GenericLineToStringIsCorrect ()
     {
-        var line = new GenericLine(new GenericPrefix("a", "b"), new IGenericContent[] {
+        var line = new GenericLine(new GenericPrefix("a", "b"), [
             new MixedValue([new PlainText("x")]),
             new InlinedCommand(new("i", Array.Empty<Parameter>()))
-        });
+        ]);
         Assert.Equal("a.b: x[i]", line.ToString());
     }
 

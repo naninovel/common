@@ -5,7 +5,7 @@ public class ManagedTextDocumentTest
     [Fact]
     public void CanBeConstructedFromRecordsCollection ()
     {
-        Assert.Equal(new ManagedTextRecord[] { new("foo") }, new ManagedTextDocument(new ManagedTextRecord[] { new("foo") }).Records);
+        Assert.Equal([new("foo")], new ManagedTextDocument([new("foo")]).Records);
         Assert.Empty(new ManagedTextDocument(Array.Empty<ManagedTextRecord>()).Records);
     }
 
@@ -24,7 +24,7 @@ public class ManagedTextDocumentTest
     [Fact]
     public void CanCheckIfContainsRecordByKey ()
     {
-        var doc = new ManagedTextDocument(new ManagedTextRecord[] { new("foo") });
+        var doc = new ManagedTextDocument([new("foo")]);
         Assert.True(doc.Contains("foo"));
         Assert.False(doc.Contains("bar"));
     }
@@ -32,7 +32,7 @@ public class ManagedTextDocumentTest
     [Fact]
     public void CanGetByKey ()
     {
-        var doc = new ManagedTextDocument(new ManagedTextRecord[] { new("foo") });
+        var doc = new ManagedTextDocument([new("foo")]);
         Assert.Equal("foo", doc.Get("foo").Key);
     }
 
@@ -45,7 +45,7 @@ public class ManagedTextDocumentTest
     [Fact]
     public void CanTryGetByKey ()
     {
-        var doc = new ManagedTextDocument(new ManagedTextRecord[] { new("foo") });
+        var doc = new ManagedTextDocument([new("foo")]);
         Assert.False(doc.TryGet("bar", out var record));
         Assert.True(doc.TryGet("foo", out record));
         Assert.Equal("foo", record.Key);

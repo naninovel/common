@@ -15,28 +15,28 @@ public class ConstantEvaluatorTest
     [Fact]
     public void WhenDoesntContainExpressionsReturnsUnmodified ()
     {
-        Assert.Equal(new[] { "foo" }, Evaluate("foo"));
+        Assert.Equal(["foo"], Evaluate("foo"));
     }
 
     [Fact]
     public void CanResolveScript ()
     {
         inspectedScriptPath = "foo";
-        Assert.Equal(new[] { "foo" }, Evaluate("{$Script}"));
+        Assert.Equal(["foo"], Evaluate("{$Script}"));
     }
 
     [Fact]
     public void DoesntModifyContentOutsideOfExpression ()
     {
         inspectedScriptPath = "bar";
-        Assert.Equal(new[] { "foo/bar" }, Evaluate("foo/{$Script}"));
+        Assert.Equal(["foo/bar"], Evaluate("foo/{$Script}"));
     }
 
     [Fact]
     public void CanInjectParamValues ()
     {
         getParamValue = (id, idx) => id == "1" ? "foo" : "bar";
-        Assert.Equal(new[] { "foo/bar" }, Evaluate("{:1}/{:2}"));
+        Assert.Equal(["foo/bar"], Evaluate("{:1}/{:2}"));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class ConstantEvaluatorTest
     {
         inspectedScriptPath = "bar";
         getParamValue = (id, idx) => id == "foo" ? "foo" : null;
-        Assert.Equal(new[] { "foobar" }, Evaluate("{:foo??:bar}{:bar??$Script}"));
+        Assert.Equal(["foobar"], Evaluate("{:foo??:bar}{:bar??$Script}"));
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class ConstantEvaluatorTest
     {
         inspectedScriptPath = "nya";
         getParamValue = (id, idx) => idx == 0 ? "foo" : idx == 1 ? "bar" : null;
-        Assert.Equal(new[] { "foo/bar/nya" }, Evaluate("{:foo[0]}/{:bar[1]}/{:nya[2]??$Script}"));
+        Assert.Equal(["foo/bar/nya"], Evaluate("{:foo[0]}/{:bar[1]}/{:nya[2]??$Script}"));
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class ConstantEvaluatorTest
     {
         inspectedScriptPath = "nya";
         getParamValue = (id, idx) => idx == 0 ? "foo" : idx == 1 ? "bar" : null;
-        Assert.Equal(new[] { "foo/bar/nya", "nya/foo", "foo" }, Evaluate("{:foo[0]}/{:bar[1]}/{:nya[2]??$Script}+{$Script}/foo+{:foo[0]}"));
+        Assert.Equal(["foo/bar/nya", "nya/foo", "foo"], Evaluate("{:foo[0]}/{:bar[1]}/{:nya[2]??$Script}+{$Script}/foo+{:foo[0]}"));
     }
 
     [Fact]

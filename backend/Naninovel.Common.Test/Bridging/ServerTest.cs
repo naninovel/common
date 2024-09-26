@@ -231,7 +231,7 @@ public class ServerTest
     private async Task<T> MockIncomingAsync<T> (MockTransport transport)
         where T : IClientMessage, new()
     {
-        var messages = await MockIncomingAsync<T>(new[] { transport });
+        var messages = await MockIncomingAsync<T>([transport]);
         return messages[0];
     }
 
