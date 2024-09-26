@@ -4,6 +4,11 @@ internal class Utilities (ISyntax stx)
 {
     public bool IsPlainTextControlChar (char ch, char next = default)
     {
+        // Escape symbols should always be escaped, otherwise, if we only escape escape symbols
+        // before the control characters, it won't be possible to resolve semantic in some cases.
+        // For example, in the following generic text line: '\\[' — should this be parsed as an
+        // escaped escape symbol before an inlined command or as un-escaped control symbol before
+        // escaped '[' control character?
         if (ch == '\\') return true;
         if (ch == stx.ExpressionOpen[0] || ch == stx.ExpressionClose[0]) return true;
         if (ch == stx.InlinedOpen[0] || ch == stx.InlinedClose[0]) return true;

@@ -32,9 +32,9 @@ internal class MixedValueParser (bool unwrap, ISyntax stx)
     {
         value.Clear();
 
-        var unescapeQuotes = unwrap && IsValueWrapped();
-        var startIndex = valueToken.Start + (unescapeQuotes ? 1 : 0);
-        var endIndex = valueToken.EndIndex - (unescapeQuotes ? 1 : 0);
+        var wrapped = unwrap && IsValueWrapped();
+        var startIndex = valueToken.Start + (wrapped ? 1 : 0);
+        var endIndex = valueToken.EndIndex - (wrapped ? 1 : 0);
 
         var index = startIndex;
         var textStartIndex = -1;
@@ -103,7 +103,7 @@ internal class MixedValueParser (bool unwrap, ISyntax stx)
         {
             var text = walker.Extract(textStartIndex, length);
             if (unescapeAuthor) text = UnescapeAuthor(text);
-            var plain = new PlainText(UnescapePlain(text, unescapeQuotes));
+            var plain = new PlainText(UnescapePlain(text, wrapped));
             walker.Associate(plain, new InlineRange(textStartIndex, length));
             textStartIndex = -1;
             return plain;
@@ -125,19 +125,19 @@ internal class MixedValueParser (bool unwrap, ISyntax stx)
         }
     }
 
-    private string UnescapePlain (string value, bool unescapeQuotes)
+    private string UnescapePlain (string value, bool wrapped)
     {
         for (int i = value.Length - 2; i >= 0; i--)
-            if (ShouldRemove(i))
-                value = value.Remove(i, 1);
+            if (ShouldUnescapeAt(i))
+                value = value.Remove(i--, 1);
         return value;
 
-        bool ShouldRemove (int i)
+        bool ShouldUnescapeAt (int i)
         {
-            if (value[i] != '\\' || utils.IsEscaped(value, i)) return false;
-            var prev = value[i + 1];
-            if (unescapeQuotes && prev == '"') return true;
-            return utils.IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
+            if (value[i] != '\\') return false;
+            var escaped = value[i + 1];
+            if (escaped == '"' && wrapped) return true;
+            return utils.IsPlainTextControlChar(escaped, value.ElementAtOrDefault(i + 2));
         }
     }
 

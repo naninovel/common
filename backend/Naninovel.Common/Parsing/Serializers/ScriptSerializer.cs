@@ -188,21 +188,29 @@ public class ScriptSerializer (ISyntax stx)
         ignoreRanges.Add((startIndex, mixedBuilder.Length - startIndex));
     }
 
-    private string Encode (string value, bool wrap)
+    private string Encode (string value, bool considerWrapping)
     {
-        wrap = wrap && !string.IsNullOrEmpty(value) && (value[0] == '\"' || IsAnySpaceOrUnclosedQuotes());
+        var wrap = considerWrapping && ShouldWrap();
         for (int i = value.Length - 1; i >= 0; i--)
             if (ShouldEscape(i))
                 value = value.Insert(i, "\\");
         if (wrap) value = $"\"{value}\"";
         return value;
 
-        bool IsAnySpaceOrUnclosedQuotes ()
+        bool ShouldWrap ()
+        {
+            if (string.IsNullOrEmpty(value)) return false;
+            if (value[0] == '"') return true;
+            if (value[0] == stx.BooleanFlag[0] || value[^1] == stx.BooleanFlag[0]) return true;
+            return IsAnyUnwrappedSpaceOrUnclosedQuotes();
+        }
+
+        bool IsAnyUnwrappedSpaceOrUnclosedQuotes ()
         {
             var wrapping = false;
             for (int i = 0; i < value.Length; i++)
                 if (IsIgnored(ignoreRanges, i)) continue;
-                else if (char.IsWhiteSpace(value[i])) return true;
+                else if (!wrapping && char.IsWhiteSpace(value[i])) return true;
                 else if (value[i] == '"' && !utils.IsEscaped(value, i)) wrapping = !wrapping;
             return wrapping;
         }
@@ -211,6 +219,7 @@ public class ScriptSerializer (ISyntax stx)
         {
             if (IsIgnored(ignoreRanges, i)) return false;
             if (wrap && value[i] == '"') return true;
+            if (!wrap && value[i] == '\\' && value.ElementAtOrDefault(i + 1) == '"' && !utils.IsEscaped(value, i)) return false;
             return utils.IsPlainTextControlChar(value[i], value.ElementAtOrDefault(i + 1));
         }
 
