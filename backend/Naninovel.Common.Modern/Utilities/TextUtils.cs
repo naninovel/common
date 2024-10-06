@@ -60,4 +60,31 @@ public static class TextUtils
         bool Upper () => length == 1 || !char.IsLetterOrDigit(prev);
         bool Lower () => char.IsUpper(curr) && char.IsUpper(prev);
     }
+
+    /// <summary>
+    /// Converts specified string to kebab-case.
+    /// </summary>
+    public static string ToKebabCase (this string str)
+    {
+        int idx, length = 0;
+        char curr, next = default;
+        Span<char> buffer = stackalloc char[str.Length * 2];
+
+        for (idx = 0; idx < str.Length; idx++)
+        {
+            curr = str[idx];
+            next = idx + 1 < str.Length ? str[idx + 1] : default;
+            if (!Skip()) buffer[length++] = char.ToLower(curr);
+            if (Kebab()) buffer[length++] = '-';
+        }
+
+        return buffer[..length].ToString();
+
+        bool Skip () => !char.IsLetterOrDigit(curr);
+        bool Kebab () => length > 0 && (
+            char.IsLower(curr) && char.IsUpper(next) ||
+            char.IsLetter(curr) && char.IsDigit(next) ||
+            char.IsDigit(curr) && char.IsLetter(next) ||
+            !char.IsLetterOrDigit(curr) && char.IsLetterOrDigit(next));
+    }
 }

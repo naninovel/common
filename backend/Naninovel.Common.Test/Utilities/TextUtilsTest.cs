@@ -258,4 +258,30 @@ public class TextUtilsTest
     {
         Assert.Equal(expected, input.ToPascalCase());
     }
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData(" ", "")]
+    [InlineData("_-\\+^@", "")]
+    [InlineData("FooBar", "foo-bar")]
+    [InlineData("fooBar", "foo-bar")]
+    [InlineData("foo_bar", "foo-bar")]
+    [InlineData("FOO_BAR", "foo-bar")]
+    [InlineData("FOO BAR", "foo-bar")]
+    [InlineData("foo-bar", "foo-bar")]
+    [InlineData("Foo Bar", "foo-bar")]
+    [InlineData("Foo1", "foo-1")]
+    [InlineData("Foo 1", "foo-1")]
+    [InlineData("Foo123Bar321Nya", "foo-123-bar-321-nya")]
+    [InlineData("Foo 123Bar", "foo-123-bar")]
+    [InlineData(" Foo 123 Bar ", "foo-123-bar")]
+    [InlineData("Foo-123_Bar", "foo-123-bar")]
+    [InlineData("_foo_", "foo")]
+    [InlineData("__foo__", "foo")]
+    [InlineData("___foo___", "foo")]
+    [InlineData(" _ __ FOO1-2-3BAR __ _ ", "foo-1-2-3-bar")]
+    public void ToKebabCaseWorksCorrectly (string input, string expected)
+    {
+        Assert.Equal(expected, input.ToKebabCase());
+    }
 }
