@@ -206,4 +206,56 @@ public class TextUtilsTest
     {
         Assert.Equal(expected, input.Sanitize(invalid));
     }
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData(" ", "")]
+    [InlineData("_-\\+^@", "")]
+    [InlineData("FooBar", "Foo Bar")]
+    [InlineData("fooBar", "Foo Bar")]
+    [InlineData("foo_bar", "Foo Bar")]
+    [InlineData("FOO_BAR", "Foo Bar")]
+    [InlineData("FOO BAR", "Foo Bar")]
+    [InlineData("foo-bar", "Foo Bar")]
+    [InlineData("Foo Bar", "Foo Bar")]
+    [InlineData("Foo1", "Foo 1")]
+    [InlineData("Foo 1", "Foo 1")]
+    [InlineData("Foo123Bar321Nya", "Foo 123 Bar 321 Nya")]
+    [InlineData("Foo 123Bar", "Foo 123 Bar")]
+    [InlineData(" Foo 123 Bar ", "Foo 123 Bar")]
+    [InlineData("Foo-123_Bar", "Foo 123 Bar")]
+    [InlineData("_foo_", "Foo")]
+    [InlineData("__foo__", "Foo")]
+    [InlineData("___foo___", "Foo")]
+    [InlineData(" _ __ FOO1-2-3BAR __ _ ", "Foo 1 2 3 Bar")]
+    public void HumanizeWorksCorrectly (string input, string expected)
+    {
+        Assert.Equal(expected, input.Humanize());
+    }
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData(" ", "")]
+    [InlineData("_-\\+^@", "")]
+    [InlineData("FooBar", "FooBar")]
+    [InlineData("fooBar", "FooBar")]
+    [InlineData("foo_bar", "FooBar")]
+    [InlineData("FOO_BAR", "FooBar")]
+    [InlineData("FOO BAR", "FooBar")]
+    [InlineData("foo-bar", "FooBar")]
+    [InlineData("Foo Bar", "FooBar")]
+    [InlineData("Foo1", "Foo1")]
+    [InlineData("Foo 1", "Foo1")]
+    [InlineData("Foo 123 Bar 321 Nya", "Foo123Bar321Nya")]
+    [InlineData("Foo 123Bar", "Foo123Bar")]
+    [InlineData(" Foo 123 Bar ", "Foo123Bar")]
+    [InlineData("Foo-123_Bar", "Foo123Bar")]
+    [InlineData("_foo_", "Foo")]
+    [InlineData("__foo__", "Foo")]
+    [InlineData("___foo___", "Foo")]
+    [InlineData(" _ __ FOO1-2-3BAR __ _ ", "Foo123Bar")]
+    public void ToPascalCaseWorksCorrectly (string input, string expected)
+    {
+        Assert.Equal(expected, input.ToPascalCase());
+    }
 }
