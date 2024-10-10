@@ -284,4 +284,28 @@ public class TextUtilsTest
     {
         Assert.Equal(expected, input.ToKebabCase());
     }
+
+    [Theory]
+    [InlineData("", "", -1)]
+    [InlineData("x", "x", 0)]
+    [InlineData("xy", "xz", 0)]
+    [InlineData("xy", "xyz", 1)]
+    [InlineData("xyz", "xy ", 1)]
+    [InlineData("yx", "xy ", -1)]
+    public void CanFindLastCommonIndex (string a, string b, int expected)
+    {
+        Assert.Equal(expected, Naninovel.TextUtils.GetLastCommonIndex(a, b));
+    }
+
+    [Theory]
+    [InlineData("", "", -1)]
+    [InlineData("x", "x", -1)]
+    [InlineData("/", "/", 0)]
+    [InlineData("xy/", "xz/", -1)]
+    [InlineData("/xy", "/xz", 0)]
+    [InlineData("x/y", "x/yz", 1)]
+    public void CanFindLastCommonIndexOf (string a, string b, int expected)
+    {
+        Assert.Equal(expected, Naninovel.TextUtils.GetLastCommonIndexOf(a, b, '/'));
+    }
 }

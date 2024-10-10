@@ -87,4 +87,35 @@ public static class TextUtils
             char.IsDigit(curr) && char.IsLetter(next) ||
             !char.IsLetterOrDigit(curr) && char.IsLetterOrDigit(next));
     }
+
+    /// <summary>
+    /// Given specified strings both start with a number of equal characters,
+    /// finds index of the last common character, after which the strings start to differ.
+    /// Returns -1 when specified strings have no common leading characters.
+    /// </summary>
+    public static int GetLastCommonIndex (string a, string b)
+    {
+        var lastCommonIdx = -1;
+        var length = Math.Min(a.Length, b.Length);
+        for (var i = 0; i < length; i++)
+            if (a[i] != b[i]) break;
+            else lastCommonIdx = i;
+        return lastCommonIdx;
+    }
+
+    /// <summary>
+    /// Given specified strings both start with a number of equal characters,
+    /// finds index of the last specified <paramref name="of"/> character,
+    /// after which the strings start to differ. Returns -1 when specified strings
+    /// have no common leading characters or specified <paramref name="of"/> character.
+    /// </summary>
+    public static int GetLastCommonIndexOf (string a, string b, char of)
+    {
+        var lastCommonIdx = -1;
+        var length = Math.Min(a.Length, b.Length);
+        for (var i = 0; i < length; i++)
+            if (a[i] != b[i]) break;
+            else if (a[i] == of) lastCommonIdx = i;
+        return lastCommonIdx;
+    }
 }
