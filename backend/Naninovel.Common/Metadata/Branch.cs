@@ -16,4 +16,12 @@ public class Branch
     /// skip the consequent @else blocks.
     /// </summary>
     public string? SwitchRoot { get; set; }
+    /// <summary>
+    /// When the branch is <see cref="BranchTraits.Endpoint"/>, specifies a well-known endpoint or
+    /// expression to resolve the endpoint instead of looking for an endpoint command parameter.
+    /// </summary>
+    /// <remarks>
+    /// The value is resolved via <see cref="ExpressionEvaluator"/>.
+    /// </remarks>
+    public string? Endpoint { get; set; }
 }

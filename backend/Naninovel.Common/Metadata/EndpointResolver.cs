@@ -8,11 +8,15 @@ namespace Naninovel.Metadata;
 public class EndpointResolver (IMetadata meta)
 {
     private readonly NamedValueParser namedParser = new(meta.Syntax);
+    private readonly ExpressionEvaluator eval = new(meta,
+        () => throw new Error("Skip script path component in the named value to specify current script."),
+        (_, __) => throw new Error("Use endpoint parameter context to resolve it from the command parameters."));
 
     /// <summary>
-    /// When specified command has <see cref="BranchTraits.Endpoint"/> branch flag and
-    /// a parameter with navigation context (script path and/or label),
-    /// returns true and assigns related out arguments; returns false otherwise.
+    /// When specified command has <see cref="BranchTraits.Endpoint"/> branch flag with
+    /// <see cref="Branch.Endpoint"/> expression or a parameter with navigation context
+    /// (script path and/or label), returns true and assigns related out arguments;
+    /// returns false otherwise.
     /// </summary>
     /// <param name="command">Command to extract the endpoint from.</param>
     /// <param name="endpoint">When found, assigns the endpoint; default otherwise.</param>
@@ -20,6 +24,8 @@ public class EndpointResolver (IMetadata meta)
     public bool TryResolve (Parsing.Command command, out Endpoint endpoint)
     {
         endpoint = default;
+        if (meta.FindCommand(command.Identifier) is { Branch.Endpoint: { } exp })
+            return ResolveFromExpression(exp, ref endpoint);
         foreach (var parameter in command.Parameters)
             if (TryResolve(parameter, command.Identifier, out endpoint))
                 return true;
@@ -59,5 +65,13 @@ public class EndpointResolver (IMetadata meta)
                param.ValueContext[0]!.SubType == Constants.EndpointScript &&
                param.ValueContext[1]!.Type == ValueContextType.Endpoint &&
                param.ValueContext[1]!.SubType == Constants.EndpointLabel;
+    }
+
+    private bool ResolveFromExpression (string expression, ref Endpoint endpoint)
+    {
+        var result = eval.Evaluate(expression);
+        if (string.IsNullOrEmpty(result)) return false;
+        endpoint = new(result, null);
+        return true;
     }
 }

@@ -7,6 +7,10 @@ namespace Naninovel.Metadata;
 /// </summary>
 public interface IMetadata
 {
+    /// <inheritdoc cref="Project.EntryScript"/>
+    public string? EntryScript { get; }
+    /// <inheritdoc cref="Project.TitleScript"/>
+    public string? TitleScript { get; }
     /// <inheritdoc cref="Project.Actors"/>
     public IReadOnlyCollection<Actor> Actors { get; }
     /// <inheritdoc cref="Project.Commands"/>

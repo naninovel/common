@@ -50,7 +50,7 @@ public class EndpointResolverTest
     }
 
     [Fact]
-    public void WhenCommandHaveEndpointBranchFlagReturnsFalse ()
+    public void WhenCommandDoesntHaveEndpointBranchFlagReturnsFalse ()
     {
         meta.Update(new() {
             Commands = [new Command { Id = "c", Branch = new() { Traits = BranchTraits.Nest }, Parameters = [CreateEndpointParamMeta("p")] }]
@@ -105,6 +105,57 @@ public class EndpointResolverTest
         Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s.l") })]), out var point));
         Assert.Equal("s", point.ScriptPath);
         Assert.Equal("l", point.Label);
+    }
+
+    [Fact]
+    public void CanResolveEndpointFromBranch ()
+    {
+        meta.Update(new() {
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = "s" } }]
+        });
+        Assert.True(resolver.TryResolve(new("c"), out var point));
+        Assert.Equal("s", point.ScriptPath);
+    }
+
+    [Fact]
+    public void CanResolveEndpointFromBranchExpression ()
+    {
+        meta.Update(new() {
+            TitleScript = "s",
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = $"{{{ExpressionEvaluator.TitleScript}}}" } }]
+        });
+        Assert.True(resolver.TryResolve(new("c"), out var point));
+        Assert.Equal("s", point.ScriptPath);
+    }
+
+    [Fact]
+    public void WhenExpressionNotResolvedEndpointNotResolved ()
+    {
+        meta.Update(new() {
+            TitleScript = null,
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = $"{{{ExpressionEvaluator.TitleScript}}}" } }]
+        });
+        Assert.False(resolver.TryResolve(new("c"), out _));
+    }
+
+    [Fact]
+    public void ErrsWhenExpressionRequestsInspectedScript ()
+    {
+        meta.Update(new() {
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = $"{{{ExpressionEvaluator.InspectedScript}}}" } }]
+        });
+        Assert.Contains("Skip script path component in the named value to specify current script.",
+            Assert.Throws<Error>(() => resolver.TryResolve(new("c"), out _)).Message);
+    }
+
+    [Fact]
+    public void ErrsWhenExpressionRequestsParameterValue ()
+    {
+        meta.Update(new() {
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = "{:foo}" } }]
+        });
+        Assert.Contains("Use endpoint parameter context to resolve it from the command parameters.",
+            Assert.Throws<Error>(() => resolver.TryResolve(new("c"), out _)).Message);
     }
 
     private Parameter CreateEndpointParamMeta (string id) => new() {

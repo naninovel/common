@@ -8,6 +8,14 @@ namespace Naninovel.Metadata;
 public class Project
 {
     /// <summary>
+    /// Local resource path of the scenario script played when starting a new game.
+    /// </summary>
+    public string? EntryScript { get; set; }
+    /// <summary>
+    /// Local resource path of the scenario script played when entering title (main) menu.
+    /// </summary>
+    public string? TitleScript { get; set; }
+    /// <summary>
     /// Actors available in the project.
     /// </summary>
     public Actor[] Actors { get; set; } = [];
@@ -34,5 +42,5 @@ public class Project
     /// <summary>
     /// Project-specific NaniScript syntax.
     /// </summary>
-    public Syntax Syntax { get; set; } = new();
+    public Syntax Syntax { get; set; } = Syntax.Default;
 }

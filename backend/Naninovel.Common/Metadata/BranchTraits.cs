@@ -11,7 +11,8 @@ public enum BranchTraits
     /// Playback is navigated to a specific <see cref="Naninovel.Metadata.Endpoint"/>.
     /// </summary>
     /// <remarks>
-    /// Command is expected to have a parameter with <see cref="ValueContextType.Endpoint"/>
+    /// The endpoints is resolved either via <see cref="Branch.Endpoint"/> or (when not
+    /// specified) via a command parameter with <see cref="ValueContextType.Endpoint"/>
     /// context which specifies the endpoint to which the playback is redirected.
     /// </remarks>
     Endpoint = 1 << 0,

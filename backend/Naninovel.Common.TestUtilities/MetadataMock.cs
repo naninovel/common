@@ -5,6 +5,8 @@ namespace Naninovel.TestUtilities;
 
 public class MetadataMock : IMetadata
 {
+    public string EntryScript { get; set; } = null;
+    public string TitleScript { get; set; } = null;
     public List<Actor> Actors { get; set; } = [];
     public List<Metadata.Command> Commands { get; set; } = [];
     public List<Resource> Resources { get; set; } = [];
@@ -22,6 +24,8 @@ public class MetadataMock : IMetadata
     ISyntax IMetadata.Syntax => Syntax;
 
     public Project AsProject () => new() {
+        EntryScript = EntryScript,
+        TitleScript = TitleScript,
         Actors = Actors.ToArray(),
         Commands = Commands.ToArray(),
         Resources = Resources.ToArray(),
