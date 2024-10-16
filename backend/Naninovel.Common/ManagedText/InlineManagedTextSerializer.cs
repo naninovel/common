@@ -25,16 +25,19 @@ public class InlineManagedTextSerializer
         builder.Clear();
         if (!string.IsNullOrEmpty(document.Header))
             AppendHeader(document.Header);
+        else if (!string.IsNullOrEmpty(document.Records.FirstOrDefault().Comment))
+            builder.Append('\n');
         foreach (var record in document.Records)
             AppendRecord(record);
+        if (builder.Length == 0)
+            builder.Append('\n');
         return builder.ToString();
     }
 
     private void AppendHeader (string header)
     {
         builder.Append(RecordCommentLiteral)
-            .Append(' ')
-            .Append(header.Trim())
+            .Append(header)
             .Append('\n');
     }
 
@@ -43,11 +46,11 @@ public class InlineManagedTextSerializer
         for (int i = 0; i < spacing; i++)
             builder.Append('\n');
 
-        if (!string.IsNullOrWhiteSpace(record.Comment))
-            builder.Append(RecordCommentLiteral)
-                .Append(' ')
-                .Append(record.Comment)
-                .Append('\n');
+        if (!string.IsNullOrEmpty(record.Comment))
+            foreach (var line in record.Comment.SplitLines())
+                builder.Append(RecordCommentLiteral)
+                    .Append(line)
+                    .Append('\n');
 
         builder.Append(record.Key)
             .Append(RecordInlineKeyLiteral)

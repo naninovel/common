@@ -1,16 +1,20 @@
 namespace Naninovel.Parsing;
 
-internal class LexState
+internal class LexState (ISyntax stx)
 {
     public int Index { get; private set; }
     public int Length => text.Length;
     public int EndIndex => text.Length - 1;
+    public bool IsLast => Index == EndIndex;
     public bool EndReached => Index > EndIndex;
     public bool IsSpace => IsIndexValid(Index) && char.IsWhiteSpace(text[Index]);
     public bool IsNotSpace => IsIndexValid(Index) && !char.IsWhiteSpace(text[Index]);
     public bool IsPreviousSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index - 1));
+    public bool IsNextSpace => char.IsWhiteSpace(text.ElementAtOrDefault(Index + 1));
 
+    private readonly Utilities utils = new(stx);
     private string text = "";
+    private int startIndentIndex = -1;
     private ICollection<Token> tokens = Array.Empty<Token>();
 
     public void Reset (string text, ICollection<Token> tokens)
@@ -19,6 +23,7 @@ internal class LexState
         this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
         if (tokens.IsReadOnly) throw new ArgumentException("Collection shouldn't be read-only.", nameof(tokens));
         Index = 0;
+        startIndentIndex = -1;
     }
 
     public int Move () => ++Index;
@@ -40,9 +45,34 @@ internal class LexState
         while (IsSpace) Index++;
     }
 
+    public void SkipIndent ()
+    {
+        while (IsSpace)
+        {
+            if (startIndentIndex == -1 && Is(' '))
+                startIndentIndex = Index;
+
+            if (!Is(' '))
+                startIndentIndex = -1;
+
+            if (startIndentIndex >= 0 && (Index - startIndentIndex) == 3)
+            {
+                AddToken(TokenType.Indent, startIndentIndex, 4);
+                startIndentIndex = -1;
+            }
+
+            Index++;
+        }
+    }
+
     public bool Is (char @char)
     {
         return IsIndexValid(Index) && text[Index] == @char;
+    }
+
+    public bool IsPrevious (char @char)
+    {
+        return IsIndexValid(Index - 1) && text[Index - 1] == @char;
     }
 
     public bool IsNext (char @char)
@@ -52,7 +82,12 @@ internal class LexState
 
     public bool IsUnescaped (char @char)
     {
-        return Is(@char) && !Utilities.IsEscaped(text, Index);
+        return Is(@char) && !utils.IsEscaped(text, Index);
+    }
+
+    public bool IsNextUnescaped (char @char)
+    {
+        return IsNext(@char) && !utils.IsEscaped(text, Index + 1);
     }
 
     private bool IsIndexValid (int index)

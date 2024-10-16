@@ -45,46 +45,54 @@ public class SemanticsTest
     {
         var param1 = new Parameter(new IValueComponent[] { new PlainText("v1"), new Expression("e") });
         var param2 = new Parameter("p2", new[] { new PlainText("v2") });
-        var line = new CommandLine(new("c", new[] { param1, param2 }));
+        var line = new CommandLine(new("c", [param1, param2]));
         Assert.Equal("@c v1{e} p2:v2", line.ToString());
     }
 
     [Fact]
     public void GenericLineToStringIsCorrect ()
     {
-        var line = new GenericLine(new GenericPrefix("a", "b"), new IGenericContent[] {
-            new MixedValue(new[] { new PlainText("x") }),
+        var line = new GenericLine(new GenericPrefix("a", "b"), [
+            new MixedValue([new PlainText("x")]),
             new InlinedCommand(new("i", Array.Empty<Parameter>()))
-        });
+        ]);
         Assert.Equal("a.b: x[i]", line.ToString());
     }
 
     [Fact]
     public void MixedValueToStringIsCorrect ()
     {
-        Assert.Equal("foo|#id|{bar}nya", new MixedValue(new IValueComponent[] {
+        Assert.Equal("foo|#id|{bar}nya", new MixedValue([
             new IdentifiedText(new("foo"), new(new("id"))),
             new Expression("bar"),
             new PlainText("nya")
-        }).ToString());
+        ]).ToString());
     }
 
     [Fact]
     public void MixedValueCountEqualsItemCount ()
     {
-        Assert.Equal(2, new MixedValue(new[] { new PlainText(""), new PlainText("") }).Count);
+        Assert.Equal(2, new MixedValue([new PlainText(""), new PlainText("")]).Count);
     }
 
     [Fact]
     public void MixedValueHasIndexerOverComponents ()
     {
-        Assert.Equal("foo", new MixedValue(new[] { new PlainText("foo") })[0] as PlainText);
+        Assert.Equal("foo", new MixedValue([new PlainText("foo")])[0] as PlainText);
     }
 
     [Fact]
     public void MixedValueHasImplicitConversionFromArray ()
     {
         MixedValue mixed = Array.Empty<IValueComponent>();
+        Assert.IsType<MixedValue>(mixed);
+        Assert.NotNull(mixed);
+    }
+
+    [Fact]
+    public void MixedValueHasImplicitConversionFromEmptyCollectionExpression ()
+    {
+        MixedValue mixed = [];
         Assert.IsType<MixedValue>(mixed);
         Assert.NotNull(mixed);
     }
@@ -166,5 +174,13 @@ public class SemanticsTest
     public void EmptyIdentifiedTextToStringIsCorrect ()
     {
         Assert.Equal("|#|", new IdentifiedText(new(""), new("")).ToString());
+    }
+
+    [Fact]
+    public void ParameterWithWhitespaceToStringIsWrappedInQuotes ()
+    {
+        var param = new Parameter(new[] { new PlainText("lorem ipsum") });
+        var line = new CommandLine(new("c", [param]));
+        Assert.Equal("@c \"lorem ipsum\"", line.ToString());
     }
 }

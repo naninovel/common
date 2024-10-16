@@ -15,6 +15,16 @@ internal class LineWalker (ParseHandlers handlers)
 
     public char GetCharAt (int index) => lineText[index];
 
+    public bool TryGetCharAt (int index, out char nextChar)
+    {
+        if (index < lineText.Length)
+            nextChar = lineText[index];
+        else nextChar = default;
+        return nextChar != default;
+    }
+
+    public int GetIndent () => tokens.Count(t => t.Type == TokenType.Indent);
+
     public string Extract (int startIndex, int length)
     {
         if (startIndex < 0 || startIndex >= lineText.Length || length <= 0) return "";

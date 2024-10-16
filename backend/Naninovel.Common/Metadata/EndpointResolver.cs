@@ -3,69 +3,73 @@
 namespace Naninovel.Metadata;
 
 /// <summary>
-/// Allows resolving <see cref="Endpoint"/> from parsed commands.
+/// Allows resolving <see cref="Endpoint"/> from parsed commands with <see cref="BranchTraits.Endpoint"/> branch flag.
 /// </summary>
-public class EndpointResolver (MetadataProvider provider)
+public class EndpointResolver (IMetadata meta)
 {
-    private readonly NamedValueParser namedParser = new();
+    private readonly NamedValueParser namedParser = new(meta.Syntax);
+    private readonly ExpressionEvaluator eval = new(meta);
 
     /// <summary>
-    /// Builds constant expression for label component of endpoint parameter.
-    /// </summary>
-    /// <param name="paramId">ID of the parameter the expression is built for.</param>
-    /// <remarks>
-    /// Endpoints are expected to be named parameters where name component is script
-    /// name and value is the label. The expression will first attempt to get script name
-    /// from the parameter and fallback to currently edited script when it's not specified.
-    /// </remarks>
-    public static string BuildEndpointExpression (string paramId)
-    {
-        return $"Labels/{{:{paramId}[0]??$Script}}";
-    }
-
-    /// <summary>
-    /// When specified command has a parameter with navigation context (script name and/or label),
-    /// returns true and assigns related out arguments; returns false otherwise.
+    /// When specified command has <see cref="BranchTraits.Endpoint"/> branch flag with
+    /// <see cref="Branch.Endpoint"/> expression or a parameter with navigation context
+    /// (script path and/or label), returns true and assigns related out arguments;
+    /// returns false otherwise.
     /// </summary>
     /// <param name="command">Command to extract the endpoint from.</param>
     /// <param name="endpoint">When found, assigns the endpoint; default otherwise.</param>
-    /// <returns>Whether script name and/or label were found in one of the command parameters.</returns>
+    /// <returns>Whether command branches and endpoint was found in one of the command parameters.</returns>
     public bool TryResolve (Parsing.Command command, out Endpoint endpoint)
     {
+        endpoint = default;
+        if (meta.FindCommand(command.Identifier) is { Branch.Endpoint: { } exp })
+            return ResolveFromExpression(exp, ref endpoint);
         foreach (var parameter in command.Parameters)
             if (TryResolve(parameter, command.Identifier, out endpoint))
                 return true;
-        endpoint = default;
         return false;
     }
 
     /// <summary>
-    /// When specified parameter has navigation context (script name and/or label),
+    /// When command with specified ID has <see cref="BranchTraits.Endpoint"/> branch flag and
+    /// specified parameter has navigation context (script path and/or label),
     /// returns true and assigns related out arguments; returns false otherwise.
     /// </summary>
     /// <param name="parameter">Parameter to extract the endpoint from.</param>
     /// <param name="commandAliasOrId">Identifier or alias of the command which the parameter is associated with.</param>
     /// <param name="endpoint">When found, assigns the endpoint; default otherwise.</param>
-    /// <returns>Whether script name and/or label were found in one of the command parameters.</returns>
+    /// <returns>Whether parameter is an endpoint and associated command branches.</returns>
     public bool TryResolve (Parsing.Parameter parameter, string commandAliasOrId, out Endpoint endpoint)
     {
+        endpoint = default;
+        if (meta.FindCommand(commandAliasOrId) is not { Branch: { } branch } ||
+            !branch.Traits.HasFlag(BranchTraits.Endpoint)) return false;
         if (HasEndpointContext(commandAliasOrId, parameter.Identifier))
         {
             var (script, label) = namedParser.Parse(parameter.Value.ToString());
-            endpoint = new Endpoint(script, label);
+            endpoint = new(script, label);
             return true;
         }
-        endpoint = default;
         return false;
     }
 
     private bool HasEndpointContext (string commandAliasOrId, string? paramAliasOrId)
     {
-        var param = provider.FindParameter(commandAliasOrId, paramAliasOrId ?? "");
-        if (param?.ValueContext is null || param.ValueContext.Length < 2) return false;
-        return param.ValueContext[0]?.Type == ValueContextType.Resource &&
-               param.ValueContext[0]?.SubType == Constants.ScriptsType &&
-               param.ValueContext[1]?.Type == ValueContextType.Constant &&
-               param.ValueContext[1]?.SubType == BuildEndpointExpression(param.Id);
+        var param = meta.FindParameter(commandAliasOrId, paramAliasOrId);
+        if (param?.ValueContext is null ||
+            param.ValueContext.Length != 2 ||
+            param.ValueContext.Any(c => c is null)) return false;
+        return param.ValueContext[0]!.Type == ValueContextType.Endpoint &&
+               param.ValueContext[0]!.SubType == Constants.EndpointScript &&
+               param.ValueContext[1]!.Type == ValueContextType.Endpoint &&
+               param.ValueContext[1]!.SubType == Constants.EndpointLabel;
+    }
+
+    private bool ResolveFromExpression (string expression, ref Endpoint endpoint)
+    {
+        var result = eval.Evaluate(expression);
+        if (string.IsNullOrEmpty(result)) return false;
+        endpoint = new(result, null);
+        return true;
     }
 }

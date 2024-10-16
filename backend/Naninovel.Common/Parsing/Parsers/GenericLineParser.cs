@@ -2,12 +2,13 @@
 
 namespace Naninovel.Parsing;
 
-public class GenericLineParser (ParseHandlers handlers)
+public class GenericLineParser (ParseOptions options)
 {
-    private readonly CommandParser commandParser = new();
-    private readonly MixedValueParser valueParser = new(false);
+    private readonly CommandParser commandParser = new(options.Syntax);
+    private readonly MixedValueParser valueParser = new(false, options.Syntax);
     private readonly List<IGenericContent> content = [];
-    private readonly LineWalker walker = new(handlers);
+    private readonly LineWalker walker = new(options.Handlers);
+    private readonly ISyntax stx = options.Syntax;
     private PlainText? authorId, authorAppearance;
     private GenericPrefix? prefix;
 
@@ -15,7 +16,7 @@ public class GenericLineParser (ParseHandlers handlers)
     {
         Reset(lineText, tokens);
         while (TryNext()) continue;
-        return new GenericLine(prefix, content.ToArray());
+        return new GenericLine(prefix, content.ToArray(), walker.GetIndent());
     }
 
     private void Reset (string lineText, IReadOnlyList<Token> tokens)
@@ -54,7 +55,8 @@ public class GenericLineParser (ParseHandlers handlers)
                 valueParser.AddTextIdToken(token);
                 return true;
             case InlinedOpen:
-                ParseInlined();
+                if (IsEmptyInlined(token)) ParseEmptyInlined();
+                else ParseInlined();
                 return true;
             case Inlined:
                 AssociateInlined(token);
@@ -93,9 +95,22 @@ public class GenericLineParser (ParseHandlers handlers)
         walker.Identify(text);
     }
 
+    private bool IsEmptyInlined (Token openInlinedToken)
+    {
+        return walker.TryGetCharAt(openInlinedToken.EndIndex + 1, out var next) &&
+               next == stx.InlinedClose[0];
+    }
+
     private void ParseInlined ()
     {
         var command = commandParser.Parse(walker);
+        var inlined = new InlinedCommand(command);
+        content.Add(inlined);
+    }
+
+    private void ParseEmptyInlined ()
+    {
+        var command = new Command("");
         var inlined = new InlinedCommand(command);
         content.Add(inlined);
     }

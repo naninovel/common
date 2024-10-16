@@ -14,14 +14,14 @@ public class MockClientTransport : MockTransport, IClientTransport
             Open = true;
         }
 
-        public override Task SendMessageAsync (string message, CancellationToken token)
+        public override Task SendMessage (string message, CancellationToken token)
         {
             client.MockIncoming(message);
             return Task.CompletedTask;
         }
     }
 
-    public Task ConnectToServerAsync (int port, CancellationToken token)
+    public Task ConnectToServer (int port, CancellationToken token)
     {
         ThrowIfRequested(port);
         MockAcceptanceDelayed(port);

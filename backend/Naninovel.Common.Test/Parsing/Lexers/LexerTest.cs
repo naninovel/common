@@ -1,17 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using Xunit.Abstractions;
 
 namespace Naninovel.Parsing.Test;
 
-public class LexerTest
+public class LexerTest (ITestOutputHelper output)
 {
-    private static readonly Lexer lexer = new();
-    private readonly ITestOutputHelper output;
-
-    public LexerTest (ITestOutputHelper output)
-    {
-        this.output = output;
-    }
+    private static readonly Lexer lexer = new(Syntax.Default);
 
     [Fact]
     public void NullLineThrowsException ()
@@ -45,6 +38,21 @@ public class LexerTest
         Assert.Equal(new Token(TokenType.CommandBody, 0, 5), tokens[5]);
     }
 
+    [Fact]
+    public void CanOverrideDefaultIdentifiers ()
+    {
+        var tokens = new List<Token>();
+        var lexer = new Lexer(new Syntax(parameterAssign: "="));
+        lexer.TokenizeCommandBody("x y=z", tokens);
+        Assert.Equal(6, tokens.Count);
+        Assert.Equal(new Token(TokenType.CommandId, 0, 1), tokens[0]);
+        Assert.Equal(new Token(TokenType.ParamId, 2, 1), tokens[1]);
+        Assert.Equal(new Token(TokenType.ParamAssign, 3, 1), tokens[2]);
+        Assert.Equal(new Token(TokenType.ParamValue, 4, 1), tokens[3]);
+        Assert.Equal(new Token(TokenType.NamedParam, 2, 3), tokens[4]);
+        Assert.Equal(new Token(TokenType.CommandBody, 0, 5), tokens[5]);
+    }
+
     [Theory, MemberData(nameof(LexerTestData.CommentLines), MemberType = typeof(LexerTestData))]
     public void CommentLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Comment, tokens);
 
@@ -57,7 +65,6 @@ public class LexerTest
     [Theory, MemberData(nameof(LexerTestData.GenericLines), MemberType = typeof(LexerTestData))]
     public void GenericLineTokenized (string text, params Token[] tokens) => LineTokenized(text, LineType.Generic, tokens);
 
-    [ExcludeFromCodeCoverage]
     private void LineTokenized (string text, LineType expectedLineType, params Token[] expectedTokens)
     {
         var tokens = new List<Token>();

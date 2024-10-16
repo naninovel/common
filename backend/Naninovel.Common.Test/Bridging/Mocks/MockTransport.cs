@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 
 namespace Naninovel.Bridging.Test;
@@ -12,13 +11,13 @@ public class MockTransport : ITransport
     private readonly CancellationTokenSource cts = new();
     private readonly MessageSerializer serializer = new(new MockSerializer());
 
-    public virtual async Task<string> WaitMessageAsync (CancellationToken token)
+    public virtual async Task<string> WaitMessage (CancellationToken token)
     {
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
         return await readChannel.Reader.ReadAsync(linkedCts.Token);
     }
 
-    public virtual async Task SendMessageAsync (string message, CancellationToken token)
+    public virtual async Task SendMessage (string message, CancellationToken token)
     {
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
         await writeChannel.Writer.WriteAsync(message, linkedCts.Token);
@@ -35,7 +34,6 @@ public class MockTransport : ITransport
         readChannel.Writer.TryWrite(message);
     }
 
-    [ExcludeFromCodeCoverage]
     public async Task<T> WaitOutcomingAsync<T> () where T : class, IMessage
     {
         while (!cts.IsCancellationRequested)
@@ -46,7 +44,7 @@ public class MockTransport : ITransport
         throw new OperationCanceledException();
     }
 
-    public Task CloseAsync (CancellationToken token)
+    public Task Close (CancellationToken token)
     {
         Open = false;
         cts.Cancel();

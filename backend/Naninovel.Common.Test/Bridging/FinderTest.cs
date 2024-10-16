@@ -15,7 +15,7 @@ public class FinderTest
             return clientTransport;
         });
         new Server("Foo", serverTransport, serializer).Start(1);
-        var servers = await finder.FindServersAsync(1, 1, timeout);
+        var servers = await finder.FindServers(1, 1, timeout);
         Assert.Equal("Foo", servers[0].Name);
         Assert.Equal(1, servers[0].Port);
     }
@@ -33,7 +33,7 @@ public class FinderTest
         });
         new Server("Other", serverTransport1, serializer).Start(1);
         new Server("MyBoy", serverTransport2, serializer).Start(2);
-        var servers = await finder.FindServersAsync(1, 2, timeout);
+        var servers = await finder.FindServers(1, 2, timeout);
         Assert.Equal("MyBoy", servers[0].Name);
         Assert.Equal(2, servers[0].Port);
     }
@@ -42,6 +42,6 @@ public class FinderTest
     public async Task CanConstructWithDefaultTransport ()
     {
         var finder = new ServerFinder(serializer);
-        Assert.Empty(await finder.FindServersAsync(0, 0, TimeSpan.Zero));
+        Assert.Empty(await finder.FindServers(0, 0, TimeSpan.Zero));
     }
 }

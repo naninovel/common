@@ -24,7 +24,7 @@ public sealed class MockServerTransport : IServerTransport
         Listening = false;
     }
 
-    public async Task<ITransport> WaitConnectionAsync (CancellationToken token)
+    public async Task<ITransport> WaitConnection (CancellationToken token)
     {
         using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(token, cts.Token);
         return await queue.Reader.ReadAsync(combinedCts.Token);

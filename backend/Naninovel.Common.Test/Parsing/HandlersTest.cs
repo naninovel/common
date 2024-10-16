@@ -51,6 +51,7 @@ public class HandlersTest
         var mapper = new RangeMapper();
         mapper.Associate(component, range);
 
+        // ReSharper disable once NotDisposedResource
         var enumerator = ((IEnumerable)mapper).GetEnumerator();
         enumerator.MoveNext();
         Assert.Equal(component, ((KeyValuePair<ILineComponent, InlineRange>)enumerator.Current!).Key);

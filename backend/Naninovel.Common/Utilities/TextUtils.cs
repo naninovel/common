@@ -1,9 +1,13 @@
-namespace Naninovel.Utilities;
+namespace Naninovel.Utilities; // Don't remove Utilities sub-space
+// to prevent conflicts with common string utils in Unity runtime.
+// Don't use this utils in Unity runtime, as this version has breaking changes, such as
+// GetBefore/After returning empty string instead of null, which causes all sorts of shit.
+// This can be consolidated after moving to v2 of runtime.
 
 /// <summary>
 /// Common text-related helpers and extensions.
 /// </summary>
-public static class TextUtilities
+public static class TextUtils
 {
     private static readonly string[] breaks = ["\r\n", "\n", "\r"];
     private static readonly char[] junk = ['\uFEFF', '\u200B'];
@@ -69,7 +73,7 @@ public static class TextUtilities
     /// </summary>
     public static string GetBefore (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return str.IndexOf(match, comp) is var idx and >= 0 ? str.Substring(0, idx) : "";
+        return str.IndexOf(match, comp) is var idx and >= 0 ? str[..idx] : "";
     }
 
     /// <summary>
@@ -77,7 +81,7 @@ public static class TextUtilities
     /// </summary>
     public static string GetBeforeLast (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return str.LastIndexOf(match, comp) is var idx and >= 0 ? str.Substring(0, idx) : "";
+        return str.LastIndexOf(match, comp) is var idx and >= 0 ? str[..idx] : "";
     }
 
     /// <summary>
@@ -85,7 +89,10 @@ public static class TextUtilities
     /// </summary>
     public static string GetAfter (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return (str.LastIndexOf(match, comp) + match.Length) is var idx and >= 0 && idx < str.Length ? str.Substring(idx) : "";
+        var matchIdx = str.LastIndexOf(match, comp);
+        if (matchIdx == -1) return "";
+        var cutIdx = matchIdx + match.Length;
+        return cutIdx < str.Length ? str[cutIdx..] : "";
     }
 
     /// <summary>
@@ -93,7 +100,10 @@ public static class TextUtilities
     /// </summary>
     public static string GetAfterFirst (this string str, string match, StringComparison comp = StringComparison.Ordinal)
     {
-        return (str.IndexOf(match, comp) + match.Length) is var idx and >= 0 && idx < str.Length ? str.Substring(idx) : "";
+        var matchIdx = str.IndexOf(match, comp);
+        if (matchIdx == -1) return "";
+        var cutIdx = matchIdx + match.Length;
+        return cutIdx < str.Length ? str[cutIdx..] : "";
     }
 
     /// <summary>
@@ -103,7 +113,7 @@ public static class TextUtilities
     {
         if (string.IsNullOrEmpty(str) || char.IsLower(str, 0)) return str;
         if (str.Length <= 1) return str.ToLowerInvariant();
-        return $"{char.ToLowerInvariant(str[0])}{str.Substring(1)}";
+        return $"{char.ToLowerInvariant(str[0])}{str[1..]}";
     }
 
     /// <summary>
@@ -113,6 +123,31 @@ public static class TextUtilities
     {
         if (string.IsNullOrEmpty(str) || char.IsUpper(str, 0)) return str;
         if (str.Length <= 1) return str.ToUpperInvariant();
-        return $"{char.ToUpperInvariant(str[0])}{str.Substring(1)}";
+        return $"{char.ToUpperInvariant(str[0])}{str[1..]}";
+    }
+
+    /// <summary>
+    /// Removes specified <paramref name="invalid"/> characters from the string.
+    /// </summary>
+    /// <remarks>
+    /// This is faster than using <see cref="string.Replace(char,char)"/>, as it only allocates once
+    /// and doesn't allocate at all (returns initial string) when the string doesn't contain invalid chars.
+    /// </remarks>
+    public static string Sanitize (this string str, IReadOnlyCollection<char> invalid)
+    {
+        // TODO: Use IReadOnlySet when Unity switches to the modern .NET.
+
+        var validCharCount = 0;
+        foreach (var c in str)
+            if (!invalid.Contains(c))
+                validCharCount++;
+        if (validCharCount == str.Length) return str;
+
+        return string.Create(validCharCount, (str, invalid), (span, ctx) => {
+            var idx = 0;
+            foreach (var c in ctx.str)
+                if (!ctx.invalid.Contains(c))
+                    span[idx++] = c;
+        });
     }
 }

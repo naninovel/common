@@ -1,7 +1,7 @@
 namespace Naninovel.Metadata;
 
 /// <summary>
-/// Represents parameter of a script command.
+/// Parameter of a <see cref="Command"/>.
 /// </summary>
 public class Parameter
 {
@@ -47,9 +47,9 @@ public class Parameter
     /// </summary>
     public string? DefaultValue { get; set; }
     /// <summary>
-    /// Human-readable description of the parameter.
+    /// Documentation for the parameter, when specified or null.
     /// </summary>
-    public string? Summary { get; set; }
+    public Documentation? Documentation { get; set; }
 
     /// <summary>
     /// User-facing formatted identifier of the parameter.

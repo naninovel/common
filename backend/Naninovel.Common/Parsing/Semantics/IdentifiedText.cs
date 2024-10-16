@@ -3,8 +3,7 @@
 /// <summary>
 /// A plain text content with associated persistent identifier.
 /// </summary>
-public class IdentifiedText (PlainText text, TextIdentifier id)
-    : ILineComponent, IValueComponent
+public class IdentifiedText (PlainText text, TextIdentifier id) : IValueComponent
 {
     /// <summary>
     /// The identified text content.

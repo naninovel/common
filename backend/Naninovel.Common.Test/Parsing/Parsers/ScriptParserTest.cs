@@ -2,12 +2,16 @@ namespace Naninovel.Parsing.Test;
 
 public class ScriptParserTest
 {
-    private readonly ErrorCollector errors = new();
+    private readonly ErrorCollector errors = [];
     private readonly ScriptParser parser;
 
     public ScriptParserTest ()
     {
-        parser = new(new ParseHandlers { ErrorHandler = errors });
+        var options = new ParseOptions {
+            Syntax = Syntax.Default,
+            Handlers = new ParseHandlers { ErrorHandler = errors }
+        };
+        parser = new(options);
     }
 
     [Fact]
@@ -21,8 +25,7 @@ public class ScriptParserTest
     [Fact]
     public void TextSplitsCorrectly ()
     {
-        const string text = " 0 \n\r \r\n3 ";
-        var lines = ScriptParser.SplitText(text);
+        var lines = ScriptParser.SplitText(" 0 \n\r \r\n3 ");
         Assert.Equal(4, lines.Length);
         Assert.Equal(" 0 ", lines[0]);
         Assert.Equal("", lines[1]);
@@ -33,18 +36,54 @@ public class ScriptParserTest
     [Fact]
     public void ScriptTextParsed ()
     {
-        const string scriptText = @"
-; Comment line
-@commandLine
-Generic text line
-# LabelLine
-";
-        var lines = parser.ParseText(scriptText);
+        var lines = parser.ParseText(
+            """
+
+            ; Comment line
+            @commandLine
+            Generic text line
+            # LabelLine
+            """);
         Assert.IsType<GenericLine>(lines[0]);
         Assert.IsType<CommentLine>(lines[1]);
         Assert.IsType<CommandLine>(lines[2]);
         Assert.IsType<GenericLine>(lines[3]);
         Assert.IsType<LabelLine>(lines[4]);
+    }
+
+    [Fact]
+    public void CanOverrideDefaultIdentifiers ()
+    {
+        var parser = new ScriptParser(new ParseOptions {
+            Syntax = new Syntax(
+                commentLine: "/",
+                commandLine: ":",
+                labelLine: "%",
+                parameterAssign: "=",
+                inlinedOpen: "(",
+                inlinedClose: ")",
+                @true: "да",
+                @false: "нет"
+            )
+        });
+        var lines = parser.ParseText(
+            """
+
+            / Comment line
+            :commandLine p=v p! !p
+            Generic \(text\) line (cmd)
+            % LabelLine
+            """);
+        Assert.IsType<GenericLine>(lines[0]);
+        Assert.Equal("Comment line", ((CommentLine)lines[1]).Comment);
+        Assert.Equal("commandLine", ((CommandLine)lines[2]).Command.Identifier);
+        Assert.Equal("p", ((CommandLine)lines[2]).Command.Parameters[0].Identifier);
+        Assert.Equal("v", (PlainText)((CommandLine)lines[2]).Command.Parameters[0].Value[0]);
+        Assert.Equal("да", (PlainText)((CommandLine)lines[2]).Command.Parameters[1].Value[0]);
+        Assert.Equal("нет", (PlainText)((CommandLine)lines[2]).Command.Parameters[2].Value[0]);
+        Assert.Equal("Generic (text) line ", (PlainText)((MixedValue)((GenericLine)lines[3]).Content[0])[0]);
+        Assert.Equal("cmd", ((InlinedCommand)((GenericLine)lines[3]).Content[1]).Command.Identifier);
+        Assert.Equal("LabelLine", ((LabelLine)lines[4]).Label);
     }
 
     [Fact]
@@ -62,5 +101,14 @@ Generic text line
     public void CanCreateParserWithoutHandlers ()
     {
         _ = new ScriptParser();
+    }
+
+    [Fact]
+    public void IndentsParsedCorrectly ()
+    {
+        Assert.Equal(0, parser.ParseLine("# x").Indent);
+        Assert.Equal(1, parser.ParseLine("    ; x").Indent);
+        Assert.Equal(2, parser.ParseLine("        @c").Indent);
+        Assert.Equal(2, parser.ParseLine("    \t    x").Indent);
     }
 }

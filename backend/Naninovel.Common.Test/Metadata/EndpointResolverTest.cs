@@ -13,12 +13,6 @@ public class EndpointResolverTest
     }
 
     [Fact]
-    public void BuildsCorrectEndpointExpression ()
-    {
-        Assert.Equal("Labels/{:Foo[0]??$Script}", EndpointResolver.BuildEndpointExpression("Foo"));
-    }
-
-    [Fact]
     public void EndpointHashingIsCorrect ()
     {
         Assert.True(new Endpoint(null, null).Equals(new(null, null)));
@@ -38,64 +32,134 @@ public class EndpointResolverTest
     }
 
     [Fact]
+    public void WhenParameterHasNoEndpointContextReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [new Command { Id = "c", Parameters = [new() { Id = "p" }] }]
+        });
+        Assert.False(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("v") })]), out _));
+    }
+
+    [Fact]
+    public void WhenCommandDoesntBranchReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [new Command { Id = "c", Branch = null, Parameters = [CreateEndpointParamMeta("p")] }]
+        });
+        Assert.False(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("v") })]), out _));
+    }
+
+    [Fact]
+    public void WhenCommandDoesntHaveEndpointBranchFlagReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [new Command { Id = "c", Branch = new() { Traits = BranchTraits.Nest }, Parameters = [CreateEndpointParamMeta("p")] }]
+        });
+        Assert.False(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("v") })]), out _));
+    }
+
+    [Fact]
     public void WhenUnknownParameterReturnsFalse ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c" }]
+            Commands = [new Command { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint }, Parameters = [CreateEndpointParamMeta("p")] }]
+        });
+        Assert.False(resolver.TryResolve(new("x", new[] { new PlainText("v") }), "c", out _));
+    }
+
+    [Fact]
+    public void WhenParameterIsNotAssignedReturnsFalse ()
+    {
+        meta.Update(new() {
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
         Assert.False(resolver.TryResolve(new("c"), out _));
     }
 
     [Fact]
-    public void WhenOtherParameterReturnsFalse ()
+    public void CanResolveScriptComponentOfEndpoint ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [new Parameter { Id = "p" }] }]
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
-        Assert.False(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("v") }) }), out _));
+        Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s") })]), out var point));
+        Assert.Equal("s", point.ScriptPath);
     }
 
     [Fact]
-    public void CanResolveScript ()
+    public void CanResolveLabelComponentOfTheEndpoint ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s") }) }), out var point));
-        Assert.Equal("s", point.Script);
-    }
-
-    [Fact]
-    public void CanResolveLabel ()
-    {
-        meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
-        });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText(".l") }) }), out var point));
+        Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText(".l") })]), out var point));
         Assert.Equal("l", point.Label);
     }
 
     [Fact]
-    public void CanResolveScriptAndLabel ()
+    public void CanResolveBothComponentsOfTheEndpoint ()
     {
         meta.Update(new() {
-            Commands = [new Command { Id = "c", Parameters = [CreateEndpointParameterMeta("p")] }]
+            Commands = [CreateEndpointCommandMeta("c", "p")]
         });
-        Assert.True(resolver.TryResolve(new("c", new[] { new Parsing.Parameter("p", new[] { new PlainText("s.l") }) }), out var point));
-        Assert.Equal("s", point.Script);
+        Assert.True(resolver.TryResolve(new("c", [new("p", new[] { new PlainText("s.l") })]), out var point));
+        Assert.Equal("s", point.ScriptPath);
         Assert.Equal("l", point.Label);
     }
 
-    private Parameter CreateEndpointParameterMeta (string id)
+    [Fact]
+    public void CanResolveEndpointFromBranch ()
     {
-        return new Parameter {
-            Id = id,
-            ValueType = ValueType.String,
-            ValueContainerType = ValueContainerType.Named,
-            ValueContext = [
-                new() { Type = ValueContextType.Resource, SubType = "Scripts" },
-                new() { Type = ValueContextType.Constant, SubType = EndpointResolver.BuildEndpointExpression(id) }
-            ]
-        };
+        meta.Update(new() {
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = "s" } }]
+        });
+        Assert.True(resolver.TryResolve(new("c"), out var point));
+        Assert.Equal("s", point.ScriptPath);
     }
+
+    [Fact]
+    public void CanResolveEndpointFromBranchExpression ()
+    {
+        meta.Update(new() {
+            TitleScript = "s",
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = $"{{{ExpressionEvaluator.TitleScript}}}" } }]
+        });
+        Assert.True(resolver.TryResolve(new("c"), out var point));
+        Assert.Equal("s", point.ScriptPath);
+    }
+
+    [Fact]
+    public void WhenExpressionNotResolvedEndpointNotResolved ()
+    {
+        meta.Update(new() {
+            TitleScript = null,
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = $"{{{ExpressionEvaluator.TitleScript}}}" } }]
+        });
+        Assert.False(resolver.TryResolve(new("c"), out _));
+    }
+
+    [Fact] // Parameter endpoint context is expected to be used instead of requesting parameters in the expression.
+    public void DoesntResolveWhenExpressionRequestsParameterValue ()
+    {
+        meta.Update(new() {
+            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = "{:foo}" } }]
+        });
+        Assert.False(resolver.TryResolve(new("c"), out _));
+    }
+
+    private Parameter CreateEndpointParamMeta (string id) => new() {
+        Id = id,
+        ValueType = ValueType.String,
+        ValueContainerType = ValueContainerType.Named,
+        ValueContext = [
+            new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointScript },
+            new() { Type = ValueContextType.Endpoint, SubType = Constants.EndpointLabel }
+        ]
+    };
+
+    private Command CreateEndpointCommandMeta (string commandId, string paramId) => new() {
+        Id = commandId,
+        Branch = new() { Traits = BranchTraits.Endpoint },
+        Parameters = [CreateEndpointParamMeta(paramId)]
+    };
 }

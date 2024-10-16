@@ -16,7 +16,7 @@ public class Actor
     /// <summary>
     /// Collection of appearance identifiers supported by the actor.
     /// </summary>
-    public string[] Appearances { get; set; } = Array.Empty<string>();
+    public string[] Appearances { get; set; } = [];
     /// <summary>
     /// Additional human-readable information about the actor.
     /// </summary>

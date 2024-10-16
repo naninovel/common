@@ -9,11 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bootsharp" Version="0.2.0"/>
+        <PackageReference Include="Bootsharp" Version="0.3.2"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="../Naninovel.Common.Bindings/Naninovel.Common.Bindings.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
     </ItemGroup>
 
 </Project>

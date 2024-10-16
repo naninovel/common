@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -14,5 +14,9 @@
         <RepositoryUrl>https://github.com/naninovel/common</RepositoryUrl>
         <NoWarn>1591,1573</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Naninovel.Utilities"/>
+    </ItemGroup>
 
 </Project>

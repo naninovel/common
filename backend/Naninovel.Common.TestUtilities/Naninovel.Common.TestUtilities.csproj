@@ -21,4 +21,8 @@
         <ProjectReference Include="../Naninovel.Common.Modern/Naninovel.Common.Modern.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
+    </ItemGroup>
+
 </Project>

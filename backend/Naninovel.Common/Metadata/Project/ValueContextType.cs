@@ -18,6 +18,11 @@ public enum ValueContextType
     /// </summary>
     Resource,
     /// <summary>
+    /// Navigation position inside scenario script (<see cref="Metadata.Endpoint"/>); assumes underlying value
+    /// is a named string, where name is script resource name and value is label inside that script (optional).
+    /// </summary>
+    Endpoint,
+    /// <summary>
     /// Identifier of an actor from <see cref="Project.Actors"/>; type is specified via <see cref="ValueContext.SubType"/>.
     /// </summary>
     Actor,

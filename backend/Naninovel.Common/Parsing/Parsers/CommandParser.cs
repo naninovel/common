@@ -4,17 +4,18 @@ using static Naninovel.Parsing.ParsingErrors;
 
 namespace Naninovel.Parsing;
 
-internal class CommandParser
+internal class CommandParser (ISyntax stx)
 {
     private static readonly Command emptyBody = new(PlainText.Empty);
-    private static readonly MixedValue emptyValue = new(Array.Empty<IValueComponent>());
-    private readonly MixedValueParser valueParser = new(true);
+    private static readonly MixedValue emptyValue = new([]);
+    private readonly MixedValueParser valueParser = new(true, stx);
     private readonly List<Parameter> parameters = [];
     private LineWalker walker = null!;
     private Command commandBody = emptyBody;
     private PlainText commandId = PlainText.Empty;
     private MixedValue paramValue = emptyValue;
     private PlainText? paramId;
+    private Token paramIdToken;
 
     public Command Parse (LineWalker walker)
     {
@@ -37,6 +38,7 @@ internal class CommandParser
     private void ResetParameterState ()
     {
         paramId = null;
+        paramIdToken = default;
         paramValue = emptyValue;
     }
 
@@ -63,6 +65,9 @@ internal class CommandParser
         {
             case ParamId:
                 ParseParameterId(token);
+                return true;
+            case BoolFlag:
+                ParseBoolFlag(token);
                 return true;
             case TokenType.Expression:
                 valueParser.AddExpressionToken(token);
@@ -92,13 +97,21 @@ internal class CommandParser
 
     private void ParseParameterId (Token paramIdToken)
     {
+        this.paramIdToken = paramIdToken;
         paramId = walker.Extract(paramIdToken);
         walker.Associate(paramId, paramIdToken);
     }
 
+    private void ParseBoolFlag (Token flagToken)
+    {
+        var value = flagToken.EndIndex > paramIdToken.EndIndex ? stx.True : stx.False;
+        paramValue = new MixedValue([new PlainText(value)]);
+        walker.Associate(paramValue, flagToken);
+    }
+
     private void ParseParameterValue (Token valueToken)
     {
-        paramValue = new MixedValue(valueParser.Parse(valueToken, walker, false));
+        paramValue = valueParser.Parse(valueToken, walker, false);
         walker.Associate(paramValue, valueToken);
         walker.Identify(paramValue);
     }

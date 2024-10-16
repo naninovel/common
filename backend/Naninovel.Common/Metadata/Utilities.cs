@@ -8,7 +8,7 @@ internal static class Utilities
 {
     public static string BuildLabel (string? alias, string id)
     {
-        if (!string.IsNullOrEmpty(alias)) return ToFirstLower(alias!);
+        if (!string.IsNullOrEmpty(alias)) return ToFirstLower(alias);
         return ToFirstLower(id);
     }
 
@@ -26,6 +26,6 @@ internal static class Utilities
     private static string ToFirstLower (string value)
     {
         if (value.Length == 1) char.ToLowerInvariant(value[0]);
-        return char.ToLowerInvariant(value[0]) + value.Substring(1);
+        return char.ToLowerInvariant(value[0]) + value[1..];
     }
 }

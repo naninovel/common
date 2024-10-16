@@ -6,7 +6,7 @@ namespace Naninovel.Parsing;
 /// <summary>
 /// Represents plain text content.
 /// </summary>
-public class PlainText (string text) : ILineComponent, IValueComponent, IEnumerable<char>
+public class PlainText (string text) : IValueComponent, IEnumerable<char>
 {
     public static readonly PlainText Empty = new(string.Empty);
 
