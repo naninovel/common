@@ -8,9 +8,7 @@ namespace Naninovel.Metadata;
 public class EndpointResolver (IMetadata meta)
 {
     private readonly NamedValueParser namedParser = new(meta.Syntax);
-    private readonly ExpressionEvaluator eval = new(meta,
-        () => throw new Error("Skip script path component in the named value to specify current script."),
-        (_, __) => throw new Error("Use endpoint parameter context to resolve it from the command parameters."));
+    private readonly ExpressionEvaluator eval = new(meta);
 
     /// <summary>
     /// When specified command has <see cref="BranchTraits.Endpoint"/> branch flag with
@@ -49,7 +47,7 @@ public class EndpointResolver (IMetadata meta)
         if (HasEndpointContext(commandAliasOrId, parameter.Identifier))
         {
             var (script, label) = namedParser.Parse(parameter.Value.ToString());
-            endpoint = new Endpoint(script, label);
+            endpoint = new(script, label);
             return true;
         }
         return false;

@@ -138,24 +138,13 @@ public class EndpointResolverTest
         Assert.False(resolver.TryResolve(new("c"), out _));
     }
 
-    [Fact]
-    public void ErrsWhenExpressionRequestsInspectedScript ()
-    {
-        meta.Update(new() {
-            Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = $"{{{ExpressionEvaluator.InspectedScript}}}" } }]
-        });
-        Assert.Contains("Skip script path component in the named value to specify current script.",
-            Assert.Throws<Error>(() => resolver.TryResolve(new("c"), out _)).Message);
-    }
-
-    [Fact]
-    public void ErrsWhenExpressionRequestsParameterValue ()
+    [Fact] // Parameter endpoint context is expected to be used instead of requesting parameters in the expression.
+    public void DoesntResolveWhenExpressionRequestsParameterValue ()
     {
         meta.Update(new() {
             Commands = [new() { Id = "c", Branch = new() { Traits = BranchTraits.Endpoint, Endpoint = "{:foo}" } }]
         });
-        Assert.Contains("Use endpoint parameter context to resolve it from the command parameters.",
-            Assert.Throws<Error>(() => resolver.TryResolve(new("c"), out _)).Message);
+        Assert.False(resolver.TryResolve(new("c"), out _));
     }
 
     private Parameter CreateEndpointParamMeta (string id) => new() {

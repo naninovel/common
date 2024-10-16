@@ -103,7 +103,7 @@ public class ProviderTest
     [Fact]
     public void CanFindFunctions ()
     {
-        var fns = new List<Function> { new() { Name = "ShouldBeCleared" } };
+        var fns = new List<Function>();
         var meta = new Project {
             Functions = [
                 new() { Name = "foo" },

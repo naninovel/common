@@ -1,3 +1,4 @@
+using Naninovel.Parsing;
 using Naninovel.TestUtilities;
 using static Naninovel.Metadata.ExpressionEvaluator;
 
@@ -6,8 +7,6 @@ namespace Naninovel.Metadata.Test;
 public class ExpressionEvaluatorTest
 {
     private readonly MetadataMock meta = new();
-    private Func<string> getInspectedScript = () => "";
-    private GetParamValue getParamValue = (id, idx) => null;
 
     [Fact]
     public void WhenNullOrEmptyReturnsNullOrEmpty ()
@@ -23,15 +22,6 @@ public class ExpressionEvaluatorTest
     {
         Assert.Equal("foo", Evaluate("foo"));
         Assert.Equal(["foo"], EvaluateMany("foo"));
-    }
-
-    [Fact]
-    public void CanResolveInspectedScript ()
-    {
-        getInspectedScript = () => "foo";
-        Assert.Equal("foo", Evaluate($"{{{InspectedScript}}}"));
-        getInspectedScript = () => null;
-        Assert.Null(Evaluate($"{{{InspectedScript}}}"));
     }
 
     [Fact]
@@ -55,48 +45,111 @@ public class ExpressionEvaluatorTest
     [Fact]
     public void DoesntModifyContentOutsideOfExpression ()
     {
-        getInspectedScript = () => "bar";
-        Assert.Equal("foo/bar", Evaluate($"foo/{{{InspectedScript}}}"));
+        meta.EntryScript = "bar";
+        Assert.Equal("foo/bar", Evaluate($"foo/{{{EntryScript}}}"));
     }
 
     [Fact]
-    public void CanInjectParamValues ()
+    public void CanResolveCommandParamValues ()
     {
-        getParamValue = (id, idx) => id == "1" ? "foo" : "bar";
-        Assert.Equal("foo/bar", Evaluate("{:1}/{:2}"));
+        meta.Commands = [new() { Id = "c", Parameters = [new() { Id = "x" }, new() { Id = "y" }] }];
+        var cmd = new Parsing.Command("c", [new("x", new([new PlainText("foo")])), new("y", new([new PlainText("bar")]))]);
+        Assert.Equal("foo/bar", Evaluate("{:x}/{:y}", new() { Command = cmd }));
     }
 
     [Fact]
-    public void WhenParamValueIsNullEmptyOrNullIsReturned ()
+    public void WhenCommandParamValueIsEmptyEmptyOrNullIsReturned ()
     {
-        getParamValue = (id, idx) => null;
-        Assert.Null(Evaluate("{:foo}"));
-        Assert.Empty(EvaluateMany("{:foo}"));
+        meta.Commands = [new() { Id = "c", Parameters = [new() { Id = "x" }] }];
+        var cmd = new Parsing.Command("c", [new("x", [])]);
+        Assert.Null(Evaluate("{:x}", new() { Command = cmd }));
+        Assert.Empty(EvaluateMany("{:x}", new() { Command = cmd }));
+    }
+
+    [Fact]
+    public void WhenCommandParamIsMissingEmptyOrNullIsReturned ()
+    {
+        meta.Commands = [new() { Id = "c" }];
+        var cmd = new Parsing.Command("c");
+        Assert.Null(Evaluate("{:x}", new() { Command = cmd }));
+        Assert.Empty(EvaluateMany("{:x}", new() { Command = cmd }));
+    }
+
+    [Fact]
+    public void WhenCommandIsUnknownEmptyOrNullIsReturned ()
+    {
+        var cmd = new Parsing.Command("c", [new("x", new([new PlainText("foo")]))]);
+        Assert.Null(Evaluate("{:x}", new() { Command = cmd }));
+        Assert.Empty(EvaluateMany("{:x}", new() { Command = cmd }));
+    }
+
+    [Fact]
+    public void CanResolveFunctionParamValues ()
+    {
+        meta.Functions = [new() { Name = "f", Parameters = [new() { Name = "x" }, new() { Name = "y" }] }];
+        var fn = new Expression.Function("f", [new Expression.String("foo"), new Expression.String("bar")]);
+        Assert.Equal("foo/bar", Evaluate("{:x}/{:y}", new() { Function = fn }));
+    }
+
+    [Fact]
+    public void WhenFunctionParamValueIsNotStringEmptyOrNullIsReturned ()
+    {
+        meta.Functions = [new() { Name = "f", Parameters = [new() { Name = "x" }] }];
+        var fn = new Expression.Function("f", [new Expression.Numeric(42)]);
+        Assert.Null(Evaluate("{:x}", new() { Function = fn }));
+        Assert.Empty(EvaluateMany("{:x}", new() { Function = fn }));
+    }
+
+    [Fact]
+    public void WhenFunctionParamIsMissingEmptyOrNullIsReturned ()
+    {
+        meta.Functions = [new() { Name = "f", Parameters = [new() { Name = "x" }] }];
+        var fn = new Expression.Function("f", []);
+        Assert.Null(Evaluate("{:x}", new() { Function = fn }));
+        Assert.Empty(EvaluateMany("{:x}", new() { Function = fn }));
+    }
+
+    [Fact]
+    public void WhenFunctionIsUnknownEmptyOrNullIsReturned ()
+    {
+        var fn = new Expression.Function("f", [new Expression.String("foo")]);
+        Assert.Null(Evaluate("{:x}", new() { Function = fn }));
+        Assert.Empty(EvaluateMany("{:x}", new() { Function = fn }));
+    }
+
+    [Fact]
+    public void WhenParamContextNotSpecifiedEmptyOrNullIsReturned ()
+    {
+        Assert.Null(Evaluate("{:x}"));
+        Assert.Empty(EvaluateMany("{:x}"));
     }
 
     [Fact]
     public void CanUseNullCoalescing ()
     {
-        getInspectedScript = () => "bar";
-        getParamValue = (id, idx) => id == "foo" ? "foo" : null;
-        Assert.Equal("foobar", Evaluate($"{{:foo??:bar}}{{:bar??{InspectedScript}}}"));
+        meta.EntryScript = "bar";
+        meta.Commands = [new() { Id = "c", Parameters = [new() { Id = "foo" }] }];
+        var cmd = new Parsing.Command("c", [new("foo", new([new PlainText("foo")]))]);
+        Assert.Equal("foobar", Evaluate($"{{:foo??:bar}}{{:bar??{EntryScript}}}", new() { Command = cmd }));
     }
 
     [Fact]
     public void CanGetEnumerableParamValue ()
     {
-        getInspectedScript = () => "nya";
-        getParamValue = (id, idx) => idx == 0 ? "foo" : idx == 1 ? "bar" : null;
-        Assert.Equal("foo/bar/nya", Evaluate($"{{:foo[0]}}/{{:bar[1]}}/{{:nya[2]??{InspectedScript}}}"));
+        meta.EntryScript = "nya";
+        meta.Commands = [new() { Id = "c", Parameters = [new() { Id = "foo", ValueContainerType = ValueContainerType.Named }] }];
+        var cmd = new Parsing.Command("c", [new("foo", new([new PlainText("foo.bar")]))]);
+        Assert.Equal("foo/bar/nya", Evaluate($"{{:foo[0]}}/{{:foo[1]}}/{{:foo[2]??{EntryScript}}}", new() { Command = cmd }));
     }
 
     [Fact]
     public void CanConcatenate ()
     {
-        getInspectedScript = () => "nya";
-        getParamValue = (id, idx) => idx == 0 ? "foo" : idx == 1 ? "bar" : null;
+        meta.EntryScript = "nya";
+        meta.Commands = [new() { Id = "c", Parameters = [new() { Id = "foo", ValueContainerType = ValueContainerType.Named }] }];
+        var cmd = new Parsing.Command("c", [new("foo", new([new PlainText("foo.bar")]))]);
         Assert.Equal(["foo/bar/nya", "nya/foo", "foo"],
-            EvaluateMany($"{{:foo[0]}}/{{:bar[1]}}/{{:nya[2]??{InspectedScript}}}+{{{InspectedScript}}}/foo+{{:foo[0]}}"));
+            EvaluateMany($"{{:foo[0]}}/{{:foo[1]}}/{{:foo[2]??{EntryScript}}}+{{{EntryScript}}}/foo+{{:foo[0]}}", new() { Command = cmd }));
     }
 
     [Fact]
@@ -106,17 +159,17 @@ public class ExpressionEvaluatorTest
         Assert.Empty(EvaluateMany("{:foo??bar}"));
     }
 
-    private IReadOnlyList<string> EvaluateMany (string expression)
+    private IReadOnlyList<string> EvaluateMany (string expression, Context ctx = default)
     {
         var results = new List<string>();
-        var eval = new ExpressionEvaluator(meta, getInspectedScript, getParamValue);
-        eval.Evaluate(expression, results);
+        var eval = new ExpressionEvaluator(meta);
+        eval.Evaluate(expression, results, ctx);
         return results;
     }
 
-    private string Evaluate (string expression)
+    private string Evaluate (string expression, Context ctx = default)
     {
-        var eval = new ExpressionEvaluator(meta, getInspectedScript, getParamValue);
-        return eval.Evaluate(expression);
+        var eval = new ExpressionEvaluator(meta);
+        return eval.Evaluate(expression, ctx);
     }
 }

@@ -1,29 +1,37 @@
+using Naninovel.Parsing;
+
 namespace Naninovel.Metadata;
 
 /// <summary>
-/// Resolves values of expressions specified in metadata models using well-known
-/// constants, project metadata and parameter values of the scenario script commands.
+/// Resolves values of expressions specified in metadata models using project metadata
+/// and parameter values of the scenario script commands or script expression functions.
 /// </summary>
 /// <param name="meta">Project metadata.</param>
-/// <param name="getInspectedScript">Function to resolve path of the currently inspected scenario script.</param>
-/// <param name="getParamValue">Function to resolve command parameter values.</param>
-public class ExpressionEvaluator (IMetadata meta, Func<string> getInspectedScript, ExpressionEvaluator.GetParamValue getParamValue)
+public class ExpressionEvaluator (IMetadata meta)
 {
-    /// <param name="id">Identifier of the resolved parameter.</param>
-    /// <param name="index">When named or collection — index of the resolved value in the parameter.</param>
-    /// <returns>Resolved parameter value or null when not found or the parameter is un-assigned.</returns>
-    public delegate string? GetParamValue (string id, int? index = null);
+    /// <summary>
+    /// The context in which expression is evaluated.
+    /// </summary>
+    public struct Context
+    {
+        /// <summary>
+        /// Specify in case the evaluated expression is expected to access scenario script
+        /// command parameter values; not compatible with <see cref="Function"/>.
+        /// </summary>
+        public Parsing.Command? Command { get; set; }
+        /// <summary>
+        /// Specify in case the evaluated expression is expected to access script expression
+        /// function parameter values; not compatible with <see cref="Command"/>.
+        /// </summary>
+        public Expression.Function? Function { get; set; }
+    }
 
     /// <summary>
-    /// Expression constant resolved to the path of the currently inspected (eg, in IDE) scenario script.
-    /// </summary>
-    public const string InspectedScript = "$InspectedScript";
-    /// <summary>
-    /// Expression constant resolved to the path of the entry (start game) script.
+    /// Expression constant resolved to <see cref="IMetadata.EntryScript"/>.
     /// </summary>
     public const string EntryScript = "$EntryScript";
     /// <summary>
-    /// Expression constant resolved to the path of the title script.
+    /// Expression constant resolved to <see cref="IMetadata.TitleScript"/>.
     /// </summary>
     public const string TitleScript = "$TitleScript";
 
@@ -37,25 +45,32 @@ public class ExpressionEvaluator (IMetadata meta, Func<string> getInspectedScrip
     private static readonly string[] concatSeparator = [concatSymbol];
     private static readonly string[] nullSeparator = [nullCoalescingSymbol];
 
+    private readonly NamedValueParser namedParser = new(meta.Syntax);
+    private Context ctx;
+
     /// <summary>
     /// Resolves value of the specified expression.
     /// </summary>
     /// <param name="expression">The expression to resolve.</param>
-    /// <returns>The evaluated result or null.</returns>
-    public string? Evaluate (string expression)
+    /// <param name="context">The evaluation context.</param>
+    /// <returns>The evaluated result or null when failed.</returns>
+    public string? Evaluate (string expression, Context context = default)
     {
         if (string.IsNullOrEmpty(expression)) return null;
+        ctx = context;
         return EvaluatePart(expression);
     }
 
     /// <summary>
-    /// Resolves values of the specified expression; supports multiple concatenated values.
+    /// Resolves values of the specified expression; supports multiple concatenated parts.
     /// </summary>
     /// <param name="expression">The expression to resolve.</param>
+    /// <param name="context">The evaluation context.</param>
     /// <param name="results">The collection to append resolved results.</param>
-    public void Evaluate (string expression, IList<string> results)
+    public void Evaluate (string expression, IList<string> results, Context context = default)
     {
         if (string.IsNullOrEmpty(expression)) return;
+        ctx = context;
         var parts = expression.Split(concatSeparator, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < parts.Length; i++)
             if (EvaluatePart(parts[i]) is { } result)
@@ -90,7 +105,6 @@ public class ExpressionEvaluator (IMetadata meta, Func<string> getInspectedScrip
 
     private string? EvaluateAtom (string atom)
     {
-        if (atom == InspectedScript) return getInspectedScript();
         if (atom == EntryScript) return meta.EntryScript;
         if (atom == TitleScript) return meta.TitleScript;
         if (!atom.StartsWith(paramIdSymbol)) return null;
@@ -99,7 +113,46 @@ public class ExpressionEvaluator (IMetadata meta, Func<string> getInspectedScrip
         var hasIndex = indexEnd - indexStart > 1 && indexStart >= 2;
         var id = hasIndex ? atom.Substring(1, indexStart - 1) : atom[1..];
         var indexString = hasIndex ? atom.Substring(indexStart + 1, indexEnd - indexStart - 1) : null;
-        if (hasIndex && int.TryParse(indexString, out var index)) return getParamValue(id, index);
-        return getParamValue(id);
+        if (hasIndex && int.TryParse(indexString, out var idx)) return GetParamValue(id, idx);
+        return GetParamValue(id, null);
+    }
+
+    private string? GetParamValue (string id, int? idx)
+    {
+        if (ctx.Command is { } cmd) return GetParamValue(cmd, id, idx);
+        if (ctx.Function is { } fn) return GetParamValue(fn, id, idx);
+        return null;
+    }
+
+    private string? GetParamValue (Parsing.Command cmd, string id, int? idx)
+    {
+        if (meta.FindCommand(cmd.Identifier) is not { } cmdMeta) return null;
+        foreach (var param in cmd.Parameters)
+            if (meta.FindParameter(cmdMeta.Id, param.Identifier) is { } paramMeta && paramMeta.Id == id)
+                return idx.HasValue ? GetNamedValue(string.Concat(param.Value), idx.Value) : string.Concat(param.Value);
+        return null;
+    }
+
+    private string? GetParamValue (Expression.Function fn, string id, int? idx)
+    {
+        using var _ = ListPool<Function>.Rent(out var fnMetas);
+        if (!meta.FindFunctions(fn.Name, fnMetas)) return null;
+        var fnMeta = fnMetas[0]; // We don't care about overloads, as we only need param names, which are equal.
+        var paramIdx = -1; // Resolve param index based on the ID, which is the C# arg name of the associated expression method.
+        for (int i = 0; i < fnMeta.Parameters.Length; i++)
+        {
+            if (!string.Equals(fnMeta.Parameters[i].Name, id, StringComparison.OrdinalIgnoreCase)) continue;
+            paramIdx = i;
+            break;
+        }
+        if (fn.Parameters.ElementAtOrDefault(paramIdx) is not Expression.String { Value: { } value }) return null;
+        return idx.HasValue ? GetNamedValue(value, idx.Value) : value;
+    }
+
+    private string? GetNamedValue (string raw, int idx)
+    {
+        if (idx > 1) return null;
+        var (name, value) = namedParser.Parse(raw);
+        return idx > 0 ? value : name;
     }
 }

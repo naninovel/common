@@ -1,7 +1,7 @@
 namespace Naninovel.Expression;
 
 /// <summary>
-/// Parses expression text into <see cref="TryExpression"/> that can be evaluated.
+/// Parses expression text into <see cref="IExpression"/> that can be evaluated.
 /// </summary>
 public class Parser
 {

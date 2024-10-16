@@ -25,6 +25,7 @@ public class MetadataProvider : IMetadata
     private readonly List<Function> functions = [];
     private readonly Dictionary<string, Command> commandById = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Command> commandByAlias = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, List<Function>> fnsByName = new(StringComparer.OrdinalIgnoreCase);
     private readonly SyntaxProvider syntaxProvider = new();
 
     public MetadataProvider () { }
@@ -46,6 +47,8 @@ public class MetadataProvider : IMetadata
         functions.AddRange(meta.Functions);
         foreach (var command in Commands)
             IndexCommand(command);
+        foreach (var fn in Functions)
+            IndexFunction(fn);
         syntaxProvider.Update(meta.Syntax);
     }
 
@@ -69,11 +72,10 @@ public class MetadataProvider : IMetadata
 
     public bool FindFunctions (string name, ICollection<Function> result)
     {
-        result.Clear();
-        foreach (var fn in functions)
-            if (fn.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                result.Add(fn);
-        return result.Count > 0;
+        if (!fnsByName.TryGetValue(name, out var fns)) return false;
+        foreach (var fn in fns)
+            result.Add(fn);
+        return true;
     }
 
     private void Reset ()
@@ -87,6 +89,7 @@ public class MetadataProvider : IMetadata
         functions.Clear();
         commandById.Clear();
         commandByAlias.Clear();
+        fnsByName.Clear();
     }
 
     private void IndexCommand (Command command)
@@ -94,5 +97,11 @@ public class MetadataProvider : IMetadata
         commandById[command.Id] = command;
         if (!string.IsNullOrEmpty(command.Alias))
             commandByAlias[command.Alias!] = command;
+    }
+
+    private void IndexFunction (Function fn)
+    {
+        if (fnsByName.TryGetValue(fn.Name, out var fns)) fns.Add(fn);
+        else fnsByName[fn.Name] = [fn];
     }
 }
