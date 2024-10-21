@@ -1,13 +1,12 @@
-using static Naninovel.Parsing.Utilities;
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
 /// <summary>
 /// Allows parsing named values where name and value components are delimited by a dot.
 /// </summary>
-public class NamedValueParser
+public class NamedValueParser (ISyntax stx)
 {
+    private readonly Utilities utils = new(stx);
+
     /// <summary>
     /// Splits decoded named value into name and value components.
     /// </summary>
@@ -18,18 +17,18 @@ public class NamedValueParser
         if (string.IsNullOrEmpty(value)) return (null, null);
         var delimiterIndex = FindDelimiterIndex(value);
         if (delimiterIndex < 0) return (value, null);
-        var name = delimiterIndex == 0 ? null : value.Substring(0, delimiterIndex);
+        var name = delimiterIndex == 0 ? null : value[..delimiterIndex];
         var namedValue = delimiterIndex == value.Length - 1 ? null
             : value.Substring(delimiterIndex + 1, value.Length - (delimiterIndex + 1));
         return (name is null ? null : Unescape(name), namedValue);
     }
 
-    private static string Unescape (string value) => UnescapeCharacter(value, NamedDelimiter);
+    private string Unescape (string value) => utils.UnescapeCharacter(value, stx.NamedDelimiter);
 
-    private static int FindDelimiterIndex (string value)
+    private int FindDelimiterIndex (string value)
     {
         for (int i = 0; i < value.Length; i++)
-            if (value[i] == NamedDelimiter[0] && !IsEscaped(value, i))
+            if (value[i] == stx.NamedDelimiter[0] && !utils.IsEscaped(value, i))
                 return i;
         return -1;
     }

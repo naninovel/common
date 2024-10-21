@@ -4,15 +4,15 @@ namespace Naninovel.Parsing.Test;
 
 public class ParseTestHelper<TLine> where TLine : IScriptLine
 {
-    public List<Token> Tokens { get; } = new();
-    public List<ParseError> Errors { get; } = new();
+    public List<Token> Tokens { get; } = [];
+    public List<ParseError> Errors { get; } = [];
     public Dictionary<ILineComponent, InlineRange> Associations { get; } = new();
     public Dictionary<string, string> Identifications { get; } = new();
 
     private readonly Func<string, IReadOnlyList<Token>, TLine> parse;
-    private readonly Lexer lexer = new();
+    private readonly Lexer lexer = new(Syntax.Default);
 
-    public ParseTestHelper (Func<ParseHandlers, Func<string, IReadOnlyList<Token>, TLine>> ctor)
+    public ParseTestHelper (Func<ParseOptions, Func<string, IReadOnlyList<Token>, TLine>> ctor)
     {
         var errorHandler = new Mock<IErrorHandler>();
         errorHandler.Setup(h => h.HandleError(Capture.In(Errors)));
@@ -25,7 +25,11 @@ public class ParseTestHelper<TLine> where TLine : IScriptLine
             RangeAssociator = associator.Object,
             TextIdentifier = identifier.Object
         };
-        parse = ctor(handlers);
+        var options = new ParseOptions {
+            Syntax = Syntax.Default,
+            Handlers = handlers
+        };
+        parse = ctor(options);
     }
 
     public TLine Parse (string lineText)

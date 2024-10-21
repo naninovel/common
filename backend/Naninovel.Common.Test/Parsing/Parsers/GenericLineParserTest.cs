@@ -9,7 +9,7 @@ public class GenericLineParserTest
     [Fact]
     public void WhenMissingInlinedCommandIdErrorIsAdded ()
     {
-        parser.Parse("[]");
+        parser.Parse("[ ]");
         Assert.True(parser.HasError(MissingCommandId));
     }
 
@@ -20,6 +20,16 @@ public class GenericLineParserTest
         Assert.IsType<InlinedCommand>(parser.Parse("[]").Content[0]);
         Assert.IsType<InlinedCommand>(parser.Parse("x[").Content[1]);
         Assert.IsType<InlinedCommand>(parser.Parse("x[]x").Content[1]);
+    }
+
+    [Fact]
+    public void EmptyInlinedCommandsAllowDelimitingWhiteSpace ()
+    {
+        var line = parser.Parse("    [] \t x \t []");
+        Assert.Empty(parser.Errors);
+        Assert.Equal(1, line.Indent);
+        Assert.Equal(3, line.Content.Count);
+        Assert.Equal(" \t x \t ", (line.Content[1] as MixedValue)![0] as PlainText);
     }
 
     [Fact]
@@ -102,10 +112,25 @@ public class GenericLineParserTest
     }
 
     [Fact]
+    public void GenericLineWithBooleanFlagsIsParsed ()
+    {
+        var line = parser.Parse("[c p!][c !p]");
+        Assert.Equal("p", (line.Content[0] as InlinedCommand)!.Command.Parameters[0].Identifier);
+        Assert.Equal("true", (line.Content[0] as InlinedCommand)!.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Equal("p", (line.Content[1] as InlinedCommand)!.Command.Parameters[0].Identifier);
+        Assert.Equal("false", (line.Content[1] as InlinedCommand)!.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Empty(parser.Errors);
+    }
+
+    [Fact]
     public void PlainTextIdDecoded ()
     {
-        var line = parser.Parse(@""" \{ \} "" \[ \] \|#| \\""");
-        Assert.Equal(@""" { } "" [ ] |#| \""", (line.Content[0] as MixedValue)![0] as PlainText);
+        var line = parser.Parse("""
+                                " \{ \} " \[ \] \|#| \\"
+                                """);
+        Assert.Equal("""
+                     " { } " [ ] |#| \"
+                     """, (line.Content[0] as MixedValue)![0] as PlainText);
     }
 
     [Fact]

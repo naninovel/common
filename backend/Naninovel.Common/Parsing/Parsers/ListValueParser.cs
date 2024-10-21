@@ -1,14 +1,12 @@
-using static Naninovel.Parsing.Utilities;
-using static Naninovel.Parsing.Identifiers;
-
 namespace Naninovel.Parsing;
 
 /// <summary>
 /// Allows parsing list values where items are delimited by commas.
 /// </summary>
-public class ListValueParser
+public class ListValueParser (ISyntax stx)
 {
     private readonly List<string?> items = [];
+    private readonly Utilities utils = new(stx);
 
     private int prevDelimiterIndex;
     private string value = "";
@@ -20,8 +18,7 @@ public class ListValueParser
     /// <returns>List of the items; each could be null when not assigned (skipped).</returns>
     public string?[] Parse (string value)
     {
-        if (string.IsNullOrEmpty(value))
-            return Array.Empty<string>();
+        if (string.IsNullOrEmpty(value)) return [];
         Reset(value);
         for (int i = 0; i < value.Length; i++)
             ProcessCharAt(i);
@@ -43,7 +40,7 @@ public class ListValueParser
         prevDelimiterIndex = index;
     }
 
-    private bool IsDelimiter (int i) => value[i] == ListDelimiter[0] && !IsEscaped(value, i);
+    private bool IsDelimiter (int i) => value[i] == stx.ListDelimiter[0] && !utils.IsEscaped(value, i);
 
     private string? ExtractBeforeDelimiter (int delimiterIndex)
     {
@@ -51,6 +48,6 @@ public class ListValueParser
         var length = delimiterIndex - startIndex;
         if (length == 0) return null;
         var item = value.Substring(startIndex, length);
-        return UnescapeCharacter(item, ListDelimiter);
+        return utils.UnescapeCharacter(item, stx.ListDelimiter);
     }
 }

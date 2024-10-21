@@ -1,9 +1,8 @@
-using static Naninovel.Parsing.Utilities;
-
 namespace Naninovel.Parsing;
 
-internal class MixedValueParser (bool unwrap)
+internal class MixedValueParser (bool unwrap, ISyntax stx)
 {
+    private readonly Utilities utils = new(stx);
     private readonly List<IValueComponent> value = [];
     private readonly Queue<Token> expressions = new();
     private readonly Queue<Token> textIds = new();
@@ -33,9 +32,9 @@ internal class MixedValueParser (bool unwrap)
     {
         value.Clear();
 
-        var unescapeQuotes = unwrap && IsValueWrapped();
-        var startIndex = valueToken.Start + (unescapeQuotes ? 1 : 0);
-        var endIndex = valueToken.EndIndex - (unescapeQuotes ? 1 : 0);
+        var wrapped = unwrap && IsValueWrapped();
+        var startIndex = valueToken.Start + (wrapped ? 1 : 0);
+        var endIndex = valueToken.EndIndex - (wrapped ? 1 : 0);
 
         var index = startIndex;
         var textStartIndex = -1;
@@ -49,7 +48,7 @@ internal class MixedValueParser (bool unwrap)
         textIdBodies.Clear();
         expressions.Clear();
 
-        return new MixedValue(value);
+        return new MixedValue(value.ToArray());
 
         bool IsTextStarted () => textStartIndex != -1;
 
@@ -104,7 +103,7 @@ internal class MixedValueParser (bool unwrap)
         {
             var text = walker.Extract(textStartIndex, length);
             if (unescapeAuthor) text = UnescapeAuthor(text);
-            var plain = new PlainText(UnescapePlain(text, unescapeQuotes));
+            var plain = new PlainText(UnescapePlain(text, wrapped));
             walker.Associate(plain, new InlineRange(textStartIndex, length));
             textStartIndex = -1;
             return plain;
@@ -126,25 +125,25 @@ internal class MixedValueParser (bool unwrap)
         }
     }
 
-    private static string UnescapePlain (string value, bool unescapeQuotes)
+    private string UnescapePlain (string value, bool wrapped)
     {
         for (int i = value.Length - 2; i >= 0; i--)
-            if (ShouldRemove(i))
-                value = value.Remove(i, 1);
+            if (ShouldUnescapeAt(i))
+                value = value.Remove(i--, 1);
         return value;
 
-        bool ShouldRemove (int i)
+        bool ShouldUnescapeAt (int i)
         {
-            if (value[i] != '\\' || IsEscaped(value, i)) return false;
-            var prev = value[i + 1];
-            if (unescapeQuotes && prev == '"') return true;
-            return IsPlainTextControlChar(prev, value.ElementAtOrDefault(i + 2));
+            if (value[i] != '\\') return false;
+            var escaped = value[i + 1];
+            if (escaped == '"' && wrapped) return true;
+            return utils.IsPlainTextControlChar(escaped, value.ElementAtOrDefault(i + 2));
         }
     }
 
-    private static string UnescapeAuthor (string value)
+    private string UnescapeAuthor (string value)
     {
-        const string target = $"\\{Identifiers.AuthorAssign}";
+        var target = $"\\{stx.AuthorAssign}";
         var targetIndex = value.IndexOf(target, StringComparison.Ordinal);
         if (targetIndex < 1) return value;
         for (int i = 0; i < targetIndex; i++)

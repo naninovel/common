@@ -6,5 +6,5 @@ public interface IServerTransport : IDisposable
 
     void StartListening (int port);
     void StopListening ();
-    Task<ITransport> WaitConnectionAsync (CancellationToken token);
+    Task<ITransport> WaitConnection (CancellationToken token);
 }

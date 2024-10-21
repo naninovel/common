@@ -6,10 +6,10 @@ namespace Naninovel.Metadata;
 /// <summary>
 /// Allows checking if parameter values fit associated metadata.
 /// </summary>
-public class ValueValidator
+public class ValueValidator (ISyntax stx)
 {
-    private readonly ListValueParser listParser = new();
-    private readonly NamedValueParser namedParser = new();
+    private readonly ListValueParser listParser = new(stx);
+    private readonly NamedValueParser namedParser = new(stx);
     private string value = null!;
     private ValueType type;
 
@@ -61,7 +61,9 @@ public class ValueValidator
         if (string.IsNullOrWhiteSpace(value)) return type == ValueType.String;
         if (type == ValueType.Integer) return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _);
         if (type == ValueType.Decimal) return float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _);
-        if (type == ValueType.Boolean) return bool.TryParse(value, out _);
+        if (type == ValueType.Boolean)
+            return value.Equals(stx.True, StringComparison.OrdinalIgnoreCase) ||
+                   value.Equals(stx.False, StringComparison.OrdinalIgnoreCase);
         return true;
     }
 }

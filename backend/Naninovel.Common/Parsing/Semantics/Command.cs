@@ -10,7 +10,7 @@ namespace Naninovel.Parsing;
 /// <see cref="CommandLine"/> and <see cref="InlinedCommand"/>.
 /// </remarks>
 public class Command (PlainText identifier,
-    IReadOnlyList<Parameter> parameters) : ILineComponent
+    IReadOnlyList<Parameter>? parameters = null) : ILineComponent
 {
     /// <summary>
     /// Unique identifier of the command.
@@ -23,9 +23,7 @@ public class Command (PlainText identifier,
     /// <summary>
     /// Parameters of the command describing its behaviour.
     /// </summary>
-    public IReadOnlyList<Parameter> Parameters { get; } = parameters;
-
-    public Command (PlainText identifier) : this(identifier, Array.Empty<Parameter>()) { }
+    public IReadOnlyList<Parameter> Parameters { get; } = parameters ?? [];
 
     public override string ToString ()
     {

@@ -26,33 +26,52 @@ function mergeKey(key: string, value: unknown, destination: Record<string, unkno
     if (!destination.hasOwnProperty(key))
         destination[key] = value;
     else if (Array.isArray(value))
-        if (key === "commands") destination[key] = mergeCommands(value, <Array<Metadata.Command>>destination[key]);
+        if (key === "commands") destination[key] = mergeCommands(value, <never>destination[key]);
+        else if (key === "constants") destination[key] = mergeConstants(value, <never>destination[key]);
         else destination[key] = (<unknown[]>destination[key]).concat(value);
     else if (typeof value === "object")
         mergeObject(<never>value, <never>destination[key]);
+    else destination[key] = value;
 }
 
-function mergeCommands(custom: Array<Metadata.Command>, builtin: Array<Metadata.Command>) {
+function mergeCommands(custom: Array<Metadata.Command>, builtins: Array<Metadata.Command>) {
     const commands: Array<Metadata.Command> = [];
-    for (const command of builtin) {
-        const overridden = custom.find(c => c.alias != null && c.alias === command.alias);
-        if (overridden == null) commands.push(command);
-        else commands.push(mergeOverriddenCommand(overridden!, command));
+    for (const builtin of builtins) {
+        const overridden = custom.find(c => c.id === builtin.id || c.alias != null && c.alias === builtin.alias);
+        if (overridden == null) commands.push(builtin);
+        else commands.push(mergeOverriddenCommand(overridden!, builtin));
     }
     return commands.concat(custom.filter(c => !commands.includes(c)));
 }
 
+function mergeConstants(custom: Array<Metadata.Constant>, builtins: Array<Metadata.Constant>) {
+    const constants: Array<Metadata.Constant> = [];
+    for (const builtin of builtins) {
+        const overridden = custom.find(c => c.name === builtin.name);
+        if (overridden == null) constants.push(builtin);
+        else constants.push(overridden);
+    }
+    return constants.concat(custom.filter(c => !constants.includes(c)));
+}
+
 function mergeOverriddenCommand(overridden: Metadata.Command, builtin: Metadata.Command) {
-    overridden.summary ??= builtin.summary;
-    overridden.remarks ??= builtin.remarks;
-    overridden.examples ??= builtin.examples;
+    overridden.documentation ??= {};
+    if (overridden.documentation.summary == null || overridden.documentation.summary.length === 0)
+        overridden.documentation.summary = builtin.documentation?.summary;
+    if (overridden.documentation.remarks == null || overridden.documentation.remarks.length === 0)
+        overridden.documentation.remarks = builtin.documentation?.remarks;
+    if (overridden.documentation.examples == null || overridden.documentation.examples.length === 0)
+        overridden.documentation.examples = builtin.documentation?.examples;
     overridden.parameters = mergeOverriddenParams(overridden.parameters, builtin.parameters);
     return overridden;
 }
 
 function mergeOverriddenParams(overridden: Array<Metadata.Parameter>, builtin: Array<Metadata.Parameter>) {
     const lengthDelta = overridden.length - builtin.length;
-    for (let i = lengthDelta; i < overridden.length; i++)
-        overridden[i].summary = builtin[i - lengthDelta].summary;
+    for (let i = lengthDelta; i < overridden.length; i++) {
+        overridden[i].documentation ??= {};
+        if (overridden[i].documentation!.summary == null || overridden[i].documentation!.summary!.length === 0)
+            overridden[i].documentation!.summary = builtin[i - lengthDelta].documentation!.summary;
+    }
     return overridden;
 }

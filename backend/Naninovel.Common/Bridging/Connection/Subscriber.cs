@@ -33,6 +33,6 @@ internal class Subscriber
     private HashSet<Subscription> GetSubscriptions (Type type)
     {
         if (subscriptions.TryGetValue(type, out var result)) return result;
-        return subscriptions[type] = new HashSet<Subscription>();
+        return subscriptions[type] = [];
     }
 }

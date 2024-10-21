@@ -15,7 +15,7 @@ public class ClientTest
     [Fact]
     public async Task CanConnect ()
     {
-        var status = await ConnectAsync();
+        var status = await Connect();
         Assert.True(status.Connected);
     }
 
@@ -24,7 +24,7 @@ public class ClientTest
     {
         const string expectedName = nameof(ServerInformationIsCorrect);
         const int expectedPort = 666;
-        var status = await ConnectAsync(expectedName, expectedPort);
+        var status = await Connect(expectedName, expectedPort);
         Assert.Equal(expectedName, status.ServerInfo.Name);
         Assert.Equal(expectedPort, status.ServerInfo.Port);
     }
@@ -32,21 +32,21 @@ public class ClientTest
     [Fact]
     public async Task WhenConnectingWhileConnectedExceptionIsThrown ()
     {
-        await ConnectAsync();
-        await Assert.ThrowsAsync<InvalidOperationException>(ConnectAsync);
+        await Connect();
+        await Assert.ThrowsAsync<InvalidOperationException>(Connect);
     }
 
     [Fact]
     public async Task WhenCanceledWhileConnectingMethodReturns ()
     {
         using var cts = new CancellationTokenSource(1);
-        await Assert.ThrowsAsync<TaskCanceledException>(() => client.ConnectAsync(0, cts.Token));
+        await Assert.ThrowsAsync<TaskCanceledException>(() => client.Connect(0, cts.Token));
     }
 
     [Fact]
     public async Task WhenDisposedConnectionIsClosed ()
     {
-        var status = await ConnectAsync();
+        var status = await Connect();
         client.Dispose();
         await status.MaintainTask;
         Assert.False(status.Connected);
@@ -56,7 +56,7 @@ public class ClientTest
     [Fact]
     public async Task SentMessageWrittenToSocket ()
     {
-        await ConnectAsync();
+        await Connect();
         client.Send(new ClientMessage());
         var message = await transport.WaitOutcomingAsync<ClientMessage>();
         Assert.NotNull(message);
@@ -65,7 +65,7 @@ public class ClientTest
     [Fact]
     public async Task WhenSocketClosedWhileSendingConnectionCloses ()
     {
-        var status = await ConnectAsync();
+        var status = await Connect();
         client.Send(new ClientMessage());
         transport.Open = false;
         await status.MaintainTask;
@@ -75,14 +75,14 @@ public class ClientTest
     [Fact]
     public async Task AwaitedMessageReturned ()
     {
-        await ConnectAsync();
+        await Connect();
         Assert.NotNull(await MockIncomingAsync<ServerMessage>());
     }
 
     [Fact]
     public async Task MultipleAwaitedMessagesReturned ()
     {
-        await ConnectAsync();
+        await Connect();
         var tasks = new List<Task>();
         for (int i = 0; i < 100; i++)
             if (i % 2 == 0) tasks.Add(MockIncomingAsync<ServerMessageA>());
@@ -94,7 +94,7 @@ public class ClientTest
     [Fact]
     public async Task WhenCanceledWhileWaitingMethodReturns ()
     {
-        await ConnectAsync();
+        await Connect();
         using var cts = new CancellationTokenSource(1);
         await Assert.ThrowsAsync<TaskCanceledException>(() => client.WaitAsync<ServerMessage>(cts.Token));
     }
@@ -104,7 +104,7 @@ public class ClientTest
     {
         var message = default(ServerMessage);
         client.Subscribe<ServerMessage>(m => message = m);
-        await ConnectAsync();
+        await Connect();
         await MockIncomingAsync<ServerMessage>();
         Assert.NotNull(message);
     }
@@ -115,17 +115,17 @@ public class ClientTest
         var handler = new Mock<Action<ServerMessage>>();
         client.Subscribe<ServerMessage>(handler.Object);
         client.Unsubscribe<ServerMessage>(handler.Object);
-        await ConnectAsync();
+        await Connect();
         await MockIncomingAsync<ServerMessage>();
         handler.VerifyNoOtherCalls();
     }
 
-    private Task<ConnectionStatus> ConnectAsync () => ConnectAsync("");
+    private Task<ConnectionStatus> Connect () => Connect("");
 
-    private Task<ConnectionStatus> ConnectAsync (string serverName, int port = 0)
+    private Task<ConnectionStatus> Connect (string serverName, int port = 0)
     {
         transport.MockIncoming(new ConnectionAccepted { ServerName = serverName });
-        return client.ConnectAsync(port);
+        return client.Connect(port);
     }
 
     private Task<T> MockIncomingAsync<T> () where T : IServerMessage, new()

@@ -30,8 +30,8 @@ public class CommandLineParserTest
     public void WhenCommandTokensMissingErrorIsAdded ()
     {
         var errors = new ErrorCollector();
-        var parser = new CommandLineParser(new() { ErrorHandler = errors });
-        parser.Parse("@", new[] { new Token(LineId, 0, 1) });
+        var parser = new CommandLineParser(new() { Handlers = new() { ErrorHandler = errors } });
+        parser.Parse("@", [new Token(LineId, 0, 1)]);
         Assert.Contains(MissingCommandTokens, errors.Select(e => e.Message));
     }
 
@@ -106,7 +106,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void IdentifiedTextParsedCorrectly ()
+    public void IdentifiedTextParsed ()
     {
         var line = parser.Parse("@c 1|#id1|2|#id2| p:3|#id3|");
         Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
@@ -118,7 +118,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void UnclosedIdentifiedTextParsedCorrectly ()
+    public void UnclosedIdentifiedTextParsed ()
     {
         var line = parser.Parse("@c 1|#id1");
         Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
@@ -126,7 +126,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void EmptyIdentifiedTextParsedCorrectly ()
+    public void EmptyIdentifiedTextParsed ()
     {
         var line = parser.Parse("@c |#|");
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
@@ -134,7 +134,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void UnclosedEmptyIdentifiedTextParsedCorrectly ()
+    public void UnclosedEmptyIdentifiedTextParsed ()
     {
         var line = parser.Parse("@c |#");
         Assert.Empty(((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
@@ -142,7 +142,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void EmptyAndUnclosedIdentifiedTextsParsedCorrectly ()
+    public void EmptyAndUnclosedIdentifiedTextsParsed ()
     {
         var line = parser.Parse("@c 1|#|2|#id2");
         Assert.Equal("1", ((IdentifiedText)line.Command.Parameters[0].Value[0]).Text);
@@ -152,7 +152,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void EscapedTextIdentifierParsedCorrectly ()
+    public void EscapedTextIdentifierParsed ()
     {
         var line = parser.Parse("@c 1\\|#id1|");
         Assert.Single(line.Command.Parameters[0].Value);
@@ -160,7 +160,25 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void CommandIsParsedCorrectly ()
+    public void PositiveBooleanFlagParsed ()
+    {
+        var line = parser.Parse("@c p!");
+        Assert.Equal("p", line.Command.Parameters[0].Identifier);
+        Assert.Equal("true", line.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Empty(parser.Errors);
+    }
+
+    [Fact]
+    public void NegativeBooleanFlagParsed ()
+    {
+        var line = parser.Parse("@c !p");
+        Assert.Equal("p", line.Command.Parameters[0].Identifier);
+        Assert.Equal("false", line.Command.Parameters[0].Value[0] as PlainText);
+        Assert.Empty(parser.Errors);
+    }
+
+    [Fact]
+    public void CommandIsParsed ()
     {
         var line = parser.Parse("@char k.Happy pos:{x},10 wait:false");
         Assert.Equal("char", line.Command.Identifier);
@@ -175,7 +193,7 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void CommandWithExpressionsIsParsedCorrectly ()
+    public void CommandWithExpressionsIsParsed ()
     {
         var line = parser.Parse("@c {x} x:x{y}x{z}");
         Assert.True(line.Command.Parameters[0].Value.Dynamic);
@@ -200,57 +218,55 @@ public class CommandLineParserTest
     [Fact]
     public void PlainTextIsDecoded ()
     {
-        var line = parser.Parse(@"@c ""x \"" \{ \} \\"" p:""\{x\}\\");
+        var line = parser.Parse("""@c "x \" \{ \} \\" p:"\{x\}\\""");
         Assert.Equal(@"x "" { } \", line.Command.Parameters[0].Value[0] as PlainText);
         Assert.Equal(@"""{x}\", line.Command.Parameters[1].Value[0] as PlainText);
     }
 
     [Fact]
-    public void WrapIsNotRequiredWhenInlineSpaceIsInQuotes ()
+    public void SingleQuoteValueIsParsed ()
     {
-        var line = parser.Parse(@"@set remark=""Shouting \""Stop the car!\"" was a mistake.""");
-        Assert.Equal(@"remark=""Shouting \""Stop the car!\"" was a mistake.""",
-            line.Command.Parameters[0].Value[0] as PlainText);
-    }
-
-    [Fact]
-    public void SingleQuoteValueIsParsedCorrectly ()
-    {
-        var line = parser.Parse(@"@c ""\"""" p:v");
+        var line = parser.Parse("""@c "\"" p:v""");
         Assert.Equal(@"""", line.Command.Parameters[0].Value[0] as PlainText);
     }
 
     [Fact]
-    public void ExpressionWithQuotesIsParsedCorrectly ()
+    public void ExpressionWithQuotesIsParsed ()
     {
-        var line = parser.Parse(@"@c "" \"" { Random(var, "" \"" "") } \"" "" p:v");
+        var line = parser.Parse("""@c " \" { Random(var, " \" ") } \" " p:v""");
         Assert.Equal(@" "" ", line.Command.Parameters[0].Value[0] as PlainText);
-        Assert.Equal(@" Random(var, "" \"" "") ", (line.Command.Parameters[0].Value[1] as Expression)!.Body);
+        Assert.Equal(""" Random(var, " \" ") """, (line.Command.Parameters[0].Value[1] as Expression)!.Body);
         Assert.Equal(@" "" ", line.Command.Parameters[0].Value[2] as PlainText);
     }
 
     [Fact]
-    public void RangesAreAssociatedCorrectly ()
+    public void RangesAreAssociated ()
     {
-        var line = parser.Parse("@c v|#i| p:v{x}");
-        Assert.Equal(new(1, 14), parser.Resolve(line.Command));
+        var line = parser.Parse("@c v|#i| p:v{x} p! !p");
+        Assert.Equal(new(1, 20), parser.Resolve(line.Command));
         Assert.Equal(new(1, 1), parser.Resolve(line.Command.Identifier));
         Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0]));
         Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value));
-        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value[0] as IdentifiedText));
+        Assert.Equal(new(3, 5), parser.Resolve(line.Command.Parameters[0].Value[0]));
         Assert.Equal(new(3, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Text));
         Assert.Equal(new(4, 4), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id));
         Assert.Equal(new(6, 1), parser.Resolve((line.Command.Parameters[0].Value[0] as IdentifiedText)!.Id.Body));
         Assert.Equal(new(9, 6), parser.Resolve(line.Command.Parameters[1]));
         Assert.Equal(new(9, 1), parser.Resolve(line.Command.Parameters[1].Identifier));
         Assert.Equal(new(11, 4), parser.Resolve(line.Command.Parameters[1].Value));
-        Assert.Equal(new(11, 1), parser.Resolve(line.Command.Parameters[1].Value[0] as PlainText));
-        Assert.Equal(new(12, 3), parser.Resolve(line.Command.Parameters[1].Value[1] as Expression));
+        Assert.Equal(new(11, 1), parser.Resolve(line.Command.Parameters[1].Value[0]));
+        Assert.Equal(new(12, 3), parser.Resolve(line.Command.Parameters[1].Value[1]));
         Assert.Equal(new(13, 1), parser.Resolve((line.Command.Parameters[1].Value[1] as Expression)!.Body));
+        Assert.Equal(new(16, 2), parser.Resolve(line.Command.Parameters[2]));
+        Assert.Equal(new(16, 1), parser.Resolve(line.Command.Parameters[2].Identifier));
+        Assert.Equal(new(17, 1), parser.Resolve(line.Command.Parameters[2].Value));
+        Assert.Equal(new(19, 2), parser.Resolve(line.Command.Parameters[3]));
+        Assert.Equal(new(19, 1), parser.Resolve(line.Command.Parameters[3].Value));
+        Assert.Equal(new(20, 1), parser.Resolve(line.Command.Parameters[3].Identifier));
     }
 
     [Fact]
-    public void TextIsIdentifiedCorrectly ()
+    public void TextIsIdentified ()
     {
         parser.Parse("@c foo|#f|far{f} p:bar|#b|nya|#n|");
         Assert.Equal("foo", parser.Identifications["f"]);
@@ -268,14 +284,18 @@ public class CommandLineParserTest
     [Fact]
     public void EscapedEmptyContentIsParsedAsEmptyValue ()
     {
-        var line = parser.Parse(@"@c """"");
+        var line = parser.Parse("""
+                                @c ""
+                                """);
         Assert.Empty(line.Command.Parameters[0].Value);
     }
 
     [Fact]
     public void UnwrapsWhitespaceInValue ()
     {
-        var line = parser.Parse(@"@c ""a \"" c""");
+        var line = parser.Parse("""
+                                @c "a \" c"
+                                """);
         Assert.Equal(@"a "" c", line.Command.Parameters[0].Value[0] as PlainText);
     }
 
@@ -292,8 +312,10 @@ public class CommandLineParserTest
     [Fact]
     public void EscapedQuotesAreUnescaped ()
     {
-        var line = parser.Parse(@"@c ""x\""\, \""x { \"" }x\\""");
-        Assert.Equal(@"x""\, ""x ", line.Command.Parameters[0].Value[0] as PlainText);
+        var line = parser.Parse("""
+                                @c "x\"\, \"x { \" }x\\"
+                                """);
+        Assert.Equal("""x"\, "x """, line.Command.Parameters[0].Value[0] as PlainText);
         Assert.Equal(@" \"" ", (line.Command.Parameters[0].Value[1] as Expression)!.Body);
         Assert.Equal(@"x\", line.Command.Parameters[0].Value[2] as PlainText);
     }
@@ -308,23 +330,131 @@ public class CommandLineParserTest
     }
 
     [Fact]
-    public void WhenWrappedWithoutSpacesValueIsUnwrapped ()
+    public void UnescapesEscapeSymbol ()
     {
-        var line = parser.Parse(@"@c ""\""x\""""");
-        Assert.Equal(@"""x""", line.Command.Parameters[0].Value[0] as PlainText);
+        AssertValueParsed(
+            """
+            foo bar\
+            """,
+            """
+            "foo bar\\"
+            """);
+        AssertValueParsed(
+            """
+            a=" \";b=" \"
+            """,
+            """
+            "a=\" \\\";b=\" \\\""
+            """);
+        AssertValueParsed(
+            """
+            a=" \";b=" \"
+            """,
+            """
+            a=" \\";b=" \\"
+            """);
+        AssertValueParsed(
+            """
+            a=" \\";b=" \\"
+            """,
+            """
+            a=" \\\\";b=" \\\\"
+            """);
+    }
+
+    [Fact]
+    public void WhenEscapeSymbolNotProperlyEscapedStillParses ()
+    {
+        AssertValueParsed(
+            """
+            foo\bar
+            """,
+            """
+            foo\bar
+            """);
+        AssertValueParsed(
+            """
+            foo -\- bar
+            """,
+            """
+            "foo -\- bar"
+            """);
+        AssertValueParsed(
+            """
+            a=" \ ";b=" \ "
+            """,
+            """
+            a=" \ ";b=" \ "
+            """);
     }
 
     [Fact]
     public void WhenAllSpacesWrappedDoesntUnwrap ()
     {
-        var line = parser.Parse(@"@c a="" \"" "";b="" \"" """);
-        Assert.Equal(@"a="" \"" "";b="" \"" """, line.Command.Parameters[0].Value[0] as PlainText);
+        AssertValueParsed(
+            """
+            foo="bar baz"
+            """,
+            """
+            foo="bar baz"
+            """);
+        AssertValueParsed(
+            """
+            a=" x ";b=" x "
+            """,
+            """
+            a=" x ";b=" x "
+            """);
     }
 
     [Fact]
-    public void UnescapesEscapedQuotesCorrectly ()
+    public void WhenWrappedWithoutSpacesValueIsStillUnwrapped ()
     {
-        var line = parser.Parse(@"@c ""a=\"" \\\"" \"";b=\"" \\\"" \""""");
-        Assert.Equal(@"a="" \"" "";b="" \"" """, line.Command.Parameters[0].Value[0] as PlainText);
+        AssertValueParsed(
+            """
+            "x"
+            """,
+            """
+            "\"x\""
+            """);
+    }
+
+    [Fact]
+    public void DoesntUnescapeQuotesInsideQuotesWhenValueIsNotWrapped ()
+    {
+        // Required to allow propagating escaped quotes to expression evaluator, eg:
+        // @set foo="text \"quoted text\" text"
+        // If we'd go with a more consistent rule to escape quotes inside quotes
+        // without exceptions, including inside un-wrapped values, it'd require:
+        // @set foo="text \\\"quoted text\\\" text"
+        // — here we have to escape both the escape symbol and the inner quotes.
+
+        AssertValueParsed(
+            """
+            x"x \" y \" x"x
+            """,
+            """
+            x"x \" y \" x"x
+            """);
+        AssertValueParsed(
+            """
+            foo=" \"x\" ";bar="\"y\""
+            """,
+            """
+            foo=" \"x\" ";bar="\"y\""
+            """);
+        AssertValueParsed(
+            """
+            a=" \" ";b="\""
+            """,
+            """
+            a=" \" ";b="\""
+            """);
+    }
+
+    private void AssertValueParsed (string expectedParsedValue, string inputSerializedValue)
+    {
+        var line = parser.Parse($"@c {inputSerializedValue}");
+        Assert.Equal(expectedParsedValue, line.Command.Parameters[0].Value[0] as PlainText);
     }
 }

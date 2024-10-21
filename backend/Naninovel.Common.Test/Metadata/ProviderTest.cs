@@ -1,3 +1,5 @@
+using Naninovel.Parsing;
+
 namespace Naninovel.Metadata.Test;
 
 public class ProviderTest
@@ -8,12 +10,12 @@ public class ProviderTest
     public void ProjectMetadataIsAssignedToCollections ()
     {
         provider.Update(new() {
-            Actors = [new Actor { Id = "foo" }],
-            Constants = [new Constant { Name = "bar" }],
+            Actors = [new Actor { Id = "bar" }],
+            Constants = [new Constant { Name = "baz" }],
             Resources = [new Resource { Path = "nya" }]
         });
-        Assert.Equal("foo", provider.Actors.First().Id);
-        Assert.Equal("bar", provider.Constants.First().Name);
+        Assert.Equal("bar", provider.Actors.First().Id);
+        Assert.Equal("baz", provider.Constants.First().Name);
         Assert.Equal("nya", provider.Resources.First().Path);
     }
 
@@ -93,13 +95,46 @@ public class ProviderTest
     }
 
     [Fact]
+    public void WhenFunctionNotFoundFalseIsReturned ()
+    {
+        Assert.False(provider.FindFunctions("", []));
+    }
+
+    [Fact]
+    public void CanFindFunctions ()
+    {
+        var fns = new List<Function>();
+        var meta = new Project {
+            Functions = [
+                new() { Name = "foo" },
+                new() { Name = "bar" },
+                new() { Name = "foo", Parameters = [new() { Name = "x" }] }
+            ]
+        };
+        provider.Update(meta);
+        Assert.True(provider.FindFunctions("Foo", fns));
+        Assert.Equal(2, fns.Count);
+        Assert.Equal(meta.Functions[0], fns[0]);
+        Assert.Equal(meta.Functions[2], fns[1]);
+    }
+
+    [Fact]
     public void CanCreateProviderWithMeta ()
     {
         var provider = new MetadataProvider(new() {
             Variables = ["foo"],
-            Functions = ["bar"]
+            Functions = [new() { Name = "bar" }]
         });
         Assert.Equal("foo", provider.Variables.First());
-        Assert.Equal("bar", provider.Functions.First());
+        Assert.Equal("bar", provider.Functions.First().Name);
+    }
+
+    [Fact]
+    public void SyntaxIsCopied ()
+    {
+        var syntax = new Syntax(@true: "+");
+        var provider = new MetadataProvider(new Project { Syntax = syntax });
+        Assert.NotSame(syntax, provider.Syntax);
+        Assert.Equal("+", provider.Syntax.True);
     }
 }

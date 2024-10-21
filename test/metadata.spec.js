@@ -27,6 +27,44 @@ test("can merge with object", () => {
     expect(merged.object.bar).toEqual("bar");
 });
 
+test("can merge with primitive", () => {
+    const merged = merge({ foo: "foo" }, { bar: "bar" });
+    expect(merged.foo).toEqual("foo");
+    expect(merged.bar).toEqual("bar");
+});
+
+test("can merge constants", () => {
+    const merged = merge(
+        { constants: [{ name: "foo", values: ["1", "2"] }] },
+        { constants: [{ name: "bar", values: ["3", "4"] }] }
+    );
+    expect(merged.constants).toHaveLength(2);
+    expect(merged.constants).toContainEqual({ name: "foo", values: ["1", "2"] });
+    expect(merged.constants).toContainEqual({ name: "bar", values: ["3", "4"] });
+});
+
+test("overrides object on merge", () => {
+    const merged = merge({ object: { foo: "foo" } }, { object: { foo: "bar" } });
+    expect(merged.object.foo).toEqual("bar");
+});
+
+test("overrides primitive on merge", () => {
+    const merged = merge({ foo: "foo" }, { foo: "bar" });
+    expect(merged.foo).toEqual("bar");
+});
+
+test("doesnt override object when target is undefined or null", () => {
+    const merged = merge({ object: { foo: "foo", bar: "bar" } }, { object: { foo: undefined, bar: null } });
+    expect(merged.object.foo).toEqual("foo");
+    expect(merged.object.bar).toEqual("bar");
+});
+
+test("doesn't override primitive when target is undefined or null", () => {
+    const merged = merge({ foo: "foo", bar: "bar" }, { foo: undefined, bar: null });
+    expect(merged.foo).toEqual("foo");
+    expect(merged.bar).toEqual("bar");
+});
+
 test("replaces overridden commands by alias", () => {
     const def = { commands: [{ id: "def", alias: "foo", parameters: [] }] };
     const custom = { commands: [{ id: "custom", alias: "foo", parameters: [] }] };
@@ -35,22 +73,39 @@ test("replaces overridden commands by alias", () => {
     expect(merged.commands.filter(c => c.alias === "foo")[0].id).toEqual("custom");
 });
 
+test("replaces overridden constant values", () => {
+    const def = { constants: [{ name: "foo", values: ["a", "b", "c"] }] };
+    const custom = { constants: [{ name: "foo", values: ["x", "y", "z"] }] };
+    const merged = merge(def, custom);
+    expect(merged.constants).toHaveLength(1);
+    expect(merged.constants).toContainEqual({ name: "foo", values: ["x", "y", "z"] });
+});
+
 test("transfers docs to the overridden commands and parameters", () => {
-    const def = { id: "*", alias: "foo", summary: "", remarks: "", examples: "", parameters: [{ id: "*", summary: "" }] };
-    const custom = { id: "*", alias: "foo", parameters: [{ id: "*" }] };
+    const def = {
+        id: "*",
+        alias: "foo",
+        documentation: { summary: "", remarks: "", examples: "" },
+        parameters: [{ id: "*", documentation: { summary: "" } }]
+    };
+    const custom = {
+        id: "*",
+        alias: "foo",
+        parameters: [{ id: "*" }]
+    };
     const merged = merge({ commands: [def] }, { commands: [custom] });
     const command = merged.commands.find(c => c.alias === "foo");
-    expect(command.summary).toStrictEqual("");
-    expect(command.remarks).toStrictEqual("");
-    expect(command.examples).toStrictEqual("");
+    expect(command.documentation.summary).toStrictEqual("");
+    expect(command.documentation.remarks).toStrictEqual("");
+    expect(command.documentation.examples).toStrictEqual("");
     expect(command.parameters.length).toEqual(1);
-    expect(command.parameters[0].summary).toStrictEqual("");
+    expect(command.parameters[0].documentation.summary).toStrictEqual("");
 });
 
 test("doesn't mutate original metadata", async () => {
     mock("../assets/default-metadata.json", {
         actors: [{ id: "foo" }],
-        commands: [{ id: "cmd", parameters: [{ id: "bar" }] }]
+        commands: [{ id: "cmd", parameters: [{ id: "bar" }], branch: { traits: 1, endpoint: "baz" } }]
     });
     const def = getDefaultMetadata();
     const custom = { actors: [{ id: "baz" }] };
@@ -67,6 +122,8 @@ test("doesn't mutate original metadata", async () => {
     expect(def.commands[0].id).toStrictEqual("cmd");
     expect(def.commands[0].parameters.length).toStrictEqual(1);
     expect(def.commands[0].parameters[0].id).toStrictEqual("bar");
+    expect(def.commands[0].branch.traits).toStrictEqual(1);
+    expect(def.commands[0].branch.endpoint).toStrictEqual("baz");
 });
 
 function merge(...metas) {

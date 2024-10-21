@@ -34,12 +34,18 @@ public class Parameter (PlainText? identifier, MixedValue value)
     public override string ToString ()
     {
         var builder = new StringBuilder();
+
         if (!Nameless)
         {
             builder.Append(Identifier!);
-            builder.Append(Identifiers.ParameterAssign);
+            builder.Append(Syntax.Default.ParameterAssign);
         }
-        builder.Append(Value);
+
+        var value = Value.ToString();
+        if (value.Any(char.IsWhiteSpace))
+            value = $"\"{value}\"";
+        builder.Append(value);
+
         return builder.ToString();
     }
 }

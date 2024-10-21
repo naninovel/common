@@ -2,7 +2,7 @@
 
 public class ListValueParserTest
 {
-    private readonly ListValueParser parser = new();
+    private readonly ListValueParser parser = new(Syntax.Default);
 
     [Fact]
     public void WhenValueIsNullOrEmptyEmptyListIsReturned ()

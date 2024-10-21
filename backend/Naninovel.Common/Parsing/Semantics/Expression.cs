@@ -3,7 +3,7 @@
 /// <summary>
 /// Script expression evaluated at runtime.
 /// </summary>
-public class Expression (PlainText body) : ILineComponent, IValueComponent
+public class Expression (PlainText body) : IValueComponent
 {
     /// <summary>
     /// The evaluated body of the expression.
@@ -12,6 +12,6 @@ public class Expression (PlainText body) : ILineComponent, IValueComponent
 
     public override string ToString ()
     {
-        return $"{Identifiers.ExpressionOpen}{Body}{Identifiers.ExpressionClose}";
+        return $"{Syntax.Default.ExpressionOpen}{Body}{Syntax.Default.ExpressionClose}";
     }
 }

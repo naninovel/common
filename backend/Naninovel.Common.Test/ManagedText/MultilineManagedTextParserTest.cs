@@ -2,32 +2,37 @@
 
 public class MultilineManagedTextParserTest
 {
-    public static IEnumerable<object[]> Facts { get; } = new[] {
-        Fact("", Array.Empty<ManagedTextRecord>()),
-        Fact("\n\r \n\t", Array.Empty<ManagedTextRecord>()),
-        Fact(";", Array.Empty<ManagedTextRecord>()),
-        Fact("key: value", Array.Empty<ManagedTextRecord>()),
-        Fact("; comment\nkey: value", Array.Empty<ManagedTextRecord>()),
-        Fact(" # k", Array.Empty<ManagedTextRecord>()),
-        Fact("# key", new ManagedTextRecord("key")),
-        Fact("#key\n", new ManagedTextRecord("key")),
-        Fact("# key \t\n", new ManagedTextRecord("key")),
-        Fact("# k \t ey \t\n", new ManagedTextRecord("k \t ey")),
-        Fact("#key1\n#key2\n", new("key1", ""), new("key2", "")),
-        Fact("# key\n; comment\n", new ManagedTextRecord("key", "", "comment")),
-        Fact("# key\n;  comment \t\n", new ManagedTextRecord("key", "", " comment \t")),
-        Fact("# key\n; comment\nvalue\n", new ManagedTextRecord("key", "value", "comment")),
-        Fact("# key\nvalue\n; comment\n", new ManagedTextRecord("key", "value", "comment")),
-        Fact("# key1\nvalue\n; comment\n# key2\n", new("key1", "value", "comment"), new("key2", "", "")),
-        Fact("# keyA\na 1 \na2\n# keyB\n b 1\nb2 \n", new("keyA", "a 1 a2"), new("keyB", " b 1b2 ")),
-        Fact("# key\nfoo\n\nbar\n", new ManagedTextRecord("key", "foobar")),
-        Fact("#key1\n\n\nfoo\nbar\n\n\n#key2\n\n\nvalue\n\n\n", new("key1", "foobar"), new("key2", "value"))
+    public static TheoryData<string, ManagedTextRecord[]> Facts { get; } = new() {
+        { "", [] },
+        { "\n\r \n\t", [] },
+        { ";", [] },
+        { "key: value", [] },
+        { "; comment\nkey: value", [] },
+        { " # k", [] },
+        { "# key", [new("key")] },
+        { "# key\n", [new("key")] },
+        { "# key \t\n", [new("key")] },
+        { "# k \t ey \t\n", [new("k \t ey")] },
+        { "# key1\n# key2\n", [new("key1", ""), new("key2", "")] },
+        { "# key\n; comment\n", [new("key", "", "comment")] },
+        { "# key\n;  comment \t\n", [new("key", "", " comment \t")] },
+        { "# key\n; comment\nvalue\n", [new("key", "value", "comment")] },
+        { "# key\nvalue\n; comment\n", [new("key", "value", "comment")] },
+        { "# key1\nvalue\n; comment\n# key2\n", [new("key1", "value", "comment"), new("key2", "", "")] },
+        { "# keyA\na 1 \na2\n# keyB\n b 1\nb2 \n", [new("keyA", "a 1 a2"), new("keyB", " b 1b2 ")] },
+        { "# key\nfoo\n\nbar\n", [new("key", "foobar")] },
+        { "# key1\n\n\nfoo\nbar\n\n\n# key2\n\n\nvalue\n\n\n", [new("key1", "foobar"), new("key2", "value")] },
+        { "# k1|k2\n; c1|c2\nv1|v2\n", [new("k1|k2", "v1|v2", "c1|c2")] },
+        { "# k\n; c1\n; c2\n; c3\nv\n", [new("k", "v", "c1\nc2\nc3")] },
+        { "# k\n; c1\n; \n; c3\nv\n", [new("k", "v", "c1\n\nc3")] },
+        { "#key", [] },
+        { "# key\n;value_because_no_space_in_prefix", [new("key", ";value_because_no_space_in_prefix")] },
     };
 
     private readonly MultilineManagedTextParser parser = new();
 
     [Theory, MemberData(nameof(Facts))]
-    public void ParseTheory (string text, params ManagedTextRecord[] expected)
+    public void ParseTheory (string text, ManagedTextRecord[] expected)
     {
         var records = parser.Parse(text).Records.ToArray();
         Assert.Equal(expected.Length, records.Length);
@@ -42,11 +47,11 @@ public class MultilineManagedTextParserTest
     [Fact]
     public void CommentOnFirstLineIsParsedAsHeader ()
     {
-        Assert.Equal("foo", parser.Parse(";foo").Header);
+        Assert.Equal("foo", parser.Parse("; foo").Header);
     }
 
     [Fact]
-    public void HeaderIsTrimmed ()
+    public void HeaderIsNotTrimmed ()
     {
         Assert.Equal("\tfoo \t", parser.Parse("; \tfoo \t").Header);
     }
@@ -60,11 +65,12 @@ public class MultilineManagedTextParserTest
     [Fact]
     public void CommentOnSecondLineIsNotParsedAsHeader ()
     {
-        Assert.Empty(parser.Parse("\n;foo").Header);
+        Assert.Empty(parser.Parse("\n; foo").Header);
     }
 
-    private static object[] Fact (string text, params ManagedTextRecord[] records)
+    [Fact]
+    public void ErrsOnEmptyKey ()
     {
-        return [text, records];
+        Assert.Throws<Error>(() => parser.Parse("# \n"));
     }
 }

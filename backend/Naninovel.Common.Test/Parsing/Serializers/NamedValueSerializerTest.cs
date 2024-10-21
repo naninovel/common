@@ -2,7 +2,7 @@
 
 public class NamedValueSerializerTest
 {
-    private readonly NamedValueSerializer serializer = new();
+    private readonly NamedValueSerializer serializer = new(Syntax.Default);
 
     [Fact]
     public void CanSerializeWhenBothNameAndValueAreDefined ()

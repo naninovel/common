@@ -19,21 +19,23 @@ public class Command
     /// </summary>
     public bool Localizable { get; set; }
     /// <summary>
-    /// Human-readable description of the command.
+    /// Nesting properties of the command or null in case the command
+    /// doesn't support nesting other commands under itself.
     /// </summary>
-    public string? Summary { get; set; }
+    public Nest? Nest { get; set; }
     /// <summary>
-    /// Additional, less important information about the command.
+    /// Nature of script playback flow branching caused by the command execution
+    /// or null when the command execution doesn't cause branching.
     /// </summary>
-    public string? Remarks { get; set; }
+    public Branch? Branch { get; set; }
     /// <summary>
-    /// Command usage examples in scenario script.
+    /// Documentation for the command, when specified or null.
     /// </summary>
-    public string? Examples { get; set; }
+    public Documentation? Documentation { get; set; }
     /// <summary>
-    /// List of parameters the command supports.
+    /// List of parameters supported by the command.
     /// </summary>
-    public Parameter[] Parameters { get; set; } = Array.Empty<Parameter>();
+    public Parameter[] Parameters { get; set; } = [];
 
     /// <summary>
     /// User-facing formatted identifier of the command.

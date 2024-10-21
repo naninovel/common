@@ -3,9 +3,9 @@ using static Naninovel.Parsing.TokenType;
 
 namespace Naninovel.Parsing;
 
-public class CommentLineParser (ParseHandlers handlers)
+public class CommentLineParser (ParseOptions options)
 {
-    private readonly LineWalker walker = new(handlers);
+    private readonly LineWalker walker = new(options.Handlers);
     private PlainText comment = PlainText.Empty;
 
     public CommentLine Parse (string lineText, IReadOnlyList<Token> tokens)
@@ -15,7 +15,7 @@ public class CommentLineParser (ParseHandlers handlers)
             walker.Error(MissingLineId);
         else if (walker.Next(CommentText, out var commentToken))
             ParseComment(commentToken);
-        return new CommentLine(comment);
+        return new CommentLine(comment, walker.GetIndent());
     }
 
     private void Reset (string lineText, IReadOnlyList<Token> tokens)

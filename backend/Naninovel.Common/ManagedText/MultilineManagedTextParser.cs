@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Naninovel.Utilities;
 using static Naninovel.ManagedText.ManagedTextConstants;
 
 namespace Naninovel.ManagedText;
@@ -10,7 +9,7 @@ namespace Naninovel.ManagedText;
 /// <remarks>
 /// Multiline format spec:
 /// <code>
-/// # key (space around key is ignored)
+/// # key1 (space around key is ignored)
 /// ; comment (optional, space around comment is ignored)
 /// value (all lines until next key are joined, space is preserved)
 /// </code>
@@ -18,8 +17,12 @@ namespace Naninovel.ManagedText;
 public class MultilineManagedTextParser
 {
     private readonly HashSet<ManagedTextRecord> records = [];
+    private readonly List<string> keys = [];
+    private readonly List<string> comments = [];
+    private readonly List<string> values = [];
     private readonly StringBuilder valueBuilder = new();
-    private string header = "", lastKey = "", lastComment = "";
+    private readonly StringBuilder commentBuilder = new();
+    private string header = "";
 
     /// <summary>
     /// Creates document from specified serialized text string.
@@ -33,24 +36,41 @@ public class MultilineManagedTextParser
             else if (line.StartsWithOrdinal(RecordCommentLiteral))
                 ParseCommentLine(line, index);
             else ParseValueLine(line);
-        if (!string.IsNullOrEmpty(lastKey)) AddLastRecord();
+        if (keys.Count > 0) AddLastRecord();
         return new ManagedTextDocument(records, header);
+    }
+
+    private void Reset ()
+    {
+        records.Clear();
+        keys.Clear();
+        comments.Clear();
+        valueBuilder.Clear();
+        commentBuilder.Clear();
+        values.Clear();
+        header = "";
     }
 
     private void ParseKeyLine (string line)
     {
-        if (!string.IsNullOrEmpty(lastKey)) AddLastRecord();
-        lastKey = line.GetAfterFirst(RecordMultilineKeyLiteral).Trim();
-        valueBuilder.Clear();
-        lastComment = "";
+        if (keys.Count > 0) AddLastRecord();
+        keys.Add(line.GetAfterFirst(RecordMultilineKeyLiteral).Trim());
+        if (keys.Any(string.IsNullOrWhiteSpace))
+            throw new Error($"Managed text key can't be empty: {line}");
     }
 
     private void ParseCommentLine (string line, int index)
     {
-        lastComment = line.GetAfterFirst(RecordCommentLiteral);
-        if (lastComment.Length > 0 && lastComment[0] == ' ')
-            lastComment = lastComment.Substring(1);
-        if (index == 0) header = lastComment;
+        if (index == 0)
+        {
+            header = line.GetAfterFirst(RecordCommentLiteral);
+            return;
+        }
+
+        var comment = line.GetAfterFirst(RecordCommentLiteral);
+        if (commentBuilder.Length > 0)
+            commentBuilder.Append('\n');
+        commentBuilder.Append(comment);
     }
 
     private void ParseValueLine (string line)
@@ -60,15 +80,14 @@ public class MultilineManagedTextParser
 
     private void AddLastRecord ()
     {
-        records.Add(new(lastKey, valueBuilder.ToString(), lastComment));
+        values.Add(valueBuilder.ToString());
+        comments.Add(commentBuilder.ToString());
+        for (int i = 0; i < keys.Count; i++)
+            records.Add(new(keys[i], values.ElementAtOrDefault(i), comments.ElementAtOrDefault(i)));
+        keys.Clear();
+        comments.Clear();
+        commentBuilder.Clear();
+        values.Clear();
         valueBuilder.Clear();
-        lastKey = lastComment = "";
-    }
-
-    private void Reset ()
-    {
-        records.Clear();
-        valueBuilder.Clear();
-        header = lastKey = lastComment = "";
     }
 }

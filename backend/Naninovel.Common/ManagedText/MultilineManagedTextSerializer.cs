@@ -19,43 +19,66 @@ public class MultilineManagedTextSerializer
 
     /// <summary>
     /// Serializes specified document into text string.
+    /// When join keys specified, will join associated records into single lines.
     /// </summary>
     public string Serialize (ManagedTextDocument document)
     {
-        builder.Clear();
+        Reset();
         if (!string.IsNullOrEmpty(document.Header))
             AppendHeader(document.Header);
         foreach (var record in document.Records)
             AppendRecord(record);
+        if (builder.Length == 0)
+            builder.Append('\n');
         return builder.ToString();
+    }
+
+    private void Reset ()
+    {
+        builder.Clear();
     }
 
     private void AppendHeader (string header)
     {
         builder.Append(RecordCommentLiteral)
-            .Append(' ')
-            .Append(header.Trim())
+            .Append(header)
             .Append('\n');
     }
 
     private void AppendRecord (ManagedTextRecord record)
     {
-        for (int i = 0; i < spacing; i++)
-            builder.Append('\n');
+        AppendSpace();
+        AppendKey();
+        if (!string.IsNullOrEmpty(record.Comment))
+            foreach (var line in record.Comment.SplitLines())
+                AppendCommentLine(line);
+        AppendValue();
 
-        builder.Append(RecordMultilineKeyLiteral)
-            .Append(' ')
-            .Append(record.Key)
-            .Append('\n');
+        void AppendSpace ()
+        {
+            for (int i = 0; i < spacing; i++)
+                builder.Append('\n');
+        }
 
-        if (!string.IsNullOrWhiteSpace(record.Comment))
-            builder.Append(RecordCommentLiteral)
-                .Append(' ')
-                .Append(record.Comment)
+        void AppendKey ()
+        {
+            builder.Append(RecordMultilineKeyLiteral)
+                .Append(record.Key)
                 .Append('\n');
+        }
 
-        var value = InsertLineBreaksAfterBrTags(record.Value);
-        builder.Append(value).Append('\n');
+        void AppendCommentLine (string line)
+        {
+            builder.Append(RecordCommentLiteral)
+                .Append(line)
+                .Append('\n');
+        }
+
+        void AppendValue ()
+        {
+            builder.Append(InsertLineBreaksAfterBrTags(record.Value));
+            builder.Append('\n');
+        }
     }
 
     private string InsertLineBreaksAfterBrTags (string value)

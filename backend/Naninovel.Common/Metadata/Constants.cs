@@ -21,4 +21,21 @@ public static class Constants
     /// Flag representing any type.
     /// </summary>
     public const string WildcardType = "*";
+    /// <summary>
+    /// Subtype of the script part of an endpoint.
+    /// </summary>
+    public const string EndpointScript = "Script";
+    /// <summary>
+    /// Subtype of the label part of an endpoint.
+    /// </summary>
+    public const string EndpointLabel = "Label";
+    /// <summary>
+    /// Subtype of expression parameter context indicating that the expression is assignment.
+    /// </summary>
+    public const string Assignment = "Assignment";
+    /// <summary>
+    /// Subtype of expression parameter context indicating that the expression result
+    /// is a condition for the associated command execution.
+    /// </summary>
+    public const string Condition = "Condition";
 }

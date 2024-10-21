@@ -1,8 +1,10 @@
-﻿namespace Naninovel.Metadata.Test;
+﻿using Naninovel.Parsing;
+
+namespace Naninovel.Metadata.Test;
 
 public class ValueValidatorTest
 {
-    private readonly ValueValidator validator = new();
+    private readonly ValueValidator validator = new(Syntax.Default);
 
     [Theory]
     [InlineData(null, ValueContainerType.Single, ValueType.String, true)]
@@ -36,5 +38,15 @@ public class ValueValidatorTest
     public void ValidationTheory (string value, ValueContainerType container, ValueType type, bool expected)
     {
         Assert.Equal(expected, validator.Validate(value, container, type));
+    }
+
+    [Fact]
+    public void RespectsLocalizedBoolean ()
+    {
+        var validator = new ValueValidator(new Syntax(@true: "+", @false: "-"));
+        Assert.True(validator.Validate("+", ValueContainerType.Single, ValueType.Boolean));
+        Assert.True(validator.Validate("-", ValueContainerType.Single, ValueType.Boolean));
+        Assert.False(validator.Validate("true", ValueContainerType.Single, ValueType.Boolean));
+        Assert.False(validator.Validate("false", ValueContainerType.Single, ValueType.Boolean));
     }
 }
