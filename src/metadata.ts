@@ -26,8 +26,8 @@ function mergeKey(key: string, value: unknown, destination: Record<string, unkno
     if (!destination.hasOwnProperty(key))
         destination[key] = value;
     else if (Array.isArray(value))
-        if (key === "commands") destination[key] = mergeCommands(value, <Array<Metadata.Command>>destination[key]);
-        else if (key === "constants") destination[key] = mergeConstants(value, <Array<Metadata.Constant>>destination[key]);
+        if (key === "commands") destination[key] = mergeCommands(value, <never>destination[key]);
+        else if (key === "constants") destination[key] = mergeConstants(value, <never>destination[key]);
         else destination[key] = (<unknown[]>destination[key]).concat(value);
     else if (typeof value === "object")
         mergeObject(<never>value, <never>destination[key]);
